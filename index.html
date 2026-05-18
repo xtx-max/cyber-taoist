@@ -1895,16 +1895,18 @@ function getYingQi(movingLine, upperTrigram, lowerTrigram){
 // ============================================================
 
 function computeCompatibility(bazi1,bazi2){
-  const a1=analyzeBaziFull(bazi1),a2=analyzeBaziFull(bazi2);
-  let score=100;const details=[],highlights=[],cautions=[];
+  let score=100;const highlights=[],cautions=[];
   const yearRel=checkRelationship(bazi1.yearPillar.branchIdx,bazi2.yearPillar.branchIdx);
   if(yearRel.includes('六冲')){score-=12;cautions.push('年柱六冲：根基有较大差异，需在核心价值观上多加磨合');}
   else if(yearRel.includes('六合')){score+=6;highlights.push('年柱六合：根基相融，在家庭观和人生方向上容易达成一致');}
   else if(yearRel.includes('三合')){score+=4;highlights.push('年柱三合：气场相吸，彼此的家庭背景能够互相接纳');}
+  else if(yearRel.includes('相害')){score-=8;cautions.push('年柱相害：家族背景层面有隐性摩擦，宜保持独立空间');}
   const dayRel=checkRelationship(bazi1.dayPillar.branchIdx,bazi2.dayPillar.branchIdx);
   if(dayRel.includes('六冲')){score-=20;cautions.push('日柱六冲：性格深处存在张力，需以爱和耐心化解日常冲突');}
   else if(dayRel.includes('六合')){score+=10;highlights.push('日柱六合：心思相投，彼此能在无声中懂得对方');}
   else if(dayRel.includes('三合')){score+=7;highlights.push('日柱三合：志趣相合，共同的目标让彼此紧密相连');}
+  else if(dayRel.includes('相害')){score-=14;cautions.push('日柱相害：相处时或有说不清的隔阂，需深度沟通化解');}
+  else if(dayRel.includes('相刑')){score-=10;cautions.push('日柱相刑：性格中有互相摩擦的棱角，需要智慧和耐心');}
   const dm1Elem=TG_ELEMENT[bazi1.dayPillar.stemIdx],dm2Elem=TG_ELEMENT[bazi2.dayPillar.stemIdx];
   if(WX_GENERATE[dm1Elem]===dm2Elem){score+=10;highlights.push('日干相生：你如春风化雨，滋养着对方的心田');}
   else if(WX_GENERATE[dm2Elem]===dm1Elem){score+=8;highlights.push('日干相生：对方如阳光般温暖着你，给予你力量');}
@@ -1914,6 +1916,12 @@ function computeCompatibility(bazi1,bazi2){
   const monthRel=checkRelationship(bazi1.monthPillar.branchIdx,bazi2.monthPillar.branchIdx);
   if(monthRel.includes('六冲')){score-=8;cautions.push('月柱六冲：处事节奏时有碰撞，需协调双方的生活步调');}
   else if(monthRel.includes('六合')){score+=4;highlights.push('月柱六合：成长轨迹协调，在工作和生活上配合默契');}
+  else if(monthRel.includes('三合')){score+=3;highlights.push('月柱三合：事业和生活节奏协同共振，合作无间');}
+  // Hidden stem complement: check if one person's weak element is the other's strong
+  const a1=analyzeBaziFull(bazi1),a2=analyzeBaziFull(bazi2);
+  if(a1.weakestElement && a2.strongestElement && WX_GENERATE[a2.strongestElement]===a1.weakestElement){
+    score+=6;highlights.push('五行深度互补：彼此的强势正好弥补对方的短板，形成完整闭环');
+  }
   score=Math.max(20,Math.min(100,score));
   let tier,desc;
   if(score>=85){tier='天作之合';desc='你们的缘分如金风玉露相逢，五行互补，琴瑟和鸣。彼此是对方的镜子，也是对方的光。在生命的长河中，你们互相滋养、共同成长，是天造地设的一对佳偶。';}
@@ -1921,7 +1929,7 @@ function computeCompatibility(bazi1,bazi2){
   else if(score>=55){tier='中平之合';desc='你们的缘分如一幅未完成的画卷，既有美丽的色彩，也有留白待填的空间。缘分如同一块璞玉，需要双方用心雕琢。理解彼此的不同，在差异中寻找平衡与互补。';}
   else if(score>=40){tier='磨合之缘';desc='你们的相遇如两条不同方向的河流交汇，需要一些时间来找到共同的航道。但这并不意味着不能一起流向大海——世间许多深刻的感情，都是在磨合中淬炼而成的结晶。';}
   else{tier='修行之缘';desc='你们的相遇或许正是一场安排好的修行。差异带来的挑战，是让你们更加了解自己的镜子。不强求，不执念，珍惜相遇的每一刻。正因为难得，每一次靠近都格外珍贵。';}
-  return {score,tier,desc,highlights,cautions,yearRel,dayRel,monthRel};
+  return {score,tier,desc,highlights,cautions,yearRel,dayRel,monthRel,a1,a2};
 }
 
 // ============================================================
@@ -2093,16 +2101,17 @@ function copyShareLink(){
 // ============================================================
 
 function getProfiles(){try{return JSON.parse(localStorage.getItem('cyberTaoistProfiles')||'[]')}catch(e){return[]}}
-function saveProfile(name,gender,date,hourBranch,longitude){
+function saveProfile(name,gender,date,clockHourBranch,longitude){
   const profiles=getProfiles();
   const lng=longitude||120;
   const [y,m,d]=date.split('-').map(Number);
-  const solarTime=applyTrueSolarTime(hourBranch===0?0:hourBranch*2-1+1,0,lng);
-  const adjHourBranch=solarTime.hourBranch;
+  // Always save raw clock data; solar time correction applied at analysis time
+  const clockHour=(clockHourBranch===0?0:clockHourBranch*2-1+1);
+  const solarTime=applyTrueSolarTime(clockHour,0,lng);
   const solarDate=new Date(y,m-1,d,12,0,0);
   const adjustedDate=solarTime.dayAdvance?new Date(y,m-1,d+1,12,0,0):solarDate;
-  const bazi=calculateBazi(adjustedDate,adjHourBranch);
-  profiles.push({id:Date.now(),name,gender,date,hourBranch:adjHourBranch,clockHourBranch:hourBranch,longitude:lng,bazi});
+  const bazi=calculateBazi(adjustedDate,solarTime.hourBranch);
+  profiles.push({id:Date.now(),name,gender,date,clockHourBranch,hourBranch:solarTime.hourBranch,longitude:lng,bazi,v:1});
   localStorage.setItem('cyberTaoistProfiles',JSON.stringify(profiles));
   return profiles;
 }
@@ -2159,11 +2168,11 @@ function loadProfileToCompat(num){
   document.getElementById('compat-name'+num).value=p.name||'';
   document.getElementById('compat-date'+num).value=p.date;
   const hourEl=document.getElementById('compat-hour'+num);
-  if(hourEl) hourEl.value=p.clockHourBranch!==undefined?p.clockHourBranch:p.hourBranch;
+  // v1+ profiles: use clockHourBranch (raw). v0: use hourBranch directly
+  if(hourEl) hourEl.value=(p.v>=1&&p.clockHourBranch!==undefined)?p.clockHourBranch:p.hourBranch;
   document.getElementById('compat'+num+'-lng').value=p.longitude||120;
-  // Set city input
   const cityEl=document.getElementById('compat-city'+num);
-  if(cityEl) cityEl.value=''; // clear, user can search
+  if(cityEl) cityEl.value='';
   showToast('已加载「'+p.name+'」的档案到第'+num+'人 ✨');
 }
 
@@ -2177,7 +2186,7 @@ function loadProfileToBazi(){
   document.getElementById('bazi-name').value=p.name||'';
   document.getElementById('bazi-gender').value=p.gender||'male';
   document.getElementById('bazi-date').value=p.date;
-  document.getElementById('bazi-hour').value=p.clockHourBranch!==undefined?p.clockHourBranch:p.hourBranch;
+  document.getElementById('bazi-hour').value=(p.v>=1&&p.clockHourBranch!==undefined)?p.clockHourBranch:p.hourBranch;
   document.getElementById('bazi-lng').value=p.longitude||120;
   updateProfileSelect();
   showToast('已加载「'+p.name+'」的档案，可直接推算或修改 ✨');
@@ -2557,7 +2566,7 @@ function analyzeCompatibility(){
   const bazi2=calculateBazi(adjDate2,solar2.hourBranch);
   setProgress('compat-result',55,'命理合参中');
   const compat=computeCompatibility(bazi1,bazi2);
-  const a1=analyzeBaziFull(bazi1),a2=analyzeBaziFull(bazi2);
+  const a1=compat.a1,a2=compat.a2; // reuse from computeCompatibility
   setProgress('compat-result',78,'卦象解读中');
   const d1_=new Date(y1,m1-1,d1),d2_=new Date(y2,m2-1,d2);
   const n1=(d1_.getFullYear()+d1_.getMonth()+d1_.getDate())%100+1;
@@ -3390,8 +3399,9 @@ function renderProfileList(){
   }
   let html='<div class="profile-list">';
   for(const p of profiles){
+    const displayHour=(p.v>=1&&p.clockHourBranch!==undefined)?p.clockHourBranch:p.hourBranch;
     html+=`<div class="profile-row">
-      <div><div class="pinfo">${p.name||'未命名'}</div><div class="pmeta">${p.date} · ${HOUR_NAMES[p.clockHourBranch!==undefined?p.clockHourBranch:p.hourBranch]} · ${p.gender==='male'?'男':'女'} · 经度${(p.longitude||120).toFixed(1)}°</div></div>
+      <div><div class="pinfo">${p.name||'未命名'}</div><div class="pmeta">${p.date} · ${HOUR_NAMES[displayHour]} · ${p.gender==='male'?'男':'女'} · 经度${(p.longitude||120).toFixed(1)}°</div></div>
       <button class="pdel" onclick="deleteProfileAndRefresh(${p.id})">删除</button>
     </div>`;
   }

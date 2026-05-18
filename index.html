@@ -796,7 +796,7 @@ footer p{margin:4px 0}
       <p style="font-weight:700;color:var(--gold-dark);margin-bottom:8px">🔗 分享给朋友</p>
       <p style="font-size:0.85rem;color:var(--text-dim);margin-bottom:12px">复制链接发给任何人，手机电脑一触即达</p>
       <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-        <input id="share-url" readonly value="https://xtx-max.github.io/cyber-taoist/" style="flex:1;min-width:200px;max-width:320px;font-size:0.85rem;cursor:pointer" onclick="this.value='https://xtx-max.github.io/cyber-taoist/';this.select();navigator.clipboard.writeText(this.value);showToast('链接已复制 📋 如对方看到旧版，请其点页面底部「检查更新」')" title="点击复制链接">
+        <input id="share-url" readonly value="https://cdn.jsdelivr.net/gh/xtx-max/cyber-taoist@main/index.html" style="flex:1;min-width:200px;max-width:320px;font-size:0.8rem;cursor:pointer" onclick="this.select();navigator.clipboard.writeText(this.value);showToast('链接已复制 📋')" title="点击复制链接">
         <button class="btn btn-primary" style="padding:10px 20px;font-size:0.9rem" onclick="copyShareLink()">📋 复制链接</button>
       </div>
     </div>
@@ -2089,7 +2089,7 @@ function copyText(text){
   else{showToast('请手动复制结果');}
 }
 function copyShareLink(){
-  const url='https://xtx-max.github.io/cyber-taoist/?v='+Date.now();
+  const url='https://cdn.jsdelivr.net/gh/xtx-max/cyber-taoist@main/index.html';
   if(navigator.clipboard){navigator.clipboard.writeText(url).then(()=>showToast('链接已复制！发给朋友即可使用 🔗'));}
   else{const el=document.getElementById('share-url');if(el){el.select();document.execCommand('copy');showToast('链接已复制 📋');}}
 }

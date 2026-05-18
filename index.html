@@ -2597,25 +2597,53 @@ function analyzeCompatibility(){
       </div>`:''}
 
       <div class="analysis-section">
-        <h3>✦ 四柱逐对分析</h3>
+        <h3>✦ 四柱逐对深度分析</h3>
         ${(()=>{
           const p1=[bazi1.yearPillar,bazi1.monthPillar,bazi1.dayPillar,bazi1.hourPillar];
           const p2=[bazi2.yearPillar,bazi2.monthPillar,bazi2.dayPillar,bazi2.hourPillar];
-          const labels=['年柱（根基·家庭观）','月柱（事业·生活节奏）','日柱（性格·夫妻宫）','时柱（内心·晚年趋向）'];
+          const labels=['年柱','月柱','日柱','时柱'];
+          const domains=['根基 · 家庭背景与价值观','事业 · 生活节奏与处事方式','夫妻宫 · 性格内核与亲密互动','内心 · 晚年趋向与灵魂深处'];
+          const deepInterpret=(i,rel,elemRel,elem1,elem2)=>{
+            let t='';
+            if(i===0){ // year pillar
+              if(rel.some(r=>r.includes('六合'))) t='年柱六合是根基层面的和谐。你们对家庭的理解、对未来的规划方向天然一致。父母辈也可能相处融洽，为关系提供稳定的后方支持。';
+              else if(rel.some(r=>r.includes('六冲'))) t='年柱六冲意味着成长背景和价值观有较大差异。这不一定致命——许多跨文化跨阶层的伴侣以理解和尊重跨越了这道鸿沟。关键是：不试图改变对方的根。';
+              else t='年柱无特殊冲合，家庭背景方面没有天然的助力或阻力。你们需要主动去了解和尊重彼此的来时路。';
+            }else if(i===1){ // month pillar
+              if(rel.some(r=>r.includes('六合'))) t='月柱六合表示你们在工作和生活节奏上配合默契。如同两台齿轮咬合顺畅的机器，彼此知道对方的步调，协作起来事半功倍。';
+              else if(rel.some(r=>r.includes('六冲'))) t='月柱六冲可能表现为生活方式或事业节奏的不合拍——一个快一个慢、一个激进一个保守。这需要双方在各自轨道上给对方留出弹性空间。';
+              else t='月柱关系中等，生活节奏上需要一些磨合但不至于成为核心矛盾。';
+            }else if(i===2){ // day pillar — most important
+              if(rel.some(r=>r.includes('六合'))) t='日柱六合是合盘中最吉利的信号之一。夫妻宫相合意味着你们在性格深处是匹配的——那种无需多言就能彼此理解的默契。这是高质量长期关系最重要的基石。';
+              else if(rel.some(r=>r.includes('三合'))) t='日柱三合同样是好兆头。三合在五行中形成最强能量场，你们在精神和志趣层面有强烈的共鸣。共同目标会让你们紧紧凝聚。';
+              else if(rel.some(r=>r.includes('六冲'))) t='日柱六冲是合盘中需要重视的信号。性格深处存在根本性的张力——如同火水相遇，处理不好会互相消耗，但处理好了反而能产生惊人的化学反应。需要双方都有较高的情商和包容力。';
+              else if(rel.some(r=>r.includes('相害'))) t='日柱相害，表面和谐下可能有暗流。相处时偶尔会有"说不清哪里不对但就是不舒服"的感觉。需要更深的自我觉察和坦诚沟通来化解。';
+              else t='日柱无特殊冲合，性格上不存在天然的深度冲突或契合。关系质量更多取决于后天的经营。';
+            }else{ // hour pillar
+              if(rel.some(r=>r.includes('六合'))) t='时柱六合意味着你们的内在灵魂能够共鸣。到了晚年或独处时，你们能真正放松地做自己——这是最长情的告白。';
+              else if(rel.some(r=>r.includes('六冲'))) t='时柱六冲提醒你们关注内心的差异。可能在精神追求或人生终极目标上存在分歧。但这也可以是互补——一个仰望星空、一个脚踏实地。';
+              else t='时柱关系平稳，在内在世界和长期发展上需要持续的沟通来保持同步。';
+            }
+            // Add element relation insight
+            if(elemRel==='相生') t+=' 五行相生为吉，一方的能量自然滋养另一方，形成良性循环。';
+            else if(elemRel==='相克') t+=' 五行相克需要双方有意识地调节——克不是坏事，如同金属需要火炼才能成器，关键在于把握好"度"。';
+            return t;
+          };
           let html='';
           for(let i=0;i<4;i++){
             const rel=checkRelationship(p1[i].branchIdx,p2[i].branchIdx);
-            const relText=rel.length>0?rel.join('、'):'无特殊关系';
+            const relText=rel.length>0?rel.join('、'):'无特殊冲合';
             const relColor=rel.some(r=>r.includes('合'))?'var(--jade)':rel.some(r=>r.includes('冲')||r.includes('害')||r.includes('刑'))?'var(--red)':'var(--text-dim)';
             const elem1=DZ_ELEMENT[p1[i].branchIdx],elem2=DZ_ELEMENT[p2[i].branchIdx];
             const elemRel=WX_GENERATE[elem1]===elem2?'相生':WX_GENERATE[elem2]===elem1?'相生':WX_OVERCOME[elem1]===elem2?'相克':WX_OVERCOME[elem2]===elem1?'相克':'比和';
-            html+=`<div style="padding:12px;margin-bottom:10px;background:rgba(255,255,255,0.5);border-radius:12px;border:1px solid var(--border)">
-              <div style="font-weight:700;color:var(--text-bright);margin-bottom:4px">${labels[i]}</div>
-              <div style="font-size:0.9rem;color:var(--text-dim)">
+            html+=`<div style="padding:16px;margin-bottom:12px;background:rgba(255,255,255,0.5);border-radius:14px;border:1px solid var(--border)">
+              <div style="font-weight:700;color:var(--text-bright);margin-bottom:2px;font-size:1rem">${labels[i]} · ${domains[i]}</div>
+              <div style="font-size:0.88rem;color:var(--text-dim);margin-bottom:6px">
                 ${name1}「${p1[i].stem}${p1[i].branch}」↔ ${name2}「${p2[i].stem}${p2[i].branch}」
-                · 地支关系：<span style="color:${relColor};font-weight:600">${relText}</span>
-                · 五行：<span style="color:${elemRel==='相生'?'var(--jade)':elemRel==='相克'?'var(--red)':'var(--text-dim)'}">${elemRel}</span>
+                · <span style="color:${relColor};font-weight:600">${relText}</span>
+                · <span style="color:${elemRel==='相生'?'var(--jade)':elemRel==='相克'?'var(--red)':'var(--text-dim)'}">五行${elemRel}</span>
               </div>
+              <p style="line-height:1.9;font-size:0.9rem;color:var(--text)">${deepInterpret(i,rel,elemRel,elem1,elem2)}</p>
             </div>`;
           }
           return html;
@@ -2623,19 +2651,59 @@ function analyzeCompatibility(){
       </div>
 
       <div class="analysis-section">
-        <h3>✦ 日主互动</h3>
+        <h3>✦ 日主互动 · 核心吸引力</h3>
         ${(()=>{
           const dm1=bazi1.dayPillar.stem,dm2=bazi2.dayPillar.stem;
           const dm1Elem=TG_ELEMENT[bazi1.dayPillar.stemIdx],dm2Elem=TG_ELEMENT[bazi2.dayPillar.stemIdx];
-          const ss=SHI_SHEN_NAMES[SHI_SHEN_TABLE[bazi1.dayPillar.stemIdx][bazi2.dayPillar.stemIdx]];
-          let insight='';
-          if(WX_GENERATE[dm1Elem]===dm2Elem) insight=name1+'的'+dm1Elem+'性能量滋养着'+name2+'的'+dm2Elem+'性需求。在关系中，'+name1+'往往是给予者，而'+name2+'在接受中感受到被爱。';
-          else if(WX_GENERATE[dm2Elem]===dm1Elem) insight=name2+'的'+dm2Elem+'性能量滋养着'+name1+'的'+dm1Elem+'性需求。'+name2+'的温暖和关怀是这段关系的核心动力。';
-          else if(WX_OVERCOME[dm1Elem]===dm2Elem) insight=name1+'的'+dm1Elem+'性能量会对'+name2+'的'+dm2Elem+'性产生一定的约束和压力。'+name1+'需要注意表达方式，避免让对方感到被压制。';
-          else if(WX_OVERCOME[dm2Elem]===dm1Elem) insight=name2+'的'+dm2Elem+'性能量会对'+name1+'的'+dm1Elem+'性产生约束。'+name2+'需要多一份温柔，少一份刚硬。';
-          else insight='两人日主五行相同（'+dm1Elem+'），性格底色极为相似。你们能深深理解彼此，因为你们本质上是同类人。';
-          return `<p style="line-height:1.9;color:var(--text-dim);font-size:0.93rem">${insight}</p>
-            <p style="color:var(--text-dim);font-size:0.85rem;margin-top:4px">${name1}看${name2}为<strong>${ss}</strong>，这决定了${name1}在这段关系中的核心角色和行为模式。</p>`;
+          const ss1to2=SHI_SHEN_NAMES[SHI_SHEN_TABLE[bazi1.dayPillar.stemIdx][bazi2.dayPillar.stemIdx]];
+          const ss2to1=SHI_SHEN_NAMES[SHI_SHEN_TABLE[bazi2.dayPillar.stemIdx][bazi1.dayPillar.stemIdx]];
+          // Detailed element interaction
+          let elemInsight='',roleInsight='',attractionInsight='';
+          if(WX_GENERATE[dm1Elem]===dm2Elem){
+            elemInsight=name1+'的'+dm1Elem+'性能量天然地滋养着'+name2+'的'+dm2Elem+'。如同树木生火——'+name1+'是那棵树，提供源源不断的温暖与支持；'+name2+'是那团火，在'+name1+'的滋养下燃烧得更加明亮。';
+            roleInsight='在这段关系中，'+name1+'自然地扮演着给予者和支持者的角色，而'+name2+'在这份滋养中感受到安全与被爱。但需注意：单向流动太久，树木也会干涸。'+name2+'需要学着回馈，不让付出变得理所当然。';
+          }else if(WX_GENERATE[dm2Elem]===dm1Elem){
+            elemInsight=name2+'的'+dm2Elem+'性能量天然地滋养着'+name1+'的'+dm1Elem+'。'+name2+'如同温暖的阳光，而'+name1+'则是被照耀的大地。'+name2+'的存在本身就是'+name1+'的力量来源。';
+            roleInsight=name2+'在关系中自然地给予温暖和支持，而'+name1+'在接受中绽放。这是一种美好的互补——但'+name1+'也需主动表达爱意，不要让'+name2+'觉得自己的付出石沉大海。';
+          }else if(WX_OVERCOME[dm1Elem]===dm2Elem){
+            elemInsight=name1+'的'+dm1Elem+'性能量天然地对'+name2+'的'+dm2Elem+'形成约束。如同金属切割木材——'+name1+'的理性和原则可能让'+name2+'感到被束缚。但"克"并非全坏：如同园丁修剪树枝，适度的约束能让关系更加健康有序。';
+            roleInsight='关键在于'+name1+'表达的方式——同样的话，温柔地说和生硬地说效果天差地别。'+name2+'则需要理解：对方的"挑剔"往往出于关心而非否定。';
+          }else if(WX_OVERCOME[dm2Elem]===dm1Elem){
+            elemInsight=name2+'的'+dm2Elem+'性能量天然地对'+name1+'的'+dm1Elem+'形成约束。如同水能灭火——'+name2+'的冷静可能让'+name1+'感到热情被浇灭。但"克"也是平衡：过旺的火需要水的调节才不会失控。';
+            roleInsight=name2+'需要多一份温柔表达，少一份直接批判。'+name1+'则需要看到：对方的"克制"不是冷漠，而是一种不同的爱的语言——深沉而有力。';
+          }else{
+            elemInsight='两人日主五行同为'+dm1Elem+'，这是一种极其难得的"同类相吸"。你们不需翻译就能听懂彼此——因为你们本质上是同一种能量频率的人。如同两面镜子对望，在对方身上看到自己的影子。';
+            roleInsight='同气相求的伴侣最大的优势是理解，最大的挑战也是理解——因为太像了，彼此的缺点也被放大。保持欣赏、警惕投射，是你们关系的核心课题。';
+          }
+          // Shi Shen role interpretation
+          const ssMap={
+            '正官':'在'+name1+'眼中，'+name2+'是一个有原则、值得尊重的人。这份关系中带有责任感和约束力——不是激情四射的类型，而是细水长流的守护。',
+            '七杀':'在'+name1+'眼中，'+name2+'有魄力、有挑战性。这份关系带着张力——可能是又爱又怕的复杂情感。学会将压力转化为动力是'+name1+'的课题。',
+            '正财':'在'+name1+'眼中，'+name2+'带来了稳定和安全感。这份关系中有务实的底色——'+name1+'愿意为'+name2+'付出实际努力来维系关系。',
+            '偏财':'在'+name1+'眼中，'+name2+'充满魅力和惊喜。这份关系可能一开始就被'+name2+'的某种特质深深吸引——慷慨、大方、或与众不同的风采。',
+            '正印':'在'+name1+'眼中，'+name2+'是温暖而包容的存在。这份关系中'+name1+'感受到被呵护和理解，如同在母亲怀抱中的安全感。',
+            '偏印':'在'+name1+'眼中，'+name2+'有一种独特的气质和智慧。这份关系带有"灵魂伴侣"的潜质——'+name2+'能打开'+name1+'的精神世界。',
+            '食神':'在'+name1+'眼中，'+name2+'温和善良，能带来轻松和快乐。这份关系让'+name1+'感到放松——和'+name2+'在一起可以做真实的自己。',
+            '伤官':'在'+name1+'眼中，'+name2+'才华横溢、与众不同。这份关系充满刺激和新鲜感，但有时也会因为'+name2+'的叛逆不羁而产生摩擦。',
+            '比肩':'在'+name1+'眼中，'+name2+'是旗鼓相当的同伴。这份关系有竞争也有扶持——如同两条并行的河流，时而交错时而并肩。',
+            '劫财':'在'+name1+'眼中，'+name2+'是行动力旺盛的伙伴。这份关系有强烈的吸引也有潜在的较量——学会共赢而非零和是你们的课题。'
+          };
+          const roleFor1=ssMap[ss1to2]||'';
+          const roleFor2=ssMap[ss2to1]?ssMap[ss2to1].replace(new RegExp(name1,'g'),'__TEMP__').replace(new RegExp(name2,'g'),name1).replace(/__TEMP__/g,name2):'';
+          return `<p style="line-height:2;font-size:0.95rem;color:var(--text);margin-bottom:8px"><strong>五行互动：</strong>${elemInsight}</p>
+            <p style="line-height:2;font-size:0.93rem;color:var(--text-dim);margin-bottom:8px"><strong>关系动态：</strong>${roleInsight}</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+              <div style="padding:12px;background:rgba(255,255,255,0.5);border-radius:10px">
+                <p style="font-weight:600;color:var(--gold-dark);font-size:0.85rem;margin-bottom:4px">${name1} → ${name2}</p>
+                <p style="font-size:0.85rem;color:var(--text-dim)">视为<strong>${ss1to2}</strong></p>
+                <p style="line-height:1.8;font-size:0.85rem;color:var(--text-dim);margin-top:4px">${roleFor1}</p>
+              </div>
+              <div style="padding:12px;background:rgba(255,255,255,0.5);border-radius:10px">
+                <p style="font-weight:600;color:var(--gold-dark);font-size:0.85rem;margin-bottom:4px">${name2} → ${name1}</p>
+                <p style="font-size:0.85rem;color:var(--text-dim)">视为<strong>${ss2to1}</strong></p>
+                <p style="line-height:1.8;font-size:0.85rem;color:var(--text-dim);margin-top:4px">${roleFor2}</p>
+              </div>
+            </div>`;
         })()}
       </div>
 
@@ -2742,15 +2810,31 @@ function analyzeCompatibility(){
         ${(()=>{
           const s=compat.score;
           let advice='';
-          if(s>=85) advice='你们是天造地设的一对，缘分深种。但最怕的不是波折，而是将一切视为理所当然。建议定期为关系注入新鲜感——一次旅行、一个惊喜、或一次深夜长谈。在最好的缘分里，也需要最用心的经营。';
-          else if(s>=70) advice='这是一段值得投入的关系。建议你们建立深度沟通的习惯——不是表面的问候，而是分享内心的真实想法。偶尔的分歧是正常的，学会在争吵后第一个说"我们谈谈"的人，才是关系真正的守护者。';
-          else if(s>=55) advice='你们的关系如同需要雕琢的玉石。重点不在于回避差异，而在于学会与差异共处。建议找到一项两人都喜欢的共同活动，在合作中培养默契。同时，给对方也给自己一些独立空间——最好的关系是"在一起但不窒息"。';
-          else if(s>=40) advice='每段关系都是一场修行，你们的特别之处在于需要更多的耐心和包容。建议关注对方的"爱的语言"——有的人需要言语肯定，有的人需要实际行动。找到对方接收爱的方式，比用自己的方式去爱更重要。';
-          else advice='缘分深浅不只是由命理决定的。最真挚的感情往往在看似"不配"的组合中淬炼而出。如果你们决意走下去，建议放下对"合不合适"的执念，把精力放在"如何让彼此变得更好"上。';
-          return `<p style="line-height:2;font-size:0.95rem;color:var(--text)">${advice}</p>`;
+          if(s>=85){
+            advice='<p style="line-height:2;margin-bottom:8px"><strong>你们是天造地设的一对。</strong>命理层面的高度契合为你们铺好了一条金色大道。但最难得的缘分也最容易让人掉以轻心——最大的风险不是外部的波折，而是内部的"理所当然"。</p>';
+            advice+='<p style="line-height:2;margin-bottom:8px"><strong>具体建议：</strong>① 定期创造"第一次"——第一次一起去的地方、第一次一起学的技能，新鲜感是长期关系的保鲜剂。② 建立"感恩清单"习惯——每周说出对方让你感动的一件小事，不让付出被忽视。③ 警惕"默契陷阱"——因为太懂对方而省略沟通，反而可能错过对方内心正在发生的变化。</p>';
+            advice+='<p style="line-height:2"><strong>核心提醒：</strong>你们的关系如同一座美丽的花园——天赐了肥沃的土壤，但每日的浇灌和修剪仍需两人亲手完成。不要让"天作之合"成为懈怠的借口。</p>';
+          }else if(s>=70){
+            advice='<p style="line-height:2;margin-bottom:8px"><strong>这是一份高质量的关系。</strong>你们的匹配度在大多数人之上，拥有良好的基础和明确的未来。偶有摩擦恰如玉石相击的清脆声响——不是缺陷而是特色。</p>';
+            advice+='<p style="line-height:2;margin-bottom:8px"><strong>具体建议：</strong>① 建立"深度沟通"机制——不是每天汇报行程，而是每周至少一次放下手机、面对面聊聊内心的真实感受。② 学会"修复"技巧——争吵不可怕，可怕的是一直不修复。谁先说"我们谈谈"谁就是关系中的英雄。③ 培养一个共同的目标——可以是一起存钱去旅行、一起装修房子、或一起学一门手艺，共同的期待是最强的粘合剂。</p>';
+            advice+='<p style="line-height:2"><strong>核心提醒：</strong>你们的关系如同上好的茶叶——品质已经很好，但泡出的味道取决于你用的水和泡的时间。用心经营则回甘无穷。</p>';
+          }else if(s>=55){
+            advice='<p style="line-height:2;margin-bottom:8px"><strong>你们的关系处于中上水平。</strong>有契合也有差异——这恰恰是最接近于真实情感的状态。世上没有两个完全相同的人，差异不是问题，如何与差异共处才是。</p>';
+            advice+='<p style="line-height:2;margin-bottom:8px"><strong>具体建议：</strong>① 识别三个"非 negotiable"——各自列出在关系中绝对不能妥协的三样东西，坦诚交换。② 找到"重叠区"——你们兴趣或价值观的交集，把它经营成关系的"根据地"，当分歧出现时可以回到这里来。③ 留出独立空间——对方不是你，也不需要变成你。允许彼此拥有各自的兴趣圈和朋友，会让在一起的时间更有质量。</p>';
+            advice+='<p style="line-height:2"><strong>核心提醒：</strong>你们的关系如同一块璞玉——需要时间和耐心来雕琢。翡翠不会一夜成形，但它最终的价值远超那些速成的玻璃。不急于定义、不急于结论，让时间给出答案。</p>';
+          }else if(s>=40){
+            advice='<p style="line-height:2;margin-bottom:8px"><strong>你们的缘分被安排了一场修行。</strong>命理层面有较多的张力，但这绝不意味着关系不能幸福。事实上，许多最深刻最动人的爱情故事恰恰发生在"不配"的组合中——因为要跨越的障碍更多，所以到达彼岸时的风景也更壮丽。</p>';
+            advice+='<p style="line-height:2;margin-bottom:8px"><strong>具体建议：</strong>① 学习对方的"爱的语言"——有的人需要言语肯定、有的人需要实际行动、有的人需要礼物、有的人需要陪伴。你以你的方式爱对方可能事倍功半，找到对方真正需要的方式才能事半功倍。② 设定"冷却期"——当冲突升级时，约定各自冷静15分钟再继续对话。③ 寻求"翻译者"——找一个你们都尊重的朋友或长辈，在沟通死结时请ta帮你们"翻译"对方真正想表达的意思。</p>';
+            advice+='<p style="line-height:2"><strong>核心提醒：</strong>钻石需要高压才能形成。如果你们都愿意为这段关系付出额外的努力，最终收获的可能是一份比"天作之合"更深刻、更坚固的连接。不放弃不是因为执着，而是因为值得。</p>';
+          }else{
+            advice='<p style="line-height:2;margin-bottom:8px"><strong>命理评分只是参考。</strong>请记住：八字合盘反映的是"先天条件"，而不是"后天结果"。人类最伟大的爱情故事中，有太多是命理"不配"却书写了传奇的例子。</p>';
+            advice+='<p style="line-height:2;margin-bottom:8px"><strong>如果你们决定走下去：</strong>① 停止用"合不合适"的框架去审视对方，转而问"我如何能让对方变得更好"。② 建立强大的"我们vs问题"而非"你vs我"的思维模式——任何外部困难都是你们共同的敌人。③ 珍惜每一次小的胜利——一次顺畅的沟通、一次默契的合作、一次温暖的拥抱，这些小胜利积累起来就是不可动摇的信任。</p>';
+            advice+='<p style="line-height:2"><strong>核心提醒：</strong>缘分深浅不只是由命理决定的。两个愿意为彼此付出的人，可以写出命理之外的答案。命运是起点，选择是终点。</p>';
+          }
+          return advice;
         })()}
-        <p style="color:var(--text-dim);font-size:0.85rem;margin-top:8px">
-          以上分析基于八字命理和梅花易数，仅供参考。真正的缘分，是由两人每一天的选择与付出共同书写的。
+        <p style="color:var(--text-dim);font-size:0.82rem;margin-top:12px;text-align:center">
+          以上分析基于八字命理和梅花易数，融合《渊海子平》《滴天髓》等古籍理法，仅供参详。真正的缘分，由两人每一天的选择与付出共同书写。
         </p>
       </div>
     </div>

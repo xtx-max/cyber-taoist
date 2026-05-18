@@ -1905,10 +1905,8 @@ function computeCompatibility(bazi1,bazi2){
   else if(dayRel.includes('相害')){score-=8;cautions.push('日柱相害：相处时或有说不清的隔阂，需深度沟通化解');}
   else if(dayRel.includes('相刑')){score-=6;cautions.push('日柱相刑：性格中有互相摩擦的棱角，需要智慧和耐心');}
   const dm1Elem=TG_ELEMENT[bazi1.dayPillar.stemIdx],dm2Elem=TG_ELEMENT[bazi2.dayPillar.stemIdx];
-  if(WX_GENERATE[dm1Elem]===dm2Elem){score+=12;highlights.push('日干相生：你如春风化雨，滋养着对方的心田');}
-  else if(WX_GENERATE[dm2Elem]===dm1Elem){score+=10;highlights.push('日干相生：对方如阳光般温暖着你，给予你力量');}
-  else if(WX_OVERCOME[dm1Elem]===dm2Elem){score-=6;cautions.push('日干相克：你的表达方式有时会让对方感到压力，宜多一些温柔');}
-  else if(WX_OVERCOME[dm2Elem]===dm1Elem){score-=5;cautions.push('日干相克：需要学会以柔克刚，在包容中找到平衡');}
+  if(WX_GENERATE[dm1Elem]===dm2Elem||WX_GENERATE[dm2Elem]===dm1Elem){score+=11;highlights.push('日干相生：五行之气在你们之间自然流转，彼此滋养，如春风与万物');}
+  else if(WX_OVERCOME[dm1Elem]===dm2Elem||WX_OVERCOME[dm2Elem]===dm1Elem){score-=5;cautions.push('日干相克：五行之克是双向的张力，需要双方共同以柔克刚、互相包容');}
   else if(dm1Elem===dm2Elem){score+=6;highlights.push('日干同气：你们是同类人，彼此理解和共鸣非常深刻');}
   const monthRel=checkRelationship(bazi1.monthPillar.branchIdx,bazi2.monthPillar.branchIdx);
   if(monthRel.includes('六冲')){score-=5;cautions.push('月柱六冲：处事节奏时有碰撞，需协调双方的生活步调');}

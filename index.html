@@ -3177,35 +3177,32 @@ function askMeiHua(){
     if(!h) return '卦象已显，请静心体悟。';
     const detail=getHexDetail(h.name);
     const judgment=h.judgment||'';
+    // Build multi-paragraph conversational answer, each paragraph references the question
     const domName=domain==='综合运势'?'运势':domain;
-    // Synthesize one coherent answer that directly addresses the question
-    let ans=`针对你问的「${question}」，卦得<strong>${h.name}</strong>。`;
-    // Core hexagram meaning applied to the question
-    ans+=detail+' ';
-    // Ti-yong applied specifically to this question
-    const relApp={
-      'bihe':`体用比和，${lowerTrigram.element}气相通——你所问的${domName}之事与你自身的能量天然协调。`,
-      'yong-sheng-ti':`用卦生体，外部机缘正流向你——对于你问的${domName}，这是有利信号。`,
-      'ti-sheng-yong':`体卦生用，你需要为这件${domName}之事主动付出，但投入必有回响。`,
-      'yong-ke-ti':`用克体，当前在${domName}上确有阻力。卦的建议是暂缓而非放弃。`,
-      'ti-ke-yong':`体克用，对这件${domName}之事你有掌控力。需要的是果断而非犹豫。`
+    // Para 1: Direct response — what the hexagram says about THIS specific question
+    let p1=`你问「${question}」。卦得<strong>${h.name}</strong>，${detail}这件事与你当下的状态，卦象已给出了清晰的回应。`;
+    // Para 2: Ti-yong explaining the dynamic of THIS question
+    const p2map={
+      'bihe':`从体用关系来看，体卦${lowerTrigram.name}（${lowerTrigram.element}）代表你自身，用卦${upperTrigram.name}（${upperTrigram.element}）代表你所问之事。体用${lowerTrigram.element}气比和——这意味着对于「${question.substring(0,15)}…」这件事，你与它之间不存在天然的冲突。你不需要变成另一个人才能应对它，以你本来的方式去面对，就是最对的路。`,
+      'yong-sheng-ti':`从体用关系来看，体卦${lowerTrigram.name}（${lowerTrigram.element}）代表你，用卦${upperTrigram.name}（${upperTrigram.element}）代表你所问之事。用卦生体卦，${upperTrigram.element}生${lowerTrigram.element}——这是最好的信号。对于你问的这件事，外部机缘正在向你靠拢，环境和时机都对你有利。你主动伸出手，它会握住你。`,
+      'ti-sheng-yong':`从体用关系来看，体卦${lowerTrigram.name}（${lowerTrigram.element}）代表你，用卦${upperTrigram.name}（${upperTrigram.element}）代表你所问之事。体卦生用卦，${lowerTrigram.element}生${upperTrigram.element}——这意味着这件事需要你主动投入。它不会自动送上门，但卦象明确告诉你：每一分真实的付出都不会白费。如同种下一颗种子，你的汗水最终会变成它的养分。`,
+      'yong-ke-ti':`从体用关系来看，体卦${lowerTrigram.name}（${lowerTrigram.element}）代表你，用卦${upperTrigram.name}（${upperTrigram.element}）代表你所问之事。用卦克体卦，${upperTrigram.element}克${lowerTrigram.element}——说实话，当前在「${question.substring(0,15)}…」这件事上确有阻力。但克不是否定，更像是逆风——逆风的时候不是停下，而是调整航向。卦的建议是：不要硬碰硬，以柔克刚，等待和迂回有时比正面冲锋更有效。`,
+      'ti-ke-yong':`从体用关系来看，体卦${lowerTrigram.name}（${lowerTrigram.element}）代表你，用卦${upperTrigram.name}（${upperTrigram.element}）代表你所问之事。体卦克用卦，${lowerTrigram.element}克${upperTrigram.element}——这说明面对这件事，你是有能力驾驭的，但"克"不是轻松的事。卦象在说：你有这个实力，但你得真的去用。如同手中握着一把好刀，不挥出去就永远只是摆设。`
     };
-    ans+=(relApp[rel]||'')+' ';
-    // Tie back to the question
-    const tieBacks={
-      '感情姻缘':`感情之事，卦象给你的核心提示是：${h.name.includes('咸')?'两情相悦时最忌猜疑，真诚回应对方是此刻最重要的事。':h.name.includes('恒')?'持久的关系需要日复一日的用心，轰轰烈烈不如细水长流。':h.name.includes('睽')?'分歧不是终点，求同存异反而让关系更丰富。':h.name.includes('家人')?'家是讲情的地方不是讲理的地方。以温暖而非道理经营关系。':'不要过度分析卦的吉凶而忽略了最重要的东西——你自己的真心。卦可指方向，但走到终点的永远是你的双脚。'}`,
-      '事业工作':`事业之事，${h.name.includes('升')||h.name.includes('晋')?'卦象显示上升之势，但升卦的精髓在于"积小以高大"——一步一个脚印比一步登天更可靠。':h.name.includes('困')||h.name.includes('蹇')?'当前的困境是暂时的。困卦的智慧在于"守正"——在最难的时候做最对的事。':h.name.includes('革')||h.name.includes('鼎')?'变革的时机到了。革故鼎新，不舍不得。旧的不去新的不来。':'找到你的"不可替代性"——不是做最多的事，而是做只有你能做的事。'}`,
-      '财运财富':`财务之事，${h.name.includes('大有')||h.name.includes('丰')?'丰收在望但需知"日中则昃"——最好的时候也是最需要警惕的时候。':h.name.includes('损')||h.name.includes('剥')?'有失有得，损卦告诉你：暂时的舍弃是为了更好的获得。精打细算胜过投机取巧。':'财富是流动的，卦象提示你关注"进"与"出"的平衡。开源重要，节流同样重要。'}`,
-      '健康身体':`健康之事，${h.name.includes('复')?'一阳来复——身体的自愈能力正在启动。给身体足够的时间恢复。':h.name.includes('颐')?'颐养之道在于"节"——言语有节以养气，饮食有节以养身。':'身心一体，卦象提醒你：身体的不适往往是内心失衡的信号。养身先养心。'}`,
-      '学业考试':`学业之事，${h.name.includes('蒙')?'启蒙阶段需要虚心求教。"匪我求童蒙，童蒙求我"——主动学习比被动接受有效百倍。':h.name.includes('渐')?'循序渐进，不急不躁。渐卦告诉你：慢就是快。每天进步一点点，积累的力量最惊人。':'功到自然成。卦象提示：方法比努力更重要，方向比速度更重要。'}`,
-      '出行迁移':`出行之事，${h.name.includes('旅')?'旅卦为行旅之象。人生如逆旅，心安即是家——准备好就出发。':h.name.includes('需')?'需卦为待时之象——出发之前可能需要再等一等，云上于天，雨将至而未至。':'旅途顺利与否取决于准备是否充分。卦象建议做好功课再上路。'}`,
-      '人际合作':`人际之事，${h.name.includes('同人')?'同人之卦主聚合。志同道合者终将相遇——保持开放的心态，对的人正在来的路上。':h.name.includes('讼')?'讼卦提醒：争赢了一时，可能输了一世。以和为贵，退一步海阔天空。':'以诚相待永远是最有效的社交策略。卦象提示：换位思考可化解大半纷争。'}`,
-      '选择决策':`抉择之事，${h.name.includes('夬')?'夬卦为决断之象——当断不断反受其乱。卦象鼓励你果断行动。':h.name.includes('豫')?'豫卦提醒：不要被犹豫消耗掉最好的时机。做好分析后就大胆决定。':'两条路都有风景。卦象建议：选择你最不怕后悔的那条路。'}`,
-      '综合运势':`当前运势，${h.name.includes('泰')?'泰卦大吉——天地交泰，诸事顺遂。但"无平不陂"，好时不忘坏时防。':h.name.includes('否')?'否卦虽不吉但"否终则倾"——低谷是暂时的，转机已在酝酿。':h.name.includes('既济')?'事已成就但也需"思患预防"——守住成果和取得成果同样重要。':'卦象已明。运势有起伏是常态，平常心是最强大的定力。'}`
+    const p2=p2map[rel]||p2map['bihe'];
+    // Para 3: Domain-specific deep insight tied to this question
+    const p3map={
+      '感情姻缘':`那么回到你真正关心的问题——${question}。${h.name.includes('咸')?'咸卦是六十四卦中专门讲感情的卦，"感应"二字是核心。你问的这件事，卦象的建议是：不要用头脑去算计感情，用你的心去感应。真诚比策略更有效，坦率比技巧更动人。如果你已经在关系中，此刻需要的是卸下面具的勇气；如果你还在等待，卦象说——那个人正在靠近，保持你的真实。':h.name.includes('恒')?'恒卦告诉你：最深的感情不在激情中，而在恒久中。对于你问的这件事，与其求一时的答案，不如想想——这件事放在十年后还重要吗？如果答案是"是"，就用十年如一日的态度去经营它。':h.name.includes('睽')?'睽卦是火泽相背之象——但有趣的是，火在上而泽在下，看似方向相反，实则火的热量可以温暖泽水，泽的润泽可以平衡火势。对你问的问题，卦象的建议是：站在对方的角度再看一次。不是"我对你错"，而是"我们不一样但可以并存"。':h.name.includes('家人')?'家人卦风火相生——这是非常温暖的卦象。对你问的这件事，卦象想说的是：家是讲情的地方，不是讲理的地方。赢了道理输了感情，是世间最亏的买卖。用行动而非言语去表达你的在乎。':'对于你问的这件事，卦象的核心讯息是：先成为对的人，再去找对的人。感情不是找来的，是成为彼此值得的那个人之后，自然发生的。你现在最需要做的不是向外寻求答案，而是向内确认自己的真心。'}`,
+      '事业工作':`具体到你问的这件事——${question}。${h.name.includes('升')||h.name.includes('晋')?'升卦和晋卦都是上升之象，但它们的智慧不在于"快"，而在于"稳"。你问的这件事，方向是对的，但不要指望一步登天。每一级台阶都踩实了，自然就到了高处。过程中每一个看起来微不足道的进步，都是未来某个关键时刻的伏笔。':h.name.includes('困')||h.name.includes('蹇')?'困卦和蹇卦都是艰难之象，但它们最深刻的智慧是"困而不失其志"。你问的这件事当前确实不顺利——但困境是最好的老师。在逆境中能守得住自己、不慌不乱的人，顺境来了才接得住。建议你暂时把目光从"结果"移开，专注于"过程"中你能控制的事。':h.name.includes('革')||h.name.includes('鼎')?'革卦和鼎卦直指变革。对你问的这个问题，卦象在说：旧的不去新的不来。如果你已经在不满现状了，那么变革的时机已经到了。但革卦也提醒——变革不是为了变而变，而是为了更好的自己。想清楚你要去向哪里，再决定怎么出发。':'对于你问的这件事，卦象想说的是：事业不是跑道，而是旷野。不要只盯着一条路——你最独特的价值往往不在你正在竞争的那个赛道上，而在只有你才能走的那条小径上。找到它，然后深耕。'}`,
+      '财运财富':`具体到你问的「${question.substring(0,20)}…」。${h.name.includes('大有')||h.name.includes('丰')?'大有卦和丰卦都是丰收之象——但你问的这件事需要注意"日中则昃"的规律。好的时候不要贪，见好就收才是智慧。财富如水，盛满了就会溢，不如主动留一些给别人、给未来。':h.name.includes('损')||h.name.includes('剥')?'损卦表面在说"损失"，但它真正的意思是"舍得"。对你问的这件事，短期看可能有损耗，但卦象在说：这不是真正的损失，而是必要的调整。就像修剪树枝——剪掉的部分看似可惜，但它让树长得更壮。':h.name.includes('节')?'节卦的核心是"度"。对你问的这件事，卦象的建议是：找到你能承受的节奏和规模。不是最大的就是最好的，适合你的才是。量入为出、稳步增加——节制不是裹足，而是为了更好地前行。':'对你问的这件事，卦象的关键提示是：不要盯着别人在赚什么，而是关注你自己能创造什么。财富是价值的影子——你创造的价值越大，影子自然越长。与其追着影子跑，不如让自己发光。'}`,
+      '健康身体':`具体到你问的「${question.substring(0,20)}…」。${h.name.includes('复')?'复卦一阳来复——这是身体自愈力被激活的信号。你问的这件事，卦象的建议是：给身体时间。不需要做太多激进的事，睡眠是最好的药，规律是最好的医生。':h.name.includes('颐')?'颐卦是养生的最高智慧。"君子以慎言语、节饮食"——你问的这件事的答案就在这七个字里。不该说的话不说不耗气，不该吃的东西不吃不伤身。最简单的事，最难坚持。':'对你问的这件事，卦象想说的是：身体的信号是内心状态的外化。紧张头痛可能是压力在说话，肩膀僵硬可能是扛了太多不该扛的东西。先问问你的心累不累，再问身体好不好。'}`,
+      '学业考试':`具体到你问的「${question.substring(0,20)}…」。${h.name.includes('蒙')?'蒙卦是启蒙之象。你问的这件事，卦象的建议是：不要自己瞎摸索了。去找老师、找前辈、找懂的人——"匪我求童蒙，童蒙求我"，主动去问的人永远比被动等待的人学得快。':h.name.includes('渐')?'渐卦告诉你：慢就是快。你问的这件事，不需要突击也不需要速成。每天进步一点点——读一页书、做一道题、记一个概念——一个月后回头看，你已经站在了完全不同的高度。积累的力量远超你的想象。':h.name.includes('兑')?'兑卦为悦——学习最好的状态是"享受"。你问的这件事，卦象想说的可能是：你是不是把学习当成了苦差？试着找到其中让你真正感兴趣的部分，从"我得学"变成"我想学"，结果会完全不同。':'对你问的这件事，卦象的核心建议是：方法比努力更重要。不是学得久就一定学得好——找到适合你的学习方式，比熬夜苦读有效十倍。'}`,
+      '出行迁移':`具体到你问的「${question.substring(0,20)}…」。${h.name.includes('旅')?'旅卦直指行旅之事。你问的这件事，卦象的回答是：准备好了就出发。但旅卦也提醒——旅途的意义在路上，不在终点。不要因为赶路而错过了沿途的风景。':h.name.includes('需')?'需卦为待时之象，云气已聚于天上，但雨还没下。你问的这件事，卦象的建议是稍等一等——不是不出发，而是等一个更好的时机。':'对你问的这件事，卦象的提示是：做好万全准备。提前查路线、看天气、准备备用方案——旅途中的顺畅来自于出发前的功课。'}`,
+      '人际合作':`具体到你问的「${question.substring(0,20)}…」。${h.name.includes('同人')?'同人卦是聚合之象。你问的这件事的答案是：对的人正在来的路上。不要因为路上没人就怀疑方向——同声相应、同气相求，志同道合者终将看见你的旗帜。':h.name.includes('讼')?'讼卦讲的是争论。你问的这件事，卦象的建议是：不要争。争赢了道理可能输了关系。有时候退一步不是软弱，而是用空间换时间。等情绪过去了再沟通，效果天差地别。':h.name.includes('比')?'比卦为亲比之象。你问的这件事，答案在于"找到对的人靠近"。不是迎合所有人，而是找到那个懂你、能和你并肩面对的人。':'对你问的这件事，卦象最想说的是：真诚是最好的社交货币。技巧可以帮你破冰，但只有真诚能帮你走到对方心里。'}`,
+      '选择决策':`具体到你问的两难——${question}。${h.name.includes('夬')?'夬卦直指决断。你问的这件事，卦象的态度很明确：当断不断，反受其乱。纠结的成本往往比选错的成本更高。你心里其实已经有答案了——卦象只是帮你确认：是的，那个方向是对的。':h.name.includes('豫')?'豫卦是犹豫之象——但豫不是要你永远停在原地。你问的这件事，卦象在催促你：信息已经够了，再做分析就变成拖延了。相信你的直觉——它往往比理性更快抓到正确答案。':'对你问的这件事，卦象的建议是：选一条你不会后悔的路。什么叫不后悔？不是结果一定最好，而是无论结果如何你都能说"我选的时候已经尽力了"。能用这种心态面对的选项，就是对的选项。'}`
     };
-    ans+=(tieBacks[domain]||tieBacks['综合运势'])+' ';
-    ans+=judgment;
-    return ans;
+    const p3=p3map[domain]||`对你问的这件事，${h.name}的卦象已经给出了方向。不要只盯着"吉"还是"凶"——卦的智慧在于趋势而非定论。天地不言而四时行焉，万事万物的答案都在变化之中。关注变化的方向，比关注当前的状态更重要。`;
+    return `<p style="line-height:2.1;margin-bottom:14px">${p1}</p><p style="line-height:2.1;margin-bottom:14px">${p2}</p><p style="line-height:2.1;margin-bottom:14px">${p3}</p><p style="line-height:2;color:var(--gold-dark)">📜 卦辞曰：${judgment}</p>`;
   }
 
   const answerText=buildAnswer(hex,question,questionDomain,tiYongRel,result.upperTrigram,result.lowerTrigram);
@@ -3268,8 +3265,8 @@ function askMeiHua(){
 
       <div class="analysis-section">
         <h3>✦ 卦象总断</h3>
-        <div style="padding:16px;background:rgba(201,168,76,0.06);border-radius:var(--radius-sm);margin-bottom:12px">
-          <p style="color:var(--text-bright);line-height:2;font-size:1rem;font-weight:500">${answerText}</p>
+        <div style="padding:16px;background:rgba(201,168,76,0.06);border-radius:var(--radius-sm);margin-bottom:12px;color:var(--text-bright);font-size:0.96rem">
+          ${answerText}
         </div>
         <p style="color:var(--text-dim);line-height:1.9;font-size:0.95rem">📖 <strong>本卦详解</strong>：${hex?getHexDetail(hex.name):'—'}</p>
         <p style="color:var(--text-dim);line-height:1.9;margin-top:4px">📜 卦辞：${hex?hex.judgment:'—'}</p>

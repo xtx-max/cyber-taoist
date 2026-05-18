@@ -484,6 +484,31 @@ footer p{margin:4px 0}
   margin:8px 0 20px;border-radius:1px;opacity:0.6;
 }
 
+/* ============ Autocomplete ============ */
+.ac-wrap{position:relative}
+.ac-dropdown{
+  position:absolute;top:100%;left:0;right:0;z-index:200;
+  max-height:260px;overflow-y:auto;
+  background:#fffef9;border:1px solid var(--border-strong);
+  border-radius:0 0 var(--radius-sm) var(--radius-sm);
+  box-shadow:var(--shadow-hover);display:none;
+}
+.ac-dropdown.show{display:block}
+.ac-item{
+  padding:9px 14px;cursor:pointer;font-size:0.88rem;
+  color:var(--text);border-bottom:1px solid rgba(0,0,0,0.03);
+  transition:background 0.15s;
+}
+.ac-item:hover,.ac-item.active{background:rgba(201,168,76,0.1);color:var(--gold-dark)}
+.ac-item .ac-region{font-size:0.72rem;color:var(--text-dim);margin-left:6px}
+.ac-no-result{padding:12px 14px;font-size:0.85rem;color:var(--text-dim);text-align:center}
+.ac-wrap input{padding-right:30px}
+.ac-wrap::after{
+  content:'▾';position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  color:var(--text-dim);pointer-events:none;font-size:0.8rem;transition:transform 0.3s
+}
+.ac-wrap.open::after{transform:translateY(-50%) rotate(180deg)}
+
 /* ============ Responsive ============ */
 @media(max-width:640px){
   #app{padding:12px}
@@ -562,14 +587,14 @@ footer p{margin:4px 0}
           <div class="form-row">
             <div class="form-group">
               <label>出生城市（真太阳时校准）</label>
-              <select id="bazi-city" onchange="onCityChange('bazi')">
-                <option value="">— 选择城市或手动输入经度 —</option>
-                ${CITY_LNG.map(c=>`<option value="${c.city}">${c.city}（东经${c.lng.toFixed(1)}°）</option>`).join('')}
-              </select>
+              <div class="ac-wrap" id="ac-wrap-bazi">
+                <input type="text" id="bazi-city" placeholder="输入城市名搜索，如：成都 / 纽约 / 伦敦…" autocomplete="off">
+                <div class="ac-dropdown" id="ac-dd-bazi"></div>
+              </div>
             </div>
             <div class="form-group">
-              <label>自定义经度（°E，可手动输入）</label>
-              <input type="number" id="bazi-lng" placeholder="如：116.4（北京）" step="0.1" min="-180" max="180" value="120">
+              <label>出生经度（选择城市后自动填写）</label>
+              <input type="number" id="bazi-lng" placeholder="东经度数" step="0.1" min="-180" max="180" value="120">
             </div>
           </div>
           <p style="color:var(--text-dim);font-size:0.78rem;margin-bottom:8px">
@@ -607,16 +632,16 @@ footer p{margin:4px 0}
           <div class="form-group"><label>你的出生时辰</label><select id="compat-hour1"></select></div>
         </div>
         <div class="form-row">
-          <div class="form-group"><label>你的出生城市</label><select id="compat-city1" onchange="onCityChange('compat1')"><option value="">— 选择城市 —</option>${CITY_LNG.map(c=>`<option value="${c.city}">${c.city}（${c.lng.toFixed(1)}°）</option>`).join('')}</select></div>
-          <div class="form-group"><label>你的经度</label><input type="number" id="compat1-lng" placeholder="东经" step="0.1" min="-180" max="180" value="120"></div>
+          <div class="form-group"><label>你的出生城市</label><div class="ac-wrap" id="ac-wrap-compat1"><input type="text" id="compat-city1" placeholder="输入城市名搜索…" autocomplete="off"><div class="ac-dropdown" id="ac-dd-compat1"></div></div></div>
+          <div class="form-group"><label>你的出生经度</label><input type="number" id="compat1-lng" placeholder="东经" step="0.1" min="-180" max="180" value="120"></div>
         </div>
         <div class="form-row">
           <div class="form-group"><label>对方出生日期</label><input type="date" id="compat-date2" min="1900-01-01" max="2050-12-31"></div>
           <div class="form-group"><label>对方出生时辰</label><select id="compat-hour2"></select></div>
         </div>
         <div class="form-row">
-          <div class="form-group"><label>对方出生城市</label><select id="compat-city2" onchange="onCityChange('compat2')"><option value="">— 选择城市 —</option>${CITY_LNG.map(c=>`<option value="${c.city}">${c.city}（${c.lng.toFixed(1)}°）</option>`).join('')}</select></div>
-          <div class="form-group"><label>对方经度</label><input type="number" id="compat2-lng" placeholder="东经" step="0.1" min="-180" max="180" value="120"></div>
+          <div class="form-group"><label>对方出生城市</label><div class="ac-wrap" id="ac-wrap-compat2"><input type="text" id="compat-city2" placeholder="输入城市名搜索…" autocomplete="off"><div class="ac-dropdown" id="ac-dd-compat2"></div></div></div>
+          <div class="form-group"><label>对方出生经度</label><input type="number" id="compat2-lng" placeholder="东经" step="0.1" min="-180" max="180" value="120"></div>
         </div>
         <button class="btn btn-primary btn-block" onclick="analyzeCompatibility()" style="margin-top:8px">
           ❤ 查看缘分
@@ -2062,19 +2087,74 @@ function updateProfileSelect(){
   updateAllProfileSelects();
 }
 
-function onCityChange(prefix){
-  // Map prefix to actual element IDs (handle compat1/compat2 naming)
-  const cityId=prefix.startsWith('compat')?prefix+'-city':prefix+'-city';
-  const lngId=prefix.startsWith('compat')?prefix+'-lng':prefix+'-lng';
-  const cityEl=document.getElementById(cityId)||document.getElementById(prefix+'-city');
-  const lngEl=document.getElementById(lngId)||document.getElementById(prefix+'-lng');
-  if(!cityEl||!lngEl) return;
-  const city=cityEl.value;
-  if(city){
-    const lng=getLngByCity(city);
-    if(lng!==null) lngEl.value=lng;
+// ========== Autocomplete Engine ==========
+function initAutocomplete(inputId, ddId, lngId){
+  const input=document.getElementById(inputId);
+  const dd=document.getElementById(ddId);
+  const lngEl=document.getElementById(lngId);
+  const wrap=dd?.parentElement;
+  if(!input||!dd||!lngEl) return;
+  let activeIdx=-1;
+
+  // Build dropdown HTML from CITY_LNG
+  function renderDropdown(filter){
+    let html='';let count=0;
+    const q=(filter||'').toLowerCase();
+    for(const c of CITY_LNG){
+      if(q && !c.city.toLowerCase().includes(q) && !String(c.lng).includes(q)) continue;
+      const region=getRegion(c);
+      html+=`<div class="ac-item" data-city="${c.city}" data-lng="${c.lng}">${c.city}<span class="ac-region">${region} ${c.lng>0?'东经'+c.lng.toFixed(1)+'°':'西经'+Math.abs(c.lng).toFixed(1)+'°'}</span></div>`;
+      count++;
+    }
+    if(count===0) html='<div class="ac-no-result">未找到匹配城市，可直接输入城市名并手动填写经度</div>';
+    else if(filter) html='<div class="ac-no-result" style="font-size:0.75rem">找到 '+count+' 个城市，或直接输入自定义城市名并手动填写经度</div>'+html;
+    dd.innerHTML=html;
+    activeIdx=-1;
   }
+
+  function getRegion(c){
+    const l=c.lng;
+    if(l>=75&&l<=135) return '🇨🇳';
+    if(l>=135&&l<=180) return '🌏 东亚/大洋洲';
+    if(l>=50&&l<75) return '🌏 南亚/中东';
+    if(l>=-30&&l<50) return '🌍 欧洲/非洲';
+    if(l<-30) return '🌎 美洲';
+    return '';
+  }
+
+  input.addEventListener('input',()=>{
+    renderDropdown(input.value.trim());
+    dd.classList.add('show');
+    wrap?.classList.add('open');
+  });
+  input.addEventListener('focus',()=>{
+    renderDropdown(input.value.trim());
+    dd.classList.add('show');
+    wrap?.classList.add('open');
+  });
+  input.addEventListener('keydown',(e)=>{
+    const items=dd.querySelectorAll('.ac-item');
+    if(e.key==='ArrowDown'){e.preventDefault();activeIdx=Math.min(activeIdx+1,items.length-1);updateActive(items);}
+    else if(e.key==='ArrowUp'){e.preventDefault();activeIdx=Math.max(activeIdx-1,0);updateActive(items);}
+    else if(e.key==='Enter'){e.preventDefault();if(activeIdx>=0&&items[activeIdx]){selectItem(items[activeIdx]);}else{dd.classList.remove('show');wrap?.classList.remove('open');}}
+    else if(e.key==='Escape'){dd.classList.remove('show');wrap?.classList.remove('open');}
+  });
+  dd.addEventListener('click',(e)=>{
+    const item=e.target.closest('.ac-item');
+    if(item) selectItem(item);
+  });
+  function updateActive(items){items.forEach((it,i)=>it.classList.toggle('active',i===activeIdx));if(activeIdx>=0&&items[activeIdx]) items[activeIdx].scrollIntoView({block:'nearest'});}
+  function selectItem(item){
+    const city=item.dataset.city,lng=parseFloat(item.dataset.lng);
+    input.value=city;lngEl.value=lng;
+    dd.classList.remove('show');wrap?.classList.remove('open');
+  }
+  // Close on outside click
+  document.addEventListener('click',(e)=>{if(!wrap.contains(e.target)){dd.classList.remove('show');wrap?.classList.remove('open');}});
 }
+
+// Remove old onCityChange — handled by autocomplete now
+function onCityChange(prefix){} // no-op, kept for backward compat
 
 function switchToBaziForProfile(){switchTab('bazi');showToast('请填写出生信息，分析完成后自动保存为档案 ✨');}
 
@@ -2999,6 +3079,10 @@ window.loadHistoryItem=function(type,data){
 
 function init(){
   initHourSelects();initDates();updateProfileSelect();renderProfileList();renderHistory();
+  // Init autocomplete for all city inputs
+  initAutocomplete('bazi-city','ac-dd-bazi','bazi-lng');
+  initAutocomplete('compat-city1','ac-dd-compat1','compat1-lng');
+  initAutocomplete('compat-city2','ac-dd-compat2','compat2-lng');
   document.querySelectorAll('.tab').forEach(tab=>{
     tab.addEventListener('click',()=>switchTab(tab.dataset.page));
   });

@@ -2573,8 +2573,7 @@ function analyzeCompatibility(){
   const prof1=pid1?profiles.find(x=>x.id===pid1):null;
   const prof2=pid2?profiles.find(x=>x.id===pid2):null;
   let bazi1,bazi2,solar1,solar2;
-  if(prof1&&prof1.bazi&&prof1.bazi.dayPillar){
-    // Use saved bazi from profile — guarantees same score every time
+  if(prof1&&prof1.bazi&&prof1.bazi.dayPillar&&prof1.bazi.dayPillar.stem){
     bazi1=prof1.bazi;
     solar1={description:'(已存档案·经度'+(prof1.longitude||120).toFixed(1)+'°)',hourBranch:bazi1.hourPillar.branchIdx,dayAdvance:false};
     lng1=prof1.longitude||120;
@@ -2585,7 +2584,7 @@ function analyzeCompatibility(){
     const adjDate1=solar1.dayAdvance?new Date(y1,m1-1,d1+1,12,0,0):new Date(y1,m1-1,d1,12,0,0);
     bazi1=calculateBazi(adjDate1,solar1.hourBranch);
   }
-  if(prof2&&prof2.bazi&&prof2.bazi.dayPillar){
+  if(prof2&&prof2.bazi&&prof2.bazi.dayPillar&&prof2.bazi.dayPillar.stem){
     bazi2=prof2.bazi;
     solar2={description:'(已存档案·经度'+(prof2.longitude||120).toFixed(1)+'°)',hourBranch:bazi2.hourPillar.branchIdx,dayAdvance:false};
     lng2=prof2.longitude||120;
@@ -2902,8 +2901,7 @@ function analyzeCompatibility(){
     saveHistory('bazi',name1+'❤'+name2+' 合盘'+compat.score+'分');
     renderHistory();
   }catch(e){
-    document.getElementById('compat-result').innerHTML='<div class="glass-card" style="text-align:center;padding:30px"><p style="color:var(--red)">计算出错，请重试</p><p style="color:var(--text-dim);font-size:0.8rem">'+e.message+'</p></div>';
-    console.error(e);
+    document.getElementById('compat-result').innerHTML='<div class="glass-card" style="text-align:center;padding:30px"><p style="color:var(--red)">计算出错，请重试</p><p style="color:var(--text-dim);font-size:0.82rem">建议：① 点页面底部「🔄 刷新」后重试 ② 检查两人档案是否完整（需包含出生日期+时辰+经度）③ 如持续出错，删除旧档案后重新保存</p><p style="color:var(--text-dim);font-size:0.75rem;margin-top:8px">错误：'+e.message+'</p></div>';
   }
   },30);
 }
@@ -3533,32 +3531,28 @@ function init(){
 
 document.addEventListener('DOMContentLoaded',init);
 
-// Auto version check — ping server for updates, show banner if newer version available
+// Auto version check — fire-and-forget, never blocks page
 (function(){
-  try{
-    fetch('https://xtx-max.github.io/cyber-taoist/',{method:'HEAD',cache:'no-cache'})
-      .then(r=>r.headers.get('last-modified'))
-      .then(lm=>{
-        if(!lm) return;
-        const stored=localStorage.getItem('cyberTaoistLastMod');
-        if(stored && stored!==lm){
-          // Show update banner
-          const banner=document.createElement('div');
-          banner.id='update-banner';
-          banner.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#c41e3a,#a07830);color:#fff;text-align:center;padding:10px;font-size:0.9rem;font-weight:600;cursor:pointer;animation:slideDown 0.3s ease';
-          banner.textContent='🆕 有新版本可用！点击此处立即刷新 →';
-          banner.onclick=()=>{location.reload(true);};
-          document.body.prepend(banner);
-          // Also update footer
-          const verEl=document.getElementById('ver-check');
-          if(verEl){verEl.textContent='🆕 有更新！';verEl.style.color='var(--red)';verEl.style.fontWeight='700';}
-          // Auto-refresh after 3 seconds
-          setTimeout(()=>{const b=document.getElementById('update-banner');if(b)b.textContent='⏳ 正在刷新…';},2500);
-          setTimeout(()=>{location.reload(true);},3000);
-        }
-        localStorage.setItem('cyberTaoistLastMod',lm);
-      }).catch(()=>{});
-  }catch(e){}
+  setTimeout(function(){
+    try{
+      fetch('https://xtx-max.github.io/cyber-taoist/',{method:'HEAD',cache:'no-cache',signal:AbortSignal.timeout(5000)})
+        .then(r=>r.headers.get('last-modified'))
+        .then(lm=>{
+          if(!lm) return;
+          const stored=localStorage.getItem('cyberTaoistLastMod');
+          if(stored && stored!==lm){
+            const banner=document.createElement('div');
+            banner.id='update-banner';
+            banner.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#c41e3a,#a07830);color:#fff;text-align:center;padding:10px;font-size:0.9rem;font-weight:600;cursor:pointer;animation:slideDown 0.3s ease';
+            banner.textContent='🆕 有新版本！点此刷新 →';
+            banner.onclick=function(){location.reload(true);};
+            document.body.prepend(banner);
+            setTimeout(function(){location.reload(true);},3000);
+          }
+          localStorage.setItem('cyberTaoistLastMod',lm);
+        }).catch(function(){});
+    }catch(e){}
+  },5000); // Wait 5s after page load before checking
 })();
 // Add slideDown animation
 const style=document.createElement('style');

@@ -2048,9 +2048,15 @@ function showLoading(targetId){
   const el=document.getElementById(targetId);
   if(!el) return;
   el.innerHTML=`<div class="loading-ritual">
-    <div class="loading-bar-wrap"><div class="loading-bar-fill"></div></div>
-    <div class="loading-text">推演中<span>.</span><span>.</span><span>.</span></div>
+    <div class="loading-bar-wrap"><div class="loading-bar-fill" id="load-bar-${targetId}" style="width:5%"></div></div>
+    <div class="loading-text" id="load-text-${targetId}">排盘中<span>.</span><span>.</span><span>.</span></div>
   </div>`;
+}
+function setProgress(targetId, pct, text){
+  const bar=document.getElementById('load-bar-'+targetId);
+  const txt=document.getElementById('load-text-'+targetId);
+  if(bar) bar.style.width=pct+'%';
+  if(txt) txt.innerHTML=text+'<span>.</span><span>.</span><span>.</span>';
 }
 function showToast(msg){
   const toast=document.createElement('div');
@@ -2532,23 +2538,29 @@ function analyzeCompatibility(){
   const lng2=parseFloat(document.getElementById('compat2-lng').value)||120;
   if(!date1||!date2){showToast('请填写双方的出生日期');return;}
   showLoading('compat-result');
-  setTimeout(()=>{ // 50ms ensures loading bar paints before heavy computation
-    const [y1,m1,d1]=date1.split('-').map(Number);
-    const [y2,m2,d2]=date2.split('-').map(Number);
-    const clockH1=(h1===0?0:h1*2-1+1),clockH2=(h2===0?0:h2*2-1+1);
-    const solar1=applyTrueSolarTime(clockH1,0,lng1);
-    const solar2=applyTrueSolarTime(clockH2,0,lng2);
-    const adjDate1=solar1.dayAdvance?new Date(y1,m1-1,d1+1,12,0,0):new Date(y1,m1-1,d1,12,0,0);
-    const adjDate2=solar2.dayAdvance?new Date(y2,m2-1,d2+1,12,0,0):new Date(y2,m2-1,d2,12,0,0);
-    const bazi1=calculateBazi(adjDate1,solar1.hourBranch);
-    const bazi2=calculateBazi(adjDate2,solar2.hourBranch);
-    const compat=analyzeCompatibility(bazi1,bazi2);
-    const a1=analyzeBaziFull(bazi1),a2=analyzeBaziFull(bazi2);
-    const d1_=new Date(y1,m1-1,d1),d2_=new Date(y2,m2-1,d2);
-    const n1=(d1_.getFullYear()+d1_.getMonth()+d1_.getDate())%100+1;
-    const n2=(d2_.getFullYear()+d2_.getMonth()+d2_.getDate())%100+1;
-    const meihua=meiHuaYiShu(n1,n2,h1+h2+1);
-    const scoreColor=compat.score>=70?'var(--jade)':compat.score>=50?'var(--gold-dark)':'var(--red)';
+  setProgress('compat-result',10,'八字排盘中');
+  setTimeout(()=>{
+  try{
+  const [y1,m1,d1]=date1.split('-').map(Number);
+  const [y2,m2,d2]=date2.split('-').map(Number);
+  const clockH1=(h1===0?0:h1*2-1+1),clockH2=(h2===0?0:h2*2-1+1);
+  const solar1=applyTrueSolarTime(clockH1,0,lng1);
+  const solar2=applyTrueSolarTime(clockH2,0,lng2);
+  const adjDate1=solar1.dayAdvance?new Date(y1,m1-1,d1+1,12,0,0):new Date(y1,m1-1,d1,12,0,0);
+  const adjDate2=solar2.dayAdvance?new Date(y2,m2-1,d2+1,12,0,0):new Date(y2,m2-1,d2,12,0,0);
+  setProgress('compat-result',30,'八字排盘中');
+  const bazi1=calculateBazi(adjDate1,solar1.hourBranch);
+  const bazi2=calculateBazi(adjDate2,solar2.hourBranch);
+  setProgress('compat-result',55,'命理合参中');
+  const compat=analyzeCompatibility(bazi1,bazi2);
+  const a1=analyzeBaziFull(bazi1),a2=analyzeBaziFull(bazi2);
+  setProgress('compat-result',78,'卦象解读中');
+  const d1_=new Date(y1,m1-1,d1),d2_=new Date(y2,m2-1,d2);
+  const n1=(d1_.getFullYear()+d1_.getMonth()+d1_.getDate())%100+1;
+  const n2=(d2_.getFullYear()+d2_.getMonth()+d2_.getDate())%100+1;
+  const meihua=meiHuaYiShu(n1,n2,h1+h2+1);
+  setProgress('compat-result',92,'解读完成');
+  const scoreColor=compat.score>=70?'var(--jade)':compat.score>=50?'var(--gold-dark)':'var(--red)';
 
   const resultHTML=`
     <div class="glass-card reveal" style="margin-top:24px">
@@ -2606,11 +2618,15 @@ function analyzeCompatibility(){
         const rect=el.getBoundingClientRect();
         if(rect.top<window.innerHeight-100) el.classList.add('visible');
       });
-    },100);
+    },150);
     document.getElementById('compat-result').scrollIntoView({behavior:'smooth',block:'start'});
     saveHistory('bazi',name1+'❤'+name2+' 合盘'+compat.score+'分');
     renderHistory();
-  },50); // setTimeout — ensures loading bar painted
+  }catch(e){
+    document.getElementById('compat-result').innerHTML='<div class="glass-card" style="text-align:center;padding:30px"><p style="color:var(--red)">计算出错，请重试</p><p style="color:var(--text-dim);font-size:0.8rem">'+e.message+'</p></div>';
+    console.error(e);
+  }
+  },30);
 }
 
 function loadDailyFortune(){

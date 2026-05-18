@@ -2709,12 +2709,13 @@ function getDomainAdvice(domain, tiYongRel, hexName, question){
 }
 
 function getTiYongRel(upperTrigram,lowerTrigram){
+  // 体卦(lower)=问事之人, 用卦(upper)=所问之事
   const uElem=upperTrigram.element,lElem=lowerTrigram.element;
-  if(lElem===uElem) return 'bihe';
-  if(WX_GENERATE[lElem]===uElem) return 'yong-sheng-ti';
-  if(WX_GENERATE[uElem]===lElem) return 'ti-sheng-yong';
-  if(WX_OVERCOME[lElem]===uElem) return 'yong-ke-ti';
-  return 'ti-ke-yong';
+  if(lElem===uElem) return 'bihe';                       // 体用比和
+  if(WX_GENERATE[lElem]===uElem) return 'ti-sheng-yong'; // 体生用: 你生事, 需付出
+  if(WX_GENERATE[uElem]===lElem) return 'yong-sheng-ti'; // 用生体: 事生你, 大吉
+  if(WX_OVERCOME[lElem]===uElem) return 'ti-ke-yong';    // 体克用: 你克事, 可驾驭
+  return 'yong-ke-ti';                                    // 用克体: 事克你, 有阻力
 }
 
 function askMeiHua(){
@@ -2768,33 +2769,43 @@ function askMeiHua(){
     return desc;
   }
 
-  // Comprehensive answer
-  function buildAnswer(h,question){
-    if(!h) return '卦象已显。天地不言，而四时行焉，万物生焉。静心体悟卦辞，答案自在你心中。';
-    const name=h.name;
-    // Expanded keyword matching for better answers
-    const patterns=[
-      {keys:['泰','大有','益','升','晋','丰','既济','咸','恒','萃','豫','随','中孚','家人'],ans:'此卦象吉。所问之事当前处于顺境，天时地利人和俱备，宜积极主动，顺势而上。但需谨记物极必反，在顺境中保持清醒与谦逊，方能使吉运长久。'},
-      {keys:['否','剥','困','蹇','未济','明夷','讼','大过','小过','蛊','睽','坎'],ans:'此卦象有阻。所问之事当前面临挑战或阻碍，时机尚未成熟。然而天地之道，否极泰来，困难与机遇总是相伴而生。建议暂时韬光养晦，积蓄力量，在恰当的时机再行出击。'},
-      {keys:['乾'],ans:'此卦纯阳至健。所问之事需以刚健不息之精神面对，但亦需知刚不可久。天行健，君子以自强不息——以坚毅之心行事，但也要懂得刚柔并济之道。'},
-      {keys:['坤'],ans:'此卦纯阴至柔。所问之事宜以包容柔顺之心对待。地势坤，君子以厚德载物——不急不躁，以大地般的胸怀承载一切，静待花开。'},
-      {keys:['需'],ans:'此卦为待时之象。所问之事需要耐心等待，如同云气上于天，雨将至而未至。在等待中做好准备，一旦时机到来，便能顺势而起。'},
-      {keys:['复'],ans:'此卦一阳来复，万象更新。所问之事处于转机之中，冬至阳生，黑暗即将过去。七日来复，天道循环，希望正在前方。'},
-      {keys:['革','鼎'],ans:'此卦主变革与更新。所问之事正在经历或需要一场变革。革故鼎新，旧的不去新的不来——以开放的心态拥抱变化。'},
-      {keys:['谦'],ans:'此卦谦受益满招损。所问之事当以谦逊之心对待，不急不躁，以虚怀若谷的姿态应对方能得吉。天道下济而光明，地道卑而上行。'},
-      {keys:['屯'],ans:'此卦艰难创始。所问之事正处于起步阶段，万事开头难。如同种子破土而出，需要积蓄足够的力量方能冲破阻力。宜稳扎稳打，勿急功近利。'},
-      {keys:['蒙'],ans:'此卦启蒙之象。所问之事尚在蒙昧阶段，需要学习和求教。匪我求童蒙，童蒙求我——以谦虚好学的态度面对新事物。'},
-      {keys:['观'],ans:'此卦观象之卦。所问之事宜先观察再行动。静观其变，等待最佳时机。盥而不荐，有孚颙若。在观察中洞悉事物的本质。'},
-      {keys:['临'],ans:'此卦居高临下。所问之事中你处于较有利的位置，但权力越大责任越大。宜以德服人，恩威并施。'},
-      {keys:['损'],ans:'此卦损下益上。所问之事可能有所付出或牺牲。但有失才有得，损极必益。宜看淡短期得失，着眼长远。'},
-      {keys:['益'],ans:'此卦损上益下。所问之事将得到外界的帮助和支持。利有攸往，利涉大川——可以大胆前进。'}
-    ];
-    for(let p of patterns){for(let k of p.keys){if(name.includes(k)) return p.ans;}}
-    return '此卦已明。所问之事，当细心体察卦辞爻辞之意。世间之理，尽在阴阳消息之间。一念之转，或可豁然开朗。';
+  // Build answer from hexagram data + ti-yong + domain
+  function buildAnswer(h,question,domain,rel){
+    if(!h) return '卦象已显。天地不言而四时行焉。请静心体悟卦辞，答案自在你心中。';
+    const detail=getHexDetail(h.name);
+    const judgment=h.judgment||'';
+    // Synthesize answer from hexagram meaning + ti-yong relationship + question domain
+    let ans='';
+    // 1. Hexagram-specific interpretation
+    ans+=detail+' ';
+    // 2. Ti-yong interaction insight
+    const relInsight={
+      'bihe':'体用比和，你与此事天然契合，内外协调一致。',
+      'yong-sheng-ti':'用卦生体卦，外部机缘正向你汇聚。此事对你有利，机会将主动靠近。',
+      'ti-sheng-yong':'体卦生用卦，需要你为此事主动投入心力。付出与收获成正比。',
+      'yong-ke-ti':'用卦克体卦，当前外部环境尚有阻力。不宜强求，宜以柔克刚、等待时机。',
+      'ti-ke-yong':'体卦克用卦，你具备驾驭此事的能力。需要付出努力但最终可控。'
+    };
+    ans+=relInsight[rel]||'';
+    // 3. Domain-specific note
+    const domainNote={
+      '感情姻缘':'问感情之事，卦已明示。观爻变可知情之走向，真诚即是最好策略。',
+      '事业工作':'问事业前程，卦象已显趋势。顺势而为比逆势硬闯更为明智。',
+      '财运财富':'问财帛之事，卦中自有消息。时机比努力更重要——在对的时间做对的事。',
+      '健康身体':'问健康之事，身心本为一体。卦象提醒你关注那些被忽略的信号。',
+      '学业考试':'问学业功名，卦象已明方向。恒心和专注是最好的老师。',
+      '出行迁移':'问出行之事，卦已指出宜忌。做好万全准备后大胆出发。',
+      '人际合作':'问人我关系，以诚相待为第一义。卦象提醒你：换位思考可化解大半纷争。',
+      '选择决策':'问抉择之事，卦已给出方向。两难之时听从直觉往往不错。'
+    };
+    ans+=(domainNote[domain]||'')+' ';
+    // 4. Judgment text
+    ans+=judgment;
+    return ans;
   }
 
-  const answerText=buildAnswer(hex,question);
-  const changedAnswer=changed&&changed!==hex?buildAnswer(changed,question):'';
+  const answerText=buildAnswer(hex,question,questionDomain,tiYongRel);
+  const changedAnswer=changed&&changed!==hex?buildAnswer(changed,question,questionDomain,tiYongRel):'';
 
   // Mutual hexagram insight
   const mutualInsight=mutual?`互卦「${mutual.name}」揭示事物发展的中间过程。${mutual.judgment||''} 互卦为过程之象，看${mutual.name}之义，可知事件演进中的关键转折。`:'';

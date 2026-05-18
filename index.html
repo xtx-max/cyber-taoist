@@ -2659,30 +2659,69 @@ function analyzeCompatibility(){
 
       <div class="analysis-section">
         <h3>✦ 梅花易数 · 缘分卦详解</h3>
-        <div class="hexagram">
-          <div class="hexagram-name">${meihua.original.name}</div>
-          <p style="margin:4px 0">${meihua.upperTrigram.symbol} ${meihua.upperTrigram.name}上 · ${meihua.lowerTrigram.symbol} ${meihua.lowerTrigram.name}下 · 动爻<strong>第${meihua.movingLine}爻</strong></p>
-        </div>
-        <p style="color:var(--gold-dark);line-height:1.9;margin:8px 0">📖 ${getHexDetail(meihua.original.name)}</p>
-        <p style="color:var(--text-dim);line-height:1.9;margin-top:4px">📜 卦辞：${meihua.original.judgment||''}</p>
         ${(()=>{
-          const yc=getYaoCi(meihua.original.name,meihua.movingLine);
-          return `<div style="padding:10px;margin-top:8px;background:rgba(196,30,58,0.04);border-left:3px solid var(--red);border-radius:0 10px 10px 0"><p style="color:var(--red);font-weight:600;font-size:0.85rem">动爻第${meihua.movingLine}爻辞</p><p style="color:var(--text);line-height:1.9;font-size:0.92rem">${yc}</p></div>`;
-        })()}
-        ${meihua.changed&&meihua.changed!==meihua.original?`
-          <p style="color:var(--text-dim);margin-top:10px">🔄 变卦：<strong>${meihua.changed.name}</strong></p>
-          <p style="color:var(--text-dim);line-height:1.9">📖 ${getHexDetail(meihua.changed.name)}</p>
-          <p style="color:var(--text-dim);line-height:1.9">📜 ${meihua.changed.judgment||''}</p>
-        `:''}
-        ${(()=>{
+          // Build a comprehensive Mei Hua interpretation for the relationship
+          const hexName=meihua.original.name;
+          const hexDetail=getHexDetail(hexName);
+          const yc=getYaoCi(hexName,meihua.movingLine);
           const uElem=meihua.upperTrigram.element,lElem=meihua.lowerTrigram.element;
-          let tiYong='';
-          if(lElem===uElem) tiYong='体用比和：两人气场天然契合，如两棵并肩的树，无需刻意配合就能和谐共处。';
-          else if(WX_GENERATE[lElem]===uElem) tiYong='体生用：'+name1+'在这段关系中付出较多心力，但真心付出终有回应。';
-          else if(WX_GENERATE[uElem]===lElem) tiYong='用生体：外部机缘眷顾这段关系，缘分本身在推动你们靠近。';
-          else if(WX_OVERCOME[lElem]===uElem) tiYong='体克用：'+name1+'有能力主导关系走向，但需以柔克刚，避免控制欲。';
-          else tiYong='用克体：外部阻力存在，两人需共同面对而非互相消耗。';
-          return `<p style="color:var(--text-dim);line-height:1.9;margin-top:8px;font-size:0.9rem">💡 体用生克：${tiYong}</p>`;
+          // Full ti-yong with relationship context
+          let tiYongFull='';
+          if(lElem===uElem) tiYongFull='<strong>体用比和</strong>——两人气场天然契合，如同两棵并肩生长的树木，根系在地下交织而枝叶在空中各自舒展。你们不需要刻意改变自己去迎合对方，因为本质的振动频率已然一致。这种缘分最难得：彼此独立却又深度共鸣。';
+          else if(WX_GENERATE[lElem]===uElem) tiYongFull='<strong>体生用</strong>——'+name1+'在关系中自然地付出滋养，如同春雨润物细无声。'+name1+'的真心不会白费，但需注意不要掏空自己。良好的关系需要双向流动，'+name2+'也需要学会看见并回应这份付出。';
+          else if(WX_GENERATE[uElem]===lElem) tiYongFull='<strong>用生体</strong>——这段缘分自带福报，如同春风送暖，外部的因缘际会在推动你们靠近。'+name2+'的存在对'+name1+'而言是一种滋养和助力。你们的关系有"天赐良缘"的底色，好好珍惜。';
+          else if(WX_OVERCOME[lElem]===uElem) tiYongFull='<strong>体克用</strong>——'+name1+'在这段关系中有较强的主导力，可以引导关系走向。但"克"需智慧：刚极则折，以柔克刚方为长久之道。'+name1+'需要觉察自己的控制欲，给对方呼吸的空间。';
+          else tiYongFull='<strong>用克体</strong>——外部环境或现实因素对这段关系形成一定压力。但这不意味着缘分不好——钻石需要高压才能形成。两人若能共同面对外在挑战而非互相指责，关系反将在磨砺中更加坚固。';
+          // Relationship-specific interpretation based on hexagram
+          const relInterpret=(()=>{
+            const n=hexName;
+            if(n.includes('咸')) return '咸卦为"感应"之卦，正是男女情缘的本卦。卦象显示你们之间有真实的吸引力——不是理性的计算，而是本能的共鸣。此卦鼓励你们以真诚之心回应对方的感受。';
+            if(n.includes('恒')) return '恒卦为"恒久"之卦。雷与风相随，象征着持久不变的关系。但恒卦也提醒：恒久之道不在于轰轰烈烈，而在于日复一日的相守与坚持。';
+            if(n.includes('泰')) return '泰卦天地交泰，大吉之象。天地之气互通，阴阳和谐——这是感情中最好的状态。但泰极否来，在美好中保持清醒和经营，方能使吉运长久。';
+            if(n.includes('否')) return '否卦天地不交——但请勿担心。"否"是暂时的状态，否极终将泰来。当前如有沟通不畅，打开心扉说出真实想法是打破僵局的关键。';
+            if(n.includes('家人')) return '家人卦风火相生——风吹火旺，象征家庭和睦。这是非常好的缘分卦，暗示你们有组建家庭、共同生活的潜质。言有物而行有恒，以真诚经营日常。';
+            if(n.includes('归妹')) return '归妹卦直指婚姻之事。此卦提醒：感情之事以礼而行，不可苟合。真心相待、循序渐进，婚姻方能长久美满。';
+            if(n.includes('睽')) return '睽卦为乖离之象。火向上而泽向下，方向看似相反——但"睽"的智慧在于求同存异。你们不需要在所有事上一致，尊重差异反而让关系更丰富。';
+            if(n.includes('随')) return '随卦为顺随之象。雷藏泽中，顺势而为。此卦建议在关系中多一些随顺和包容，不以己意强加于人。真正的默契来自于自然而然的跟随。';
+            if(n.includes('渐')) return '渐卦为渐进之象。山上有木，慢慢生长——感情也需要时间。不要急于定义关系或推进进度，让一切在自然中逐步深化。';
+            if(n.includes('中孚')) return '中孚卦为诚信之象。风吹泽上，真诚无欺。这段关系最需要的品质是"信"——对自己诚实，对对方坦诚。信及豚鱼，至诚可以感天动地。';
+            return '此卦象已明示缘分之机。请细细品读卦辞爻辞——每一句古语中都藏着对你们关系的启示。天地不言而四时行焉，答案已在卦中。';
+          })();
+          // Changed hexagram interpretation
+          let changedInterpret='';
+          if(meihua.changed&&meihua.changed!==meihua.original){
+            const cn=meihua.changed.name;
+            changedInterpret='变卦「'+cn+'」揭示这段关系的发展方向。'+getHexDetail(cn)+' ';
+            if(cn.includes('泰')||cn.includes('大有')||cn.includes('咸')||cn.includes('恒')) changedInterpret+='变卦大吉，预示着关系将向好的方向演进，当前的磨合终将开花结果。';
+            else if(cn.includes('否')||cn.includes('剥')||cn.includes('困')) changedInterpret+='变卦有警示——提醒你们在关系中注意某些正在积累的问题。及早沟通、防微杜渐，可避免未来更大的波折。';
+            else changedInterpret+='变卦之象提示你们关注关系发展的中期走向，在关键节点做出明智的选择。';
+          }
+          return `<div style="padding:16px;background:rgba(255,255,255,0.5);border-radius:14px;margin-bottom:14px;text-align:center">
+            <div class="hexagram-name" style="font-size:1.8rem">${hexName}</div>
+            <p style="margin:4px 0;font-size:1.5rem">${meihua.upperTrigram.symbol}${meihua.lowerTrigram.symbol}</p>
+            <p style="color:var(--text-dim);font-size:0.85rem">${meihua.upperTrigram.name}上 · ${meihua.lowerTrigram.name}下 · 动爻<strong>第${meihua.movingLine}爻</strong></p>
+          </div>
+          <div style="padding:14px;background:rgba(201,168,76,0.06);border-radius:12px;margin-bottom:12px">
+            <p style="color:var(--gold-dark);font-weight:700;margin-bottom:6px">📖 卦象解读</p>
+            <p style="line-height:2;font-size:0.95rem">${hexDetail}</p>
+            <p style="line-height:2;font-size:0.93rem;margin-top:4px">💞 <strong>缘分视角：</strong>${relInterpret}</p>
+          </div>
+          <div style="padding:14px;background:rgba(196,30,58,0.03);border-left:4px solid var(--red);border-radius:0 12px 12px 0;margin-bottom:12px">
+            <p style="color:var(--red);font-weight:700;margin-bottom:4px">⚡ 动爻第${meihua.movingLine}爻 · 关系关键点</p>
+            <p style="line-height:2;font-size:0.93rem">${yc}</p>
+            <p style="color:var(--text-dim);font-size:0.85rem;margin-top:4px">这一爻是你们关系的<strong>关键变数</strong>。${meihua.movingLine===1?'初爻为始——关系的根基在此，打好基础则万丈高楼可期。':meihua.movingLine===6?'上爻为终——关系发展的最终走向在此一爻。善始善终，方得圆满。':'中爻之变——关系在发展中会遇到转折点，此爻指示了转折的方向和应对之法。'}</p>
+          </div>
+          ${changedInterpret?`
+          <div style="padding:14px;background:rgba(91,154,139,0.05);border-radius:12px;margin-bottom:12px">
+            <p style="color:var(--jade);font-weight:700;margin-bottom:4px">🔄 变卦「${meihua.changed.name}」· 关系走向</p>
+            <p style="line-height:2;font-size:0.93rem">${changedInterpret}</p>
+            <p style="color:var(--text-dim);font-size:0.9rem;margin-top:4px">📜 ${meihua.changed.judgment||''}</p>
+          </div>`:''}
+          <div style="padding:14px;background:rgba(255,255,255,0.5);border-radius:12px">
+            <p style="color:var(--text-bright);font-weight:700;margin-bottom:4px">💡 体用生克 · 关系动力</p>
+            <p style="line-height:2;font-size:0.93rem">${tiYongFull}</p>
+            <p style="color:var(--text-dim);font-size:0.82rem;margin-top:4px">体卦${meihua.lowerTrigram.name}（${meihua.lowerTrigram.element}）代表${name1} · 用卦${meihua.upperTrigram.name}（${meihua.upperTrigram.element}）代表两人关系的整体气场</p>
+          </div>`;
         })()}
       </div>
 
@@ -2692,6 +2731,23 @@ function analyzeCompatibility(){
           <div><p style="color:var(--text-dim);font-size:0.85rem">${name1}</p>${Object.entries(a1.elementScores).map(([el,s])=>`<span class="tag ${el==='木'?'wood':el==='火'?'fire':el==='土'?'earth':el==='金'?'metal':'water'}">${el} ${s}</span>`).join(' ')}</div>
           <div><p style="color:var(--text-dim);font-size:0.85rem">${name2}</p>${Object.entries(a2.elementScores).map(([el,s])=>`<span class="tag ${el==='木'?'wood':el==='火'?'fire':el==='土'?'earth':el==='金'?'metal':'water'}">${el} ${s}</span>`).join(' ')}</div>
         </div>
+      </div>
+
+      <div class="analysis-section">
+        <h3>✦ 关系经营建议</h3>
+        ${(()=>{
+          const s=compat.score;
+          let advice='';
+          if(s>=85) advice='你们是天造地设的一对，缘分深种。但最怕的不是波折，而是将一切视为理所当然。建议定期为关系注入新鲜感——一次旅行、一个惊喜、或一次深夜长谈。在最好的缘分里，也需要最用心的经营。';
+          else if(s>=70) advice='这是一段值得投入的关系。建议你们建立深度沟通的习惯——不是表面的问候，而是分享内心的真实想法。偶尔的分歧是正常的，学会在争吵后第一个说"我们谈谈"的人，才是关系真正的守护者。';
+          else if(s>=55) advice='你们的关系如同需要雕琢的玉石。重点不在于回避差异，而在于学会与差异共处。建议找到一项两人都喜欢的共同活动，在合作中培养默契。同时，给对方也给自己一些独立空间——最好的关系是"在一起但不窒息"。';
+          else if(s>=40) advice='每段关系都是一场修行，你们的特别之处在于需要更多的耐心和包容。建议关注对方的"爱的语言"——有的人需要言语肯定，有的人需要实际行动。找到对方接收爱的方式，比用自己的方式去爱更重要。';
+          else advice='缘分深浅不只是由命理决定的。最真挚的感情往往在看似"不配"的组合中淬炼而出。如果你们决意走下去，建议放下对"合不合适"的执念，把精力放在"如何让彼此变得更好"上。';
+          return `<p style="line-height:2;font-size:0.95rem;color:var(--text)">${advice}</p>`;
+        })()}
+        <p style="color:var(--text-dim);font-size:0.85rem;margin-top:8px">
+          以上分析基于八字命理和梅花易数，仅供参考。真正的缘分，是由两人每一天的选择与付出共同书写的。
+        </p>
       </div>
     </div>
   `;

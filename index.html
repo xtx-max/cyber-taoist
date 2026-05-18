@@ -3173,43 +3173,43 @@ function askMeiHua(){
   }
 
   // Build answer from hexagram data + ti-yong + domain
-  function buildAnswer(h,question,domain,rel){
-    if(!h) return '卦象已显。天地不言而四时行焉。请静心体悟卦辞，答案自在你心中。';
+  function buildAnswer(h,question,domain,rel,upperTrigram,lowerTrigram){
+    if(!h) return '卦象已显，请静心体悟。';
     const detail=getHexDetail(h.name);
     const judgment=h.judgment||'';
-    // Synthesize answer from hexagram meaning + ti-yong relationship + question domain
-    let ans='';
-    // 1. Hexagram-specific interpretation
+    const domName=domain==='综合运势'?'运势':domain;
+    // Synthesize one coherent answer that directly addresses the question
+    let ans=`针对你问的「${question}」，卦得<strong>${h.name}</strong>。`;
+    // Core hexagram meaning applied to the question
     ans+=detail+' ';
-    // 2. Ti-yong interaction insight
-    const relInsight={
-      'bihe':'体用比和，你与此事天然契合，内外协调一致。',
-      'yong-sheng-ti':'用卦生体卦，外部机缘正向你汇聚。此事对你有利，机会将主动靠近。',
-      'ti-sheng-yong':'体卦生用卦，需要你为此事主动投入心力。付出与收获成正比。',
-      'yong-ke-ti':'用卦克体卦，当前外部环境尚有阻力。不宜强求，宜以柔克刚、等待时机。',
-      'ti-ke-yong':'体卦克用卦，你具备驾驭此事的能力。需要付出努力但最终可控。'
+    // Ti-yong applied specifically to this question
+    const relApp={
+      'bihe':`体用比和，${lowerTrigram.element}气相通——你所问的${domName}之事与你自身的能量天然协调。`,
+      'yong-sheng-ti':`用卦生体，外部机缘正流向你——对于你问的${domName}，这是有利信号。`,
+      'ti-sheng-yong':`体卦生用，你需要为这件${domName}之事主动付出，但投入必有回响。`,
+      'yong-ke-ti':`用克体，当前在${domName}上确有阻力。卦的建议是暂缓而非放弃。`,
+      'ti-ke-yong':`体克用，对这件${domName}之事你有掌控力。需要的是果断而非犹豫。`
     };
-    ans+=relInsight[rel]||'';
-    // 3. Domain-specific deep analysis
-    const domainNote={
-      '感情姻缘':'问感情姻缘之事，卦象已然明示情之走向。观本卦之体用可知两人之间谁为主导、谁为辅助；观变卦可知关系之发展趋势；观动爻可知当前最关键的那个变量是什么。感情之事，真诚为第一要义——卦可指路，但路需自己走。',
-      '事业工作':'问事业前程，卦象已显吉凶趋势。本卦为当下之势，变卦为未来之机。体卦是你的能力底盘，用卦是外部环境。顺势而为胜过逆势硬闯——在对的方向努力远比盲目拼命重要。',
-      '财运财富':'问财帛之事，卦中自有玄机。体用生克揭示了你与财富之间的关系——是财富在找你，还是你在追财富。变卦指示了财务上的转折点，而动爻则告诉你：关键的决定应该什么时候做。',
-      '健康身体':'问健康之事，身心本为一体不可分割。卦象所指不仅是身体的症状，更是你内在能量状态的映射。体卦为你的身体本钱，用卦为外部的医疗和环境影响。关注卦中五行对身体的提示。',
-      '学业考试':'问学业功名，卦象已明方向。本卦如你的知识基础，变卦如考试结果。动爻指示了最需要下功夫的那个环节。恒心和专注是最有力的武器——智慧是积累出来的，不是临时抱佛脚抱出来的。',
-      '出行迁移':'问出行迁移之事，卦已指出宜忌。本卦判断出发的时机是否成熟，变卦预测旅途中的变化与结果。宜仔细品味爻辞中的警示和建议，做好万全准备之后大胆出发。',
-      '人际合作':'问人我关系之事，以诚相待是第一要义。卦象的体用生克反映了你和他人之间的力量对比和利害关系。换位思考往往能化解一半以上的纷争——卦的智慧在于让你看到自己立场之外的东西。',
-      '选择决策':'问两难抉择之事，卦已给出方向性的指引。本卦是你所处的两难局面，变卦是选择之后可能出现的结果。不要纠结于卦的"吉凶"，而要关注卦的"趋势"——趋势告诉你哪条路更适合你的本心。',
-      '综合运势':'问运势吉凶，卦象已全然展现。本卦为当下气运之状，变卦为未来之转机，互卦为中间之过程。三卦合参，配合动爻之变，可勾画出事情发展的完整轮廓。天地不言而四时行焉——答案已在卦中，请静心体悟。'
+    ans+=(relApp[rel]||'')+' ';
+    // Tie back to the question
+    const tieBacks={
+      '感情姻缘':`感情之事，卦象给你的核心提示是：${h.name.includes('咸')?'两情相悦时最忌猜疑，真诚回应对方是此刻最重要的事。':h.name.includes('恒')?'持久的关系需要日复一日的用心，轰轰烈烈不如细水长流。':h.name.includes('睽')?'分歧不是终点，求同存异反而让关系更丰富。':h.name.includes('家人')?'家是讲情的地方不是讲理的地方。以温暖而非道理经营关系。':'不要过度分析卦的吉凶而忽略了最重要的东西——你自己的真心。卦可指方向，但走到终点的永远是你的双脚。'}`,
+      '事业工作':`事业之事，${h.name.includes('升')||h.name.includes('晋')?'卦象显示上升之势，但升卦的精髓在于"积小以高大"——一步一个脚印比一步登天更可靠。':h.name.includes('困')||h.name.includes('蹇')?'当前的困境是暂时的。困卦的智慧在于"守正"——在最难的时候做最对的事。':h.name.includes('革')||h.name.includes('鼎')?'变革的时机到了。革故鼎新，不舍不得。旧的不去新的不来。':'找到你的"不可替代性"——不是做最多的事，而是做只有你能做的事。'}`,
+      '财运财富':`财务之事，${h.name.includes('大有')||h.name.includes('丰')?'丰收在望但需知"日中则昃"——最好的时候也是最需要警惕的时候。':h.name.includes('损')||h.name.includes('剥')?'有失有得，损卦告诉你：暂时的舍弃是为了更好的获得。精打细算胜过投机取巧。':'财富是流动的，卦象提示你关注"进"与"出"的平衡。开源重要，节流同样重要。'}`,
+      '健康身体':`健康之事，${h.name.includes('复')?'一阳来复——身体的自愈能力正在启动。给身体足够的时间恢复。':h.name.includes('颐')?'颐养之道在于"节"——言语有节以养气，饮食有节以养身。':'身心一体，卦象提醒你：身体的不适往往是内心失衡的信号。养身先养心。'}`,
+      '学业考试':`学业之事，${h.name.includes('蒙')?'启蒙阶段需要虚心求教。"匪我求童蒙，童蒙求我"——主动学习比被动接受有效百倍。':h.name.includes('渐')?'循序渐进，不急不躁。渐卦告诉你：慢就是快。每天进步一点点，积累的力量最惊人。':'功到自然成。卦象提示：方法比努力更重要，方向比速度更重要。'}`,
+      '出行迁移':`出行之事，${h.name.includes('旅')?'旅卦为行旅之象。人生如逆旅，心安即是家——准备好就出发。':h.name.includes('需')?'需卦为待时之象——出发之前可能需要再等一等，云上于天，雨将至而未至。':'旅途顺利与否取决于准备是否充分。卦象建议做好功课再上路。'}`,
+      '人际合作':`人际之事，${h.name.includes('同人')?'同人之卦主聚合。志同道合者终将相遇——保持开放的心态，对的人正在来的路上。':h.name.includes('讼')?'讼卦提醒：争赢了一时，可能输了一世。以和为贵，退一步海阔天空。':'以诚相待永远是最有效的社交策略。卦象提示：换位思考可化解大半纷争。'}`,
+      '选择决策':`抉择之事，${h.name.includes('夬')?'夬卦为决断之象——当断不断反受其乱。卦象鼓励你果断行动。':h.name.includes('豫')?'豫卦提醒：不要被犹豫消耗掉最好的时机。做好分析后就大胆决定。':'两条路都有风景。卦象建议：选择你最不怕后悔的那条路。'}`,
+      '综合运势':`当前运势，${h.name.includes('泰')?'泰卦大吉——天地交泰，诸事顺遂。但"无平不陂"，好时不忘坏时防。':h.name.includes('否')?'否卦虽不吉但"否终则倾"——低谷是暂时的，转机已在酝酿。':h.name.includes('既济')?'事已成就但也需"思患预防"——守住成果和取得成果同样重要。':'卦象已明。运势有起伏是常态，平常心是最强大的定力。'}`
     };
-    ans+=(domainNote[domain]||'')+' ';
-    // 4. Judgment text
+    ans+=(tieBacks[domain]||tieBacks['综合运势'])+' ';
     ans+=judgment;
     return ans;
   }
 
-  const answerText=buildAnswer(hex,question,questionDomain,tiYongRel);
-  const changedAnswer=changed&&changed!==hex?buildAnswer(changed,question,questionDomain,tiYongRel):'';
+  const answerText=buildAnswer(hex,question,questionDomain,tiYongRel,result.upperTrigram,result.lowerTrigram);
+  const changedAnswer=changed&&changed!==hex?buildAnswer(changed,question,questionDomain,tiYongRel,result.upperTrigram,result.lowerTrigram):'';
 
   // Mutual hexagram insight
   const mutualInsight=mutual?`互卦「${mutual.name}」揭示事物发展的中间过程。${mutual.judgment||''} 互卦为过程之象，看${mutual.name}之义，可知事件演进中的关键转折。`:'';

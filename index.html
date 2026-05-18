@@ -2548,30 +2548,31 @@ function analyzeCompatibility(){
   const lng1=parseFloat(document.getElementById('compat1-lng').value)||120;
   const lng2=parseFloat(document.getElementById('compat2-lng').value)||120;
   if(!date1||!date2){showToast('请填写双方的出生日期');return;}
-  showLoading('compat-result',['八字排盘中…','命理合参中…','缘分卦起卦中…','解读卦象中…']);
-  // Defer heavy computation so loading animation renders first
+  showLoading('compat-result',['八字排盘中…','命理合参中…','缘分卦起卦中…','解读完成…']);
+  // Break heavy computation into async steps so loading animation can render
   requestAnimationFrame(()=>{
-  setTimeout(()=>{
-  const [y1,m1,d1]=date1.split('-').map(Number);
-  const [y2,m2,d2]=date2.split('-').map(Number);
-  // True Solar Time correction for both
-  const clockH1=(h1===0?0:h1*2-1+1),clockH2=(h2===0?0:h2*2-1+1);
-  const solar1=applyTrueSolarTime(clockH1,0,lng1);
-  const solar2=applyTrueSolarTime(clockH2,0,lng2);
-  const adjDate1=solar1.dayAdvance?new Date(y1,m1-1,d1+1,12,0,0):new Date(y1,m1-1,d1,12,0,0);
-  const adjDate2=solar2.dayAdvance?new Date(y2,m2-1,d2+1,12,0,0):new Date(y2,m2-1,d2,12,0,0);
-  const bazi1=calculateBazi(adjDate1,solar1.hourBranch);
-  advanceLoadingStage('compat-result',1);
-  const bazi2=calculateBazi(adjDate2,solar2.hourBranch);
-  const compat=analyzeCompatibility(bazi1,bazi2);
-  advanceLoadingStage('compat-result',2);
-  const a1=analyzeBaziFull(bazi1),a2=analyzeBaziFull(bazi2);
-  const d1_=new Date(y1,m1-1,d1),d2_=new Date(y2,m2-1,d2);
-  const n1=(d1_.getFullYear()+d1_.getMonth()+d1_.getDate())%100+1;
-  const n2=(d2_.getFullYear()+d2_.getMonth()+d2_.getDate())%100+1;
-  const n3=(h1+h2+1);
-  const meihua=meiHuaYiShu(n1,n2,n3);
-  const scoreColor=compat.score>=70?'var(--jade)':compat.score>=50?'var(--gold-dark)':'var(--red)';
+  setTimeout(()=>{ // Step 1: Bazi calculation
+    const [y1,m1,d1]=date1.split('-').map(Number);
+    const [y2,m2,d2]=date2.split('-').map(Number);
+    const clockH1=(h1===0?0:h1*2-1+1),clockH2=(h2===0?0:h2*2-1+1);
+    const solar1=applyTrueSolarTime(clockH1,0,lng1);
+    const solar2=applyTrueSolarTime(clockH2,0,lng2);
+    const adjDate1=solar1.dayAdvance?new Date(y1,m1-1,d1+1,12,0,0):new Date(y1,m1-1,d1,12,0,0);
+    const adjDate2=solar2.dayAdvance?new Date(y2,m2-1,d2+1,12,0,0):new Date(y2,m2-1,d2,12,0,0);
+    const bazi1=calculateBazi(adjDate1,solar1.hourBranch);
+    const bazi2=calculateBazi(adjDate2,solar2.hourBranch);
+    setTimeout(()=>{ // Step 2: Compatibility analysis (let stage 1 render)
+      advanceLoadingStage('compat-result',1);
+      const compat=analyzeCompatibility(bazi1,bazi2);
+      const a1=analyzeBaziFull(bazi1),a2=analyzeBaziFull(bazi2);
+      setTimeout(()=>{ // Step 3: Mei Hua + Render (let stage 2 render)
+        advanceLoadingStage('compat-result',2);
+        const d1_=new Date(y1,m1-1,d1),d2_=new Date(y2,m2-1,d2);
+        const n1=(d1_.getFullYear()+d1_.getMonth()+d1_.getDate())%100+1;
+        const n2=(d2_.getFullYear()+d2_.getMonth()+d2_.getDate())%100+1;
+        const n3=(h1+h2+1);
+        const meihua=meiHuaYiShu(n1,n2,n3);
+        const scoreColor=compat.score>=70?'var(--jade)':compat.score>=50?'var(--gold-dark)':'var(--red)';
 
   const resultHTML=`
     <div class="glass-card reveal" style="margin-top:24px">
@@ -2623,18 +2624,20 @@ function analyzeCompatibility(){
     </div>
   `;
 
-  advanceLoadingStage('compat-result',3);
-  document.getElementById('compat-result').innerHTML=resultHTML;
-  setTimeout(()=>{
-    document.querySelectorAll('.reveal').forEach(el=>{
-      const rect=el.getBoundingClientRect();
-      if(rect.top<window.innerHeight-100) el.classList.add('visible');
-    });
-  },150);
-  document.getElementById('compat-result').scrollIntoView({behavior:'smooth',block:'start'});
-  saveHistory('bazi',name1+'❤'+name2+' 合盘'+compat.score+'分');
-  renderHistory();
-  },20); // setTimeout to let stage animation render
+        advanceLoadingStage('compat-result',3);
+        document.getElementById('compat-result').innerHTML=resultHTML;
+        setTimeout(()=>{
+          document.querySelectorAll('.reveal').forEach(el=>{
+            const rect=el.getBoundingClientRect();
+            if(rect.top<window.innerHeight-100) el.classList.add('visible');
+          });
+        },150);
+        document.getElementById('compat-result').scrollIntoView({behavior:'smooth',block:'start'});
+        saveHistory('bazi',name1+'❤'+name2+' 合盘'+compat.score+'分');
+        renderHistory();
+      },20); // Step 3: let stage 2 render
+    },20); // Step 2: let stage 1 render
+  },20); // Step 1: let loading animation render
   }); // requestAnimationFrame
 }
 

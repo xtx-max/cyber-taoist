@@ -12,13 +12,7 @@
 <title>赛博天师 · Cyber Taoist</title>
 <meta http-equiv="Cache-Control" content="no-cache">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' style='stop-color:%23c41e3a'/><stop offset='100%25' style='stop-color:%23c9a84c'/></linearGradient></defs><circle cx='32' cy='32' r='30' fill='none' stroke='url(%23g)' stroke-width='2'/><circle cx='32' cy='32' r='28' fill='none' stroke='%23c9a84c' stroke-width='0.5' stroke-dasharray='8 4' opacity='0.5'/><path d='M32 2 A30 30 0 0 1 32 62 A15 15 0 0 0 32 32 A15 15 0 0 1 32 2Z' fill='%23c41e3a' opacity='0.8'/><circle cx='32' cy='17' r='3' fill='%23c9a84c'/><path d='M32 62 A30 30 0 0 1 32 2 A15 15 0 0 0 32 32 A15 15 0 0 1 32 62Z' fill='%23c9a84c' opacity='0.8'/><circle cx='32' cy='47' r='3' fill='%23c41e3a'/><rect x='14' y='28' width='4' height='2' fill='%23c9a84c' opacity='0.6'/><rect x='46' y='34' width='4' height='2' fill='%23c9a84c' opacity='0.6'/><rect x='28' y='8' width='2' height='4' fill='%23c9a84c' opacity='0.6'/><rect x='34' y='52' width='2' height='4' fill='%23c9a84c' opacity='0.6'/></svg>">
-<!-- Google Fonts loaded async to prevent blocking in China -->
-<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=ZCOOL+KuaiLe&family=Ma+Shan+Zheng&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=ZCOOL+KuaiLe&family=Ma+Shan+Zheng&display=swap" rel="stylesheet"></noscript>
-<script>/* Fallback: if Google Fonts doesn't load within 2s, use system fonts */setTimeout(function(){if(!document.fonts||document.fonts.check('1em Noto Sans SC'))return;document.documentElement.style.setProperty('--font-main',"'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif");document.documentElement.style.setProperty('--font-display',"'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif");},2000);</script>
-<style>/* System font stack — works immediately even if Google Fonts blocked */ body{font-family:'PingFang SC','Hiragino Sans GB','Microsoft YaHei','Noto Sans SC',sans-serif} </style>
+<style>body{font-family:'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif}</style>
 <style>
 /* ============ CSS Variables — Festive Feng Shui Theme ============ */
 :root {
@@ -47,9 +41,9 @@
   --radius-xs: 10px;
   --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --smooth: cubic-bezier(0.4, 0, 0.2, 1);
-  --font-main: 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-  --font-display: 'ZCOOL KuaiLe', 'Ma Shan Zheng', cursive;
-  --font-brush: 'Ma Shan Zheng', cursive;
+  --font-main: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --font-display: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', serif;
+  --font-brush: 'PingFang SC', 'Hiragino Sans GB', serif;
 }
 
 /* ============ Reset & Base ============ */
@@ -3201,7 +3195,8 @@ function askMeiHua(){
     }else if(isChoice){
       // Generic choice question
       html+=`<p style="line-height:2.1;margin-bottom:14px">你问「${q}」。卦得<strong>${h.name}</strong>。${detail}</p>`;
-      html+=`<p style="line-height:2.1;margin-bottom:14px">面对这个选择，卦象的建议很明确：${rel==='yong-sheng-ti'?'机会正向你靠近，答案呼之欲出——选那个让你心跳加速的。':rel==='bihe'?'两个方向其实都走得通。但卦象提示：选那条让你不需要伪装自己的路。':rel==='ti-sheng-yong'?'无论选哪个都需要你付出，但一条是顺水推舟，一条是逆水行舟。选阻力小的那条先走。':rel==='yong-ke-ti'?'当前不是做决定的最佳时机。如果可以不选，就先放一放。如果必须选，选那个即使错了也代价较小的。':rel==='ti-ke-yong'?'你有能力驾驭任何选择。但卦象说：选那个能让你全力以赴而不是患得患失的。'}</p>`;
+      const choiceAdvice={'yong-sheng-ti':'机会正向你靠近，答案呼之欲出——选那个让你心跳加速的。','bihe':'两个方向其实都走得通。但卦象提示：选那条让你不需要伪装自己的路。','ti-sheng-yong':'无论选哪个都需要你付出，但一条是顺水推舟，一条是逆水行舟。选阻力小的那条先走。','yong-ke-ti':'当前不是做决定的最佳时机。如果可以不选，就先放一放。如果必须选，选那个即使错了也代价较小的。','ti-ke-yong':'你有能力驾驭任何选择。但卦象说：选那个能让你全力以赴而不是患得患失的。'};
+      html+=`<p style="line-height:2.1;margin-bottom:14px">面对这个选择，卦象的建议很明确：${choiceAdvice[rel]||choiceAdvice['bihe']}</p>`;
       html+=`<p style="line-height:2.1;margin-bottom:14px">${h.name}的卦义是：${judgment}</p>`;
     }else{
       // Regular question — directly address it
@@ -3214,7 +3209,8 @@ function askMeiHua(){
         'ti-ke-yong':`体卦克用卦——你对这件事有掌控力。卦象在说：你不是被动的，你有能力主导走向。需要的只是真正行动起来。`
       };
       html+=`<p style="line-height:2.1;margin-bottom:14px">${relExplain[rel]||relExplain['bihe']}</p>`;
-      html+=`<p style="line-height:2.1;margin-bottom:14px">那么对你问的这个问题，直接的回答是：${rel==='yong-sheng-ti'?'方向是对的，安心往前走。':rel==='bihe'?'保持你现在的状态就是最好的策略。':rel==='ti-sheng-yong'?'值得做，但需要你真正投入进去。':rel==='yong-ke-ti'?'时机还不成熟，建议再等等。':rel==='ti-ke-yong'?'可以做成，但你得真正动起来。'}</p>`;
+      const directAnswer={'yong-sheng-ti':'方向是对的，安心往前走。','bihe':'保持你现在的状态就是最好的策略。','ti-sheng-yong':'值得做，但需要你真正投入进去。','yong-ke-ti':'时机还不成熟，建议再等等。','ti-ke-yong':'可以做成，但你得真正动起来。'};
+      html+=`<p style="line-height:2.1;margin-bottom:14px">那么对你问的这个问题，直接的回答是：${directAnswer[rel]||directAnswer['bihe']}</p>`;
     }
     html+=`<p style="line-height:2;color:var(--gold-dark);margin-top:10px">📜 卦辞：${judgment}</p>`;
     return html;

@@ -419,41 +419,34 @@ select option{background:#fffef9;color:#3d2b1f}
 .dayun-pillar{font-size:1.1rem;font-weight:700;color:var(--text-bright);margin:4px 0}
 .dayun-nayin{font-size:0.72rem;color:var(--text-dim)}
 
-/* ============ Loading Ritual ============ */
+/* ============ Loading Progress Bar ============ */
 .loading-ritual{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:50px 20px;text-align:center;
+  padding:40px 24px;text-align:center;
 }
-.loading-taiji{
-  width:56px;height:56px;position:relative;
-  animation:taijiSpin 1.5s linear infinite;
+.loading-bar-wrap{
+  width:100%;max-width:320px;height:4px;background:rgba(0,0,0,0.05);
+  border-radius:2px;overflow:hidden;margin-bottom:16px;
 }
-.loading-taiji::before{
-  content:'☯';font-size:3rem;display:block;line-height:56px;
-  background:linear-gradient(135deg,var(--gold),var(--red));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  background-clip:text;
+.loading-bar-fill{
+  height:100%;width:0%;border-radius:2px;
+  background:linear-gradient(90deg,var(--gold),var(--red),var(--gold-dark));
+  background-size:200% 100%;
+  animation:barFill 2s ease-in-out infinite,barShimmer 1.5s linear infinite;
 }
-@keyframes taijiSpin{to{transform:rotate(360deg)}}
+@keyframes barFill{
+  0%{width:0%}30%{width:35%}60%{width:65%}100%{width:90%}
+}
+@keyframes barShimmer{
+  0%{background-position:200% 0}100%{background-position:-200% 0}
+}
 .loading-text{
-  margin-top:16px;font-size:0.95rem;color:var(--gold-dark);
-  font-family:var(--font-display);animation:pulse-text 1.2s ease-in-out infinite;
+  font-size:0.9rem;color:var(--text-dim);font-weight:500;
 }
-@keyframes pulse-text{0%,100%{opacity:0.5}50%{opacity:1}}
-.loading-stages{
-  display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;justify-content:center;
-}
-.loading-stage{
-  font-size:0.75rem;color:var(--text-dim);padding:4px 10px;
-  border-radius:12px;background:rgba(255,255,255,0.5);
-  transition:all 0.5s;opacity:0.4;
-}
-.loading-stage.done{opacity:1;color:var(--jade);background:rgba(91,154,139,0.08)}
-.loading-stage.active{opacity:1;color:var(--gold-dark);background:rgba(201,168,76,0.12);animation:pulse-text 0.8s ease-in-out infinite}
-
-/* Old spinner kept for backward compat */
-.spinner-overlay{display:none}
-.spinner{display:none}
+.loading-text span{animation:dotPulse 1.4s ease-in-out infinite}
+.loading-text span:nth-child(2){animation-delay:0.2s}
+.loading-text span:nth-child(3){animation-delay:0.4s}
+@keyframes dotPulse{0%,60%,100%{opacity:0.3}30%{opacity:1}}
 
 /* ============ Back to Top ============ */
 #back-top{
@@ -2049,25 +2042,13 @@ function generateDailyFortune(bazi){
 // ============================================================
 
 // Loading helper — feng shui ritual animation
-function showLoading(targetId, stages=[]){
+function showLoading(targetId){
   const el=document.getElementById(targetId);
   if(!el) return;
-  const stageNames=stages.length>0?stages:['排盘推演中…','五行分析中…','卦象解读中…'];
-  let stagesHTML='';
-  if(stageNames.length>1){
-    stagesHTML='<div class="loading-stages">'+stageNames.map((s,i)=>`<span class="loading-stage${i===0?' active':''}" id="load-stage-${targetId}-${i}">${s}</span>`).join('')+'</div>';
-  }
-  el.innerHTML=`<div class="loading-ritual"><div class="loading-taiji"></div><div class="loading-text">推演命盘，参悟天机…</div>${stagesHTML}</div>`;
-}
-
-function advanceLoadingStage(targetId,stageIdx){
-  const stage=document.getElementById('load-stage-'+targetId+'-'+stageIdx);
-  if(stage){
-    // Mark previous as done
-    const prev=document.getElementById('load-stage-'+targetId+'-'+(stageIdx-1));
-    if(prev){prev.classList.remove('active');prev.classList.add('done');}
-    stage.classList.add('active');
-  }
+  el.innerHTML=`<div class="loading-ritual">
+    <div class="loading-bar-wrap"><div class="loading-bar-fill"></div></div>
+    <div class="loading-text">推演中<span>.</span><span>.</span><span>.</span></div>
+  </div>`;
 }
 function showToast(msg){
   const toast=document.createElement('div');

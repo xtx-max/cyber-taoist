@@ -1718,9 +1718,8 @@ function meiHuaYiShu(num1,num2,num3){
   };
 }
 
-// Detailed 爻辞 for each of the 64 hexagrams' 6 lines
-function getYaoCi(hexName,movingLine){
-  const YC={
+// 384 爻辞 — module-level, created once (not inside function)
+const YAO_CI_DB={
     '乾为天':['潜龙勿用。时机未到，宜积蓄力量，静待风云变幻。','见龙在田，利见大人。才华初露，需要伯乐赏识。主动展示自己。','终日乾乾，夕惕若厉。勤勉不懈，朝乾夕惕，虽处险境亦可无咎。','或跃在渊，无咎。进退自如，既可一跃飞天亦可安守深渊，审时度势为上。','飞龙在天，利见大人。大展宏图，如日中天。贵人相助，事业巅峰。','亢龙有悔。盛极必衰，居高思危。切忌得意忘形，功成身退方为智者。'],
     '坤为地':['履霜，坚冰至。见微知著，小患不除将酿大祸。防微杜渐。','直方大，不习无不利。正直端方，自然行事，无需刻意修饰。','含章可贞，或从王事。内含才华而不炫耀，待机而动，功成不居。','括囊，无咎无誉。谨言慎行，收敛锋芒。此时沉默是金。','黄裳，元吉。中庸之道，谦逊温良。以柔克刚，不争而胜。','龙战于野，其血玄黄。阴阳相争，事情走到了极端。物极必反。'],
     '水雷屯':['磐桓，利居贞，利建侯。万物始生，破土艰难。宜稳守根基。','屯如邅如，乘马班如。徘徊难进，非不欲进也，乃势未至也。','即鹿无虞，惟入于林中。无导而猎，必陷于林。强求反失。','乘马班如，求婚媾。往吉，坚持可成。机遇终会降临。','屯其膏，小贞吉，大贞凶。小利可得，大举有险。宜小不宜大。','乘马班如，泣血涟如。穷途末路之象，宜回退重整。何不归去？'],
@@ -1782,18 +1781,17 @@ function getYaoCi(hexName,movingLine){
     '雷山小过':['飞鸟以凶。飞鸟带来凶兆。','过其祖，遇其妣。错过祖父遇到祖母。不及其君遇其臣。','弗过防之。不要过度但要提防。从或戕之。凶。','无咎。弗过遇之。不过分而待之。往厉必戒。','密云不雨。浓云密布却不下雨。自我西郊。公弋取彼在穴。','弗遇过之。没有相遇却超过了。飞鸟离之。凶。'],
     '水火既济':['曳其轮。拖着车轮。濡其尾。无咎。','妇丧其茀。妇人丢失了发饰。勿逐，七日得。','高宗伐鬼方。三年攻克鬼方。小人勿用。','繻有衣袽。华衣之下有破旧内衬。终日戒。','东邻杀牛。东邻杀牛祭祀不如西邻简朴的禴祭。实受其福。','濡其首。水淹没了头。厉。'],
     '火水未济':['濡其尾。弄湿了尾巴。吝。','曳其轮。拖着车轮。贞吉。','未济，征凶。事情未成，出征有凶。利涉大川。','贞吉悔亡。震用伐鬼方三年有赏于大国。','贞吉无悔。君子之光。有孚，吉。','有孚于饮酒。诚信地饮酒。无咎。濡其首。']
-  };
-  if(YC[hexName]&&YC[hexName][movingLine-1]) return YC[hexName][movingLine-1];
-  // Generic fallback with line + hexagram logic
-  const genericYao={
-    1:'此初爻为事物发端。一爻动则根基生变，万事从头来过。所问之事尚在萌芽，宜稳扎稳打，不宜好高骛远。根基牢固，方可承重。',
-    2:'此二爻为内卦之中，处低位而近核心。动在二爻，意味着事情在内部酝酿变化。宜守中道，以柔克刚，在无声中积蓄力量。',
-    3:'此三爻处上下之交，位在变动之极。动在三爻，表明事情正处在关键的转折点上。三多凶，宜谨慎守正，防微杜渐。一旦跨过此关，前路将豁然开朗。',
-    4:'此四爻近君位，外卦之始。动在四爻，外部环境即将发生变化。多惧之位，宜审时度势，顺应大局以求出路。',
-    5:'此五爻为尊位，卦之中正。动在五爻，局势将由核心人物或关键决策主导。多功之位，当以德配位，利见大人。光明在前。',
-    6:'此上爻为事物之终，穷极将变。动在上爻，意味着当前局面即将走到尽头。盛极必衰、否极泰来——变化之后将是新的开始。'
-  };
-  return genericYao[movingLine]||'此爻之变，恰合天机。静心体察卦象爻辞，答案自在其间。';
+};
+
+// 384 爻辞 — now a global, created once
+function getYaoCi(hexName,movingLine){
+  if(YAO_CI_DB[hexName]&&YAO_CI_DB[hexName][movingLine-1]) return YAO_CI_DB[hexName][movingLine-1];
+  return ['此初爻为事物发端，根基生变，万事从头来过。宜稳扎稳打。',
+    '此二爻处内卦之中，低位近核心。事在内部酝酿，宜守中道。',
+    '此三爻处上下之交，变动之极。关键转折，宜谨慎守正。',
+    '此四爻近君位，外卦之始。外部将变，宜审时度势。',
+    '此五爻为尊位，卦之中正。核心主导，利见大人。',
+    '此上爻为事之终，穷极将变。盛极必衰，否极泰来。'][movingLine-1]||'此爻之变恰合天机，静心体察卦辞。';
 }
 
 // Expanded 64 hexagram detailed interpretations
@@ -2275,7 +2273,7 @@ function analyzeBazi(){
   const longitude=parseFloat(document.getElementById('bazi-lng').value)||120;
   if(!date){showToast('请选择出生日期');return;}
   showLoading('bazi-result');
-  requestAnimationFrame(()=>{
+  setTimeout(()=>{
   const [y,m,d]=date.split('-').map(Number);
   // Calculate True Solar Time
   const clockHour=(clockHourBranch===0?0:clockHourBranch*2-1+1); // midpoint of 时辰
@@ -2516,7 +2514,7 @@ function analyzeBazi(){
   saveHistory('bazi',name+' · '+bazi.dayPillar.stem+bazi.dayPillar.branch+'日主');
   renderHistory();
   renderProfileList();
-  }); // requestAnimationFrame
+  },50);
 }
 
 function analyzeCompatibility(){
@@ -2530,8 +2528,7 @@ function analyzeCompatibility(){
   const lng2=parseFloat(document.getElementById('compat2-lng').value)||120;
   if(!date1||!date2){showToast('请填写双方的出生日期');return;}
   showLoading('compat-result');
-  // rAF ensures loading animation renders, then compute everything synchronously (fastest)
-  requestAnimationFrame(()=>{
+  setTimeout(()=>{ // 50ms ensures loading bar paints before heavy computation
     const [y1,m1,d1]=date1.split('-').map(Number);
     const [y2,m2,d2]=date2.split('-').map(Number);
     const clockH1=(h1===0?0:h1*2-1+1),clockH2=(h2===0?0:h2*2-1+1);
@@ -2609,7 +2606,7 @@ function analyzeCompatibility(){
     document.getElementById('compat-result').scrollIntoView({behavior:'smooth',block:'start'});
     saveHistory('bazi',name1+'❤'+name2+' 合盘'+compat.score+'分');
     renderHistory();
-  }); // requestAnimationFrame
+  },50); // setTimeout — ensures loading bar painted
 }
 
 function loadDailyFortune(){
@@ -2830,7 +2827,7 @@ function askMeiHua(){
   const n2=parseInt(document.getElementById('meihua-num2').value);
   if(!n1||!n2||n1<1||n2<1){showToast('请输入两个1-999之间的数字');return;}
   showLoading('meihua-result');
-  requestAnimationFrame(()=>{
+  setTimeout(()=>{
   const result=meiHuaYiShu(n1,n2,n1+n2);
   const hex=result.original,mutual=result.mutual,changed=result.changed;
   const inv=result.inverse,comp=result.complement;
@@ -3079,7 +3076,7 @@ function askMeiHua(){
   document.getElementById('meihua-result').scrollIntoView({behavior:'smooth',block:'start'});
   saveHistory('meihua',question.substring(0,40));
   renderHistory();
-  }); // requestAnimationFrame
+  },50);
 }
 
 // ============================================================

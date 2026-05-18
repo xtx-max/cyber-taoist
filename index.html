@@ -2606,10 +2606,11 @@ function analyzeCompatibility(){
 
       <p style="text-align:center;color:var(--text-dim);line-height:1.9;margin-bottom:20px;font-size:0.95rem">${compat.desc}</p>
 
-      <p style="text-align:center;font-size:0.78rem;color:var(--text-dim);margin-bottom:16px;padding:8px;background:rgba(201,168,76,0.05);border-radius:8px">
+      <p style="text-align:center;font-size:0.75rem;color:var(--text-dim);margin-bottom:16px;padding:8px;background:rgba(201,168,76,0.05);border-radius:8px">
         🕐 ${name1}：经度${lng1.toFixed(1)}° ${solar1.description} → ${HOUR_NAMES[solar1.hourBranch]}${solar1.dayAdvance?'(日柱+1天)':''}
         ｜ ${name2}：经度${lng2.toFixed(1)}° ${solar2.description} → ${HOUR_NAMES[solar2.hourBranch]}${solar2.dayAdvance?'(日柱+1天)':''}
-        <br>评分基于：${bazi1.yearPillar.stem}${bazi1.yearPillar.branch} ${bazi1.dayPillar.stem}${bazi1.dayPillar.branch} ↔ ${bazi2.yearPillar.stem}${bazi2.yearPillar.branch} ${bazi2.dayPillar.stem}${bazi2.dayPillar.branch}
+        <br>🔑 八字指纹：${bazi1.yearPillar.stem}${bazi1.yearPillar.branch} ${bazi1.monthPillar.stem}${bazi1.monthPillar.branch} ${bazi1.dayPillar.stem}${bazi1.dayPillar.branch} ${bazi1.hourPillar.stem}${bazi1.hourPillar.branch} ↔ ${bazi2.yearPillar.stem}${bazi2.yearPillar.branch} ${bazi2.monthPillar.stem}${bazi2.monthPillar.branch} ${bazi2.dayPillar.stem}${bazi2.dayPillar.branch} ${bazi2.hourPillar.stem}${bazi2.hourPillar.branch} · 评分${compat.score}分
+        <br><span style="font-size:0.7rem">只要这8个字相同，无论谁在哪台设备上算，分数永远一致</span>
       </p>
 
       <div class="pillars-grid">

@@ -14,6 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=ZCOOL+KuaiLe&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<style>/* Font fallback — ensure readable even if CDN blocked */ body{font-family:'PingFang SC','Hiragino Sans GB','Microsoft YaHei','Noto Sans SC',sans-serif} </style>
 <style>
 /* ============ CSS Variables — Festive Feng Shui Theme ============ */
 :root {
@@ -400,6 +401,76 @@ select option{background:#fffef9;color:#3d2b1f}
 .dayun-pillar{font-size:1.1rem;font-weight:700;color:var(--text-bright);margin:4px 0}
 .dayun-nayin{font-size:0.72rem;color:var(--text-dim)}
 
+/* ============ Loading Spinner ============ */
+.spinner-overlay{
+  display:flex;align-items:center;justify-content:center;padding:40px;
+}
+.spinner{
+  width:36px;height:36px;border:3px solid var(--border);
+  border-top-color:var(--gold);border-radius:50%;
+  animation:spin 0.7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ============ Back to Top ============ */
+#back-top{
+  position:fixed;bottom:30px;right:30px;z-index:99;
+  width:44px;height:44px;border-radius:50%;
+  background:var(--bg-card);border:1px solid var(--border-strong);
+  box-shadow:var(--shadow);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transform:translateY(20px);pointer-events:none;
+  transition:all 0.4s var(--spring);
+  font-size:1.2rem;color:var(--gold-dark);
+}
+#back-top.show{opacity:1;transform:translateY(0);pointer-events:auto}
+#back-top:hover{background:var(--bg-card-hover);box-shadow:var(--shadow-hover);transform:translateY(-3px)}
+
+/* ============ Profile List ============ */
+.profile-list{margin-top:12px}
+.profile-row{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:10px 14px;margin:6px 0;
+  background:rgba(255,255,255,0.6);border-radius:var(--radius-sm);
+  border:1px solid var(--border);transition:all 0.3s;
+}
+.profile-row:hover{background:rgba(255,255,255,0.9)}
+.profile-row .pinfo{flex:1;font-size:0.9rem;color:var(--text)}
+.profile-row .pmeta{font-size:0.78rem;color:var(--text-dim)}
+.profile-row .pdel{
+  padding:5px 12px;font-size:0.78rem;border-radius:16px;
+  border:1px solid rgba(196,30,58,0.2);background:rgba(196,30,58,0.04);
+  color:var(--red);cursor:pointer;transition:all 0.3s;
+}
+.profile-row .pdel:hover{background:rgba(196,30,58,0.1)}
+
+/* ============ Share Button ============ */
+.btn-share{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 18px;font-size:0.85rem;border-radius:20px;
+  background:transparent;border:1px solid var(--border);
+  color:var(--text-dim);cursor:pointer;transition:all 0.3s;
+  font-family:var(--font-main);
+}
+.btn-share:hover{border-color:var(--gold);color:var(--gold-dark);background:rgba(201,168,76,0.05)}
+
+/* ============ Section Divider Thick ============ */
+.section-thick{
+  border-top:2px dashed var(--border);margin:16px 0;
+}
+
+/* ============ History Item ============ */
+.history-item{
+  padding:12px 16px;margin:8px 0;cursor:pointer;
+  background:rgba(255,255,255,0.5);border-radius:var(--radius-sm);
+  border:1px solid var(--border);transition:all 0.3s;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+}
+.history-item:hover{background:rgba(255,255,255,0.85);border-color:var(--border-strong)}
+.history-item .hname{font-weight:600;color:var(--text);font-size:0.93rem}
+.history-item .hdate{font-size:0.78rem;color:var(--text-dim)}
+.history-item .haction{font-size:0.78rem;color:var(--gold-dark);white-space:nowrap}
+
 /* ============ Footer ============ */
 footer{
   text-align:center;padding:40px 20px;
@@ -488,12 +559,37 @@ footer p{margin:4px 0}
               </select>
             </div>
           </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>出生城市（真太阳时校准）</label>
+              <select id="bazi-city" onchange="onCityChange('bazi')">
+                <option value="">— 选择城市或手动输入经度 —</option>
+                ${CITY_LNG.map(c=>`<option value="${c.city}">${c.city}（东经${c.lng.toFixed(1)}°）</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group">
+              <label>自定义经度（°E，可手动输入）</label>
+              <input type="number" id="bazi-lng" placeholder="如：116.4（北京）" step="0.1" min="-180" max="180" value="120">
+            </div>
+          </div>
+          <p style="color:var(--text-dim);font-size:0.78rem;margin-bottom:8px">
+            💡 八字推算以<b>真太阳时</b>为准。中国标准时间以东经120°为基准，每偏1度差4分钟。如成都在东经104°，真太阳时比北京时间慢约64分钟，可能影响时辰判定。
+          </p>
           <button class="btn btn-primary btn-block" onclick="analyzeBazi()" style="margin-top:8px">
             ✦ 推算命盘
           </button>
         </form>
       </div>
       <div id="bazi-result"></div>
+
+      <div class="glass-card reveal" style="margin-top:24px">
+        <h3 style="cursor:pointer" onclick="document.getElementById('profile-list-container').style.display=document.getElementById('profile-list-container').style.display==='none'?'block':'none';document.getElementById('history-container').style.display='none'">📋 已保存档案 ▾</h3>
+        <div id="profile-list-container" style="display:none"></div>
+      </div>
+      <div class="glass-card reveal" style="margin-top:16px">
+        <h3 style="cursor:pointer" onclick="document.getElementById('history-container').style.display=document.getElementById('history-container').style.display==='none'?'block':'none';document.getElementById('profile-list-container').style.display='none'">🕐 历史记录 ▾</h3>
+        <div id="history-container" style="display:none"></div>
+      </div>
     </section>
 
     <!-- === COMPATIBILITY PAGE === -->
@@ -511,8 +607,16 @@ footer p{margin:4px 0}
           <div class="form-group"><label>你的出生时辰</label><select id="compat-hour1"></select></div>
         </div>
         <div class="form-row">
+          <div class="form-group"><label>你的出生城市</label><select id="compat-city1" onchange="onCityChange('compat1')"><option value="">— 选择城市 —</option>${CITY_LNG.map(c=>`<option value="${c.city}">${c.city}（${c.lng.toFixed(1)}°）</option>`).join('')}</select></div>
+          <div class="form-group"><label>你的经度</label><input type="number" id="compat1-lng" placeholder="东经" step="0.1" min="-180" max="180" value="120"></div>
+        </div>
+        <div class="form-row">
           <div class="form-group"><label>对方出生日期</label><input type="date" id="compat-date2" min="1900-01-01" max="2050-12-31"></div>
           <div class="form-group"><label>对方出生时辰</label><select id="compat-hour2"></select></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>对方出生城市</label><select id="compat-city2" onchange="onCityChange('compat2')"><option value="">— 选择城市 —</option>${CITY_LNG.map(c=>`<option value="${c.city}">${c.city}（${c.lng.toFixed(1)}°）</option>`).join('')}</select></div>
+          <div class="form-group"><label>对方经度</label><input type="number" id="compat2-lng" placeholder="东经" step="0.1" min="-180" max="180" value="120"></div>
         </div>
         <button class="btn btn-primary btn-block" onclick="analyzeCompatibility()" style="margin-top:8px">
           ❤ 查看缘分
@@ -575,6 +679,7 @@ footer p{margin:4px 0}
       <div id="meihua-result"></div>
     </section>
   </main>
+  <div id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="回到顶部">☯</div>
   <footer>
     <p>☯ 赛博天师 · 以古法为基，AI 为辅</p>
     <p>仅供娱乐参详，勿过度执念。命运在己，不在卦中。</p>
@@ -603,8 +708,65 @@ footer p{margin:4px 0}
 })();
 
 // ============================================================
-// SECTION 1: EMBEDDED DATA
+// SECTION 0: TRUE SOLAR TIME DATA
 // ============================================================
+
+// City longitude lookup (common Chinese cities)
+const CITY_LNG = [
+  {city:'北京',lng:116.4},{city:'上海',lng:121.5},{city:'广州',lng:113.3},{city:'深圳',lng:114.1},
+  {city:'成都',lng:104.1},{city:'重庆',lng:106.5},{city:'杭州',lng:120.2},{city:'武汉',lng:114.3},
+  {city:'西安',lng:108.9},{city:'郑州',lng:113.7},{city:'南京',lng:118.8},{city:'天津',lng:117.2},
+  {city:'长沙',lng:113.0},{city:'昆明',lng:102.7},{city:'贵阳',lng:106.7},{city:'南宁',lng:108.3},
+  {city:'福州',lng:119.3},{city:'厦门',lng:118.1},{city:'合肥',lng:117.3},{city:'南昌',lng:115.9},
+  {city:'济南',lng:117.0},{city:'青岛',lng:120.4},{city:'大连',lng:121.6},{city:'沈阳',lng:123.4},
+  {city:'长春',lng:125.3},{city:'哈尔滨',lng:126.6},{city:'乌鲁木齐',lng:87.6},{city:'拉萨',lng:91.1},
+  {city:'兰州',lng:103.7},{city:'西宁',lng:101.7},{city:'银川',lng:106.3},{city:'呼和浩特',lng:111.7},
+  {city:'海口',lng:110.3},{city:'三亚',lng:109.5},{city:'香港',lng:114.2},{city:'澳门',lng:113.5},
+  {city:'台北',lng:121.5},{city:'苏州',lng:120.6},{city:'无锡',lng:120.3},{city:'宁波',lng:121.5},
+  {city:'温州',lng:120.7},{city:'珠海',lng:113.6},{city:'佛山',lng:113.1},{city:'东莞',lng:113.7},
+  {city:'石家庄',lng:114.5},{city:'太原',lng:112.5},{city:'东京',lng:139.7},{city:'首尔',lng:127.0},
+  {city:'新加坡',lng:103.8},{city:'伦敦',lng:-0.1},{city:'纽约',lng:-74.0},{city:'洛杉矶',lng:-118.2},
+  {city:'悉尼',lng:151.2},{city:'多伦多',lng:-79.4},{city:'温哥华',lng:-123.1},{city:'巴黎',lng:2.3}
+];
+
+// Calculate True Solar Time correction
+// China standard time = UTC+8 (120°E meridian)
+// True Solar Time offset = (longitude - 120) × 4 minutes
+function getTrueSolarOffset(longitude){
+  return (longitude - 120) * 4; // in minutes
+}
+
+// Apply True Solar Time correction to birth hour and determine adjusted time
+function applyTrueSolarTime(birthHour, birthMinute, longitude){
+  const offsetMin = getTrueSolarOffset(longitude);
+  let totalMin = birthHour * 60 + birthMinute + offsetMin;
+  // Keep within 0-1440 range (one day)
+  totalMin = ((totalMin % 1440) + 1440) % 1440;
+  const adjHour = Math.floor(totalMin / 60);
+  const adjMin = Math.round(totalMin % 60);
+  // Determine 时辰 (two-hour period)
+  // 子时: 23:00-00:59, 丑时: 1:00-2:59, ..., 亥时: 21:00-22:59
+  let hourBranch;
+  if(adjHour >= 23 || adjHour < 1) hourBranch = 0; // 子时
+  else hourBranch = Math.floor((adjHour - 1) / 2) + 1;
+  // Day adjustment flag: if original hour < 23 but adjusted hour >= 23, day advances
+  // If original hour >= 23 but adjusted hour < 23, day stays (already on next day)
+  const dayAdvance = (birthHour < 23 && adjHour >= 23);
+  return {
+    adjustedHour: adjHour,
+    adjustedMinute: adjMin,
+    offsetMinutes: offsetMin,
+    hourBranch: hourBranch,
+    dayAdvance: dayAdvance,
+    description: `${offsetMin >= 0 ? '+' : ''}${Math.round(offsetMin)}分钟`
+  };
+}
+
+// Get longitude from city name
+function getLngByCity(cityName){
+  const found = CITY_LNG.find(c => c.city === cityName);
+  return found ? found.lng : null;
+}
 const TIAN_GAN = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
 const TG_ELEMENT = ['木','木','火','火','土','土','金','金','水','水'];
 const TG_YINYANG = ['阳','阴','阳','阴','阳','阴','阳','阴','阳','阴'];
@@ -1722,13 +1884,47 @@ function generateDailyFortune(bazi){
 // SECTION 8: UI CONTROLLER
 // ============================================================
 
+// Loading helper
+function showLoading(targetId){
+  const el=document.getElementById(targetId);
+  if(el) el.innerHTML='<div class="spinner-overlay"><div class="spinner"></div></div>';
+}
+function showToast(msg){
+  const toast=document.createElement('div');
+  toast.className='toast';toast.textContent=msg;
+  document.body.appendChild(toast);
+  setTimeout(()=>toast.remove(),3000);
+}
+
+// Back to top visibility
+function updateBackTop(){
+  const btn=document.getElementById('back-top');
+  if(!btn) return;
+  if(window.scrollY>400) btn.classList.add('show');
+  else btn.classList.remove('show');
+}
+
+// Copy text to clipboard
+function copyText(text){
+  if(navigator.clipboard){navigator.clipboard.writeText(text).then(()=>showToast('已复制到剪贴板 📋'));}
+  else{showToast('请手动复制结果');}
+}
+
+// ============================================================
+// SECTION 8.1: PROFILE MANAGEMENT
+// ============================================================
+
 function getProfiles(){try{return JSON.parse(localStorage.getItem('cyberTaoistProfiles')||'[]')}catch(e){return[]}}
-function saveProfile(name,gender,date,hourBranch){
+function saveProfile(name,gender,date,hourBranch,longitude){
   const profiles=getProfiles();
+  const lng=longitude||120;
   const [y,m,d]=date.split('-').map(Number);
+  const solarTime=applyTrueSolarTime(hourBranch===0?0:hourBranch*2-1+1,0,lng);
+  const adjHourBranch=solarTime.hourBranch;
   const solarDate=new Date(y,m-1,d,12,0,0);
-  const bazi=calculateBazi(solarDate,hourBranch);
-  profiles.push({id:Date.now(),name,gender,date,hourBranch,bazi});
+  const adjustedDate=solarTime.dayAdvance?new Date(y,m-1,d+1,12,0,0):solarDate;
+  const bazi=calculateBazi(adjustedDate,adjHourBranch);
+  profiles.push({id:Date.now(),name,gender,date,hourBranch:adjHourBranch,clockHourBranch:hourBranch,longitude:lng,bazi});
   localStorage.setItem('cyberTaoistProfiles',JSON.stringify(profiles));
   return profiles;
 }
@@ -1785,7 +1981,8 @@ function loadProfileToBazi(){
   document.getElementById('bazi-name').value=p.name||'';
   document.getElementById('bazi-gender').value=p.gender||'male';
   document.getElementById('bazi-date').value=p.date;
-  document.getElementById('bazi-hour').value=p.hourBranch;
+  document.getElementById('bazi-hour').value=p.clockHourBranch!==undefined?p.clockHourBranch:p.hourBranch;
+  document.getElementById('bazi-lng').value=p.longitude||120;
   updateProfileSelect();
   showToast('已加载「'+p.name+'」的档案，可直接推算或修改 ✨');
 }
@@ -1809,14 +2006,23 @@ function updateProfileSelect(){
   updateAllProfileSelects();
 }
 
+function onCityChange(prefix){
+  // Map prefix to actual element IDs (handle compat1/compat2 naming)
+  const cityId=prefix.startsWith('compat')?prefix+'-city':prefix+'-city';
+  const lngId=prefix.startsWith('compat')?prefix+'-lng':prefix+'-lng';
+  const cityEl=document.getElementById(cityId)||document.getElementById(prefix+'-city');
+  const lngEl=document.getElementById(lngId)||document.getElementById(prefix+'-lng');
+  if(!cityEl||!lngEl) return;
+  const city=cityEl.value;
+  if(city){
+    const lng=getLngByCity(city);
+    if(lng!==null) lngEl.value=lng;
+  }
+}
+
 function switchToBaziForProfile(){switchTab('bazi');showToast('请填写出生信息，分析完成后自动保存为档案 ✨');}
 
-function showToast(msg){
-  const toast=document.createElement('div');
-  toast.className='toast';toast.textContent=msg;
-  document.body.appendChild(toast);
-  setTimeout(()=>toast.remove(),3000);
-}
+// showToast defined above in SECTION 8
 
 // ============================================================
 // SECTION 9: RENDER FUNCTIONS
@@ -1826,17 +2032,26 @@ function analyzeBazi(){
   const name=document.getElementById('bazi-name').value||'未命名';
   const gender=document.getElementById('bazi-gender').value;
   const date=document.getElementById('bazi-date').value;
-  const hourBranch=parseInt(document.getElementById('bazi-hour').value);
+  const clockHourBranch=parseInt(document.getElementById('bazi-hour').value);
+  const longitude=parseFloat(document.getElementById('bazi-lng').value)||120;
   if(!date){showToast('请选择出生日期');return;}
+  showLoading('bazi-result');
   const [y,m,d]=date.split('-').map(Number);
+  // Calculate True Solar Time
+  const clockHour=(clockHourBranch===0?0:clockHourBranch*2-1+1); // midpoint of 时辰
+  const clockMinute=0;
+  const solarTime=applyTrueSolarTime(clockHour,clockMinute,longitude);
+  const hourBranch=solarTime.hourBranch;
   const solarDate=new Date(y,m-1,d,12,0,0);
-  const bazi=calculateBazi(solarDate,hourBranch);
+  // If day advances due to true solar time correction
+  const adjustedSolarDate=solarTime.dayAdvance?new Date(y,m-1,d+1,12,0,0):solarDate;
+  const bazi=calculateBazi(adjustedSolarDate,hourBranch);
   const analysis=analyzeBaziFull(bazi);
   const personality=analyzePersonality(bazi,analysis);
   const lunar=solarToLunar(solarDate);
   const xlr=xiaoLiuRen(lunar.month,lunar.day,hourBranch);
   const dayuns=calculateDaYun(bazi,gender);
-  saveProfile(name,gender,date,hourBranch);
+  saveProfile(name,gender,date,clockHourBranch,longitude);
   updateProfileSelect();
   const p=bazi;
   const nayinKey=p.yearPillar.naYin;
@@ -1849,6 +2064,12 @@ function analyzeBazi(){
       <h2>${name} 的八字命盘</h2>
       <p style="color:var(--text-dim);font-size:0.9rem;margin-bottom:16px">
         农历${lunar.year}年 ${MONTH_NAMES[lunar.month-1]}${lunar.day}日 · ${HOUR_NAMES[hourBranch]} · ${gender==='male'?'乾造':'坤造'} · 生肖${DZ_ANIMALS[bazi.yearPillar.branchIdx]}
+      </p>
+      <p style="color:var(--text-dim);font-size:0.82rem;margin-bottom:16px;padding:8px 12px;background:rgba(201,168,76,0.06);border-radius:8px">
+        🕐 真太阳时校准：出生地东经<strong>${longitude.toFixed(1)}°</strong>，与北京时间（东经120°）差<strong>${solarTime.description}</strong>。
+        钟表时辰${HOUR_NAMES[clockHourBranch]} → 真太阳时<strong>${HOUR_NAMES[hourBranch]}</strong>（${solarTime.adjustedHour}:${String(solarTime.adjustedMinute).padStart(2,'0')}）
+        ${solarTime.dayAdvance?'<span style="color:var(--red)">（日柱跨至次日）</span>':''}
+        ${clockHourBranch!==hourBranch?'<span style="color:var(--red)">（时辰变更）</span>':'<span style="color:var(--jade)">（时辰未变）</span>'}
       </p>
 
       <div class="pillars-grid">
@@ -2052,6 +2273,9 @@ function analyzeBazi(){
     });
   },150);
   document.getElementById('bazi-result').scrollIntoView({behavior:'smooth',block:'start'});
+  saveHistory('bazi',name+' · '+bazi.dayPillar.stem+bazi.dayPillar.branch+'日主');
+  renderHistory();
+  renderProfileList();
 }
 
 function analyzeCompatibility(){
@@ -2061,11 +2285,20 @@ function analyzeCompatibility(){
   const date2=document.getElementById('compat-date2').value;
   const h1=parseInt(document.getElementById('compat-hour1').value);
   const h2=parseInt(document.getElementById('compat-hour2').value);
+  const lng1=parseFloat(document.getElementById('compat1-lng').value)||120;
+  const lng2=parseFloat(document.getElementById('compat2-lng').value)||120;
   if(!date1||!date2){showToast('请填写双方的出生日期');return;}
+  showLoading('compat-result');
   const [y1,m1,d1]=date1.split('-').map(Number);
   const [y2,m2,d2]=date2.split('-').map(Number);
-  const bazi1=calculateBazi(new Date(y1,m1-1,d1,12,0,0),h1);
-  const bazi2=calculateBazi(new Date(y2,m2-1,d2,12,0,0),h2);
+  // True Solar Time correction for both
+  const clockH1=(h1===0?0:h1*2-1+1),clockH2=(h2===0?0:h2*2-1+1);
+  const solar1=applyTrueSolarTime(clockH1,0,lng1);
+  const solar2=applyTrueSolarTime(clockH2,0,lng2);
+  const adjDate1=solar1.dayAdvance?new Date(y1,m1-1,d1+1,12,0,0):new Date(y1,m1-1,d1,12,0,0);
+  const adjDate2=solar2.dayAdvance?new Date(y2,m2-1,d2+1,12,0,0):new Date(y2,m2-1,d2,12,0,0);
+  const bazi1=calculateBazi(adjDate1,solar1.hourBranch);
+  const bazi2=calculateBazi(adjDate2,solar2.hourBranch);
   const compat=analyzeCompatibility(bazi1,bazi2);
   const a1=analyzeBaziFull(bazi1),a2=analyzeBaziFull(bazi2);
   const d1_=new Date(y1,m1-1,d1),d2_=new Date(y2,m2-1,d2);
@@ -2133,6 +2366,8 @@ function analyzeCompatibility(){
     });
   },150);
   document.getElementById('compat-result').scrollIntoView({behavior:'smooth',block:'start'});
+  saveHistory('bazi',name1+'❤'+name2+' 合盘'+compat.score+'分');
+  renderHistory();
 }
 
 function loadDailyFortune(){
@@ -2351,7 +2586,7 @@ function askMeiHua(){
   const n1=parseInt(document.getElementById('meihua-num1').value);
   const n2=parseInt(document.getElementById('meihua-num2').value);
   if(!n1||!n2||n1<1||n2<1){showToast('请输入两个1-999之间的数字');return;}
-
+  showLoading('meihua-result');
   const result=meiHuaYiShu(n1,n2,n1+n2);
   const hex=result.original,mutual=result.mutual,changed=result.changed;
   const inv=result.inverse,comp=result.complement;
@@ -2588,6 +2823,8 @@ function askMeiHua(){
     });
   },150);
   document.getElementById('meihua-result').scrollIntoView({behavior:'smooth',block:'start'});
+  saveHistory('meihua',question.substring(0,40));
+  renderHistory();
 }
 
 // ============================================================
@@ -2643,12 +2880,73 @@ function initParticles(){
 // SECTION 11: INITIALIZATION
 // ============================================================
 
+function renderProfileList(){
+  const container=document.getElementById('profile-list-container');
+  if(!container) return;
+  const profiles=getProfiles();
+  if(profiles.length===0){
+    container.innerHTML='<p style="color:var(--text-dim);font-size:0.85rem;text-align:center;padding:12px">暂无已保存的档案，推算八字后将自动保存</p>';
+    return;
+  }
+  let html='<div class="profile-list">';
+  for(const p of profiles){
+    html+=`<div class="profile-row">
+      <div><div class="pinfo">${p.name||'未命名'}</div><div class="pmeta">${p.date} · ${HOUR_NAMES[p.clockHourBranch!==undefined?p.clockHourBranch:p.hourBranch]} · ${p.gender==='male'?'男':'女'} · 经度${(p.longitude||120).toFixed(1)}°</div></div>
+      <button class="pdel" onclick="deleteProfileAndRefresh(${p.id})">删除</button>
+    </div>`;
+  }
+  html+='</div>';
+  container.innerHTML=html;
+}
+window.deleteProfileAndRefresh=function(id){
+  deleteProfile(id);
+  renderProfileList();
+  updateAllProfileSelects();
+  showToast('档案已删除');
+};
+
+function saveHistory(type,data){
+  try{
+    const history=JSON.parse(localStorage.getItem('cyberTaoistHistory')||'[]');
+    history.unshift({type,data,time:new Date().toISOString()});
+    if(history.length>20) history.pop(); // keep last 20
+    localStorage.setItem('cyberTaoistHistory',JSON.stringify(history));
+  }catch(e){}
+}
+
+function renderHistory(){
+  const container=document.getElementById('history-container');
+  if(!container) return;
+  try{
+    const history=JSON.parse(localStorage.getItem('cyberTaoistHistory')||'[]');
+    if(history.length===0){
+      container.innerHTML='<p style="color:var(--text-dim);font-size:0.85rem;text-align:center;padding:12px">暂无历史记录</p>';
+      return;
+    }
+    let html='';
+    for(const h of history.slice(0,10)){
+      const d=new Date(h.time);
+      const timeStr=d.toLocaleDateString('zh-CN')+' '+d.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
+      html+=`<div class="history-item" onclick="loadHistoryItem('${h.type}','${(h.data||'').replace(/'/g,"\\'")}')">
+        <span class="hname">${h.type==='bazi'?'八字':'梅花'}</span>
+        <span style="flex:1;font-size:0.85rem;color:var(--text-dim)">${(h.data||'').substring(0,30)}</span>
+        <span class="hdate">${timeStr}</span>
+        <span class="haction">查看 →</span>
+      </div>`;
+    }
+    container.innerHTML=html;
+  }catch(e){}
+}
+window.loadHistoryItem=function(type,data){
+  showToast('请重新输入查询，历史仅供回溯参考');
+};
+
 function init(){
-  initHourSelects();initDates();updateProfileSelect();
+  initHourSelects();initDates();updateProfileSelect();renderProfileList();renderHistory();
   document.querySelectorAll('.tab').forEach(tab=>{
     tab.addEventListener('click',()=>switchTab(tab.dataset.page));
   });
-  window.addEventListener('scroll',handleScrollReveal);
+  window.addEventListener('scroll',()=>{handleScrollReveal();updateBackTop();});
   setTimeout(()=>{
     document.querySelectorAll('.reveal').forEach(el=>el.classList.add('visible'));
   },400);
@@ -2657,6 +2955,8 @@ function init(){
   if(profiles.length>0){
     const sel=document.getElementById('daily-profile');
     if(sel) sel.value=profiles[profiles.length-1].id;
+    // Auto-load daily fortune if on daily tab
+    if(document.getElementById('page-daily')?.classList.contains('active')) loadDailyFortune();
   }
 }
 

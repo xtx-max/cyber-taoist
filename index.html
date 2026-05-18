@@ -2583,23 +2583,107 @@ function analyzeCompatibility(){
       ${compat.highlights.length>0?`
       <div class="analysis-section">
         <h3>✦ 合盘亮点</h3>
-        ${compat.highlights.map(h=>`<p style="margin:8px 0;color:var(--jade)">✓ ${h}</p>`).join('')}
+        ${compat.highlights.map(h=>`<p style="margin:8px 0;color:var(--jade);line-height:1.8">✓ ${h}</p>`).join('')}
       </div>`:''}
 
       ${compat.cautions.length>0?`
       <div class="analysis-section">
-        <h3>✦ 需要注意</h3>
-        ${compat.cautions.map(c=>`<p style="margin:8px 0;color:var(--red)">⚠ ${c}</p>`).join('')}
+        <h3>✦ 需要磨合</h3>
+        ${compat.cautions.map(c=>`<p style="margin:8px 0;color:var(--red);line-height:1.8">⚠ ${c}</p>`).join('')}
       </div>`:''}
 
       <div class="analysis-section">
-        <h3>✦ 梅花易数 · 缘分卦</h3>
+        <h3>✦ 四柱逐对分析</h3>
+        ${(()=>{
+          const p1=[bazi1.yearPillar,bazi1.monthPillar,bazi1.dayPillar,bazi1.hourPillar];
+          const p2=[bazi2.yearPillar,bazi2.monthPillar,bazi2.dayPillar,bazi2.hourPillar];
+          const labels=['年柱（根基·家庭观）','月柱（事业·生活节奏）','日柱（性格·夫妻宫）','时柱（内心·晚年趋向）'];
+          let html='';
+          for(let i=0;i<4;i++){
+            const rel=checkRelationship(p1[i].branchIdx,p2[i].branchIdx);
+            const relText=rel.length>0?rel.join('、'):'无特殊关系';
+            const relColor=rel.some(r=>r.includes('合'))?'var(--jade)':rel.some(r=>r.includes('冲')||r.includes('害')||r.includes('刑'))?'var(--red)':'var(--text-dim)';
+            const elem1=DZ_ELEMENT[p1[i].branchIdx],elem2=DZ_ELEMENT[p2[i].branchIdx];
+            const elemRel=WX_GENERATE[elem1]===elem2?'相生':WX_GENERATE[elem2]===elem1?'相生':WX_OVERCOME[elem1]===elem2?'相克':WX_OVERCOME[elem2]===elem1?'相克':'比和';
+            html+=`<div style="padding:12px;margin-bottom:10px;background:rgba(255,255,255,0.5);border-radius:12px;border:1px solid var(--border)">
+              <div style="font-weight:700;color:var(--text-bright);margin-bottom:4px">${labels[i]}</div>
+              <div style="font-size:0.9rem;color:var(--text-dim)">
+                ${name1}「${p1[i].stem}${p1[i].branch}」↔ ${name2}「${p2[i].stem}${p2[i].branch}」
+                · 地支关系：<span style="color:${relColor};font-weight:600">${relText}</span>
+                · 五行：<span style="color:${elemRel==='相生'?'var(--jade)':elemRel==='相克'?'var(--red)':'var(--text-dim)'}">${elemRel}</span>
+              </div>
+            </div>`;
+          }
+          return html;
+        })()}
+      </div>
+
+      <div class="analysis-section">
+        <h3>✦ 日主互动</h3>
+        ${(()=>{
+          const dm1=bazi1.dayPillar.stem,dm2=bazi2.dayPillar.stem;
+          const dm1Elem=TG_ELEMENT[bazi1.dayPillar.stemIdx],dm2Elem=TG_ELEMENT[bazi2.dayPillar.stemIdx];
+          const ss=SHI_SHEN_NAMES[SHI_SHEN_TABLE[bazi1.dayPillar.stemIdx][bazi2.dayPillar.stemIdx]];
+          let insight='';
+          if(WX_GENERATE[dm1Elem]===dm2Elem) insight=name1+'的'+dm1Elem+'性能量滋养着'+name2+'的'+dm2Elem+'性需求。在关系中，'+name1+'往往是给予者，而'+name2+'在接受中感受到被爱。';
+          else if(WX_GENERATE[dm2Elem]===dm1Elem) insight=name2+'的'+dm2Elem+'性能量滋养着'+name1+'的'+dm1Elem+'性需求。'+name2+'的温暖和关怀是这段关系的核心动力。';
+          else if(WX_OVERCOME[dm1Elem]===dm2Elem) insight=name1+'的'+dm1Elem+'性能量会对'+name2+'的'+dm2Elem+'性产生一定的约束和压力。'+name1+'需要注意表达方式，避免让对方感到被压制。';
+          else if(WX_OVERCOME[dm2Elem]===dm1Elem) insight=name2+'的'+dm2Elem+'性能量会对'+name1+'的'+dm1Elem+'性产生约束。'+name2+'需要多一份温柔，少一份刚硬。';
+          else insight='两人日主五行相同（'+dm1Elem+'），性格底色极为相似。你们能深深理解彼此，因为你们本质上是同类人。';
+          return `<p style="line-height:1.9;color:var(--text-dim);font-size:0.93rem">${insight}</p>
+            <p style="color:var(--text-dim);font-size:0.85rem;margin-top:4px">${name1}看${name2}为<strong>${ss}</strong>，这决定了${name1}在这段关系中的核心角色和行为模式。</p>`;
+        })()}
+      </div>
+
+      <div class="analysis-section">
+        <h3>✦ 五行互补度</h3>
+        ${(()=>{
+          const s1=a1.elementScores,s2=a2.elementScores;
+          let html='';
+          for(const el of ['木','火','土','金','水']){
+            const v1=s1[el]||0,v2=s2[el]||0;
+            const diff=v1-v2;
+            let status='',color='';
+            if(Math.abs(diff)<=4){status='互补均衡';color='var(--jade)';}
+            else if(diff>0){status=name1+'偏强';color='var(--gold-dark)';}
+            else{status=name2+'偏强';color='var(--gold-dark)';}
+            html+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:0.88rem">
+              <span class="tag ${el==='木'?'wood':el==='火'?'fire':el==='土'?'earth':el==='金'?'metal':'water'}">${el}</span>
+              <span style="color:var(--text-dim)">${name1}:${v1}分 · ${name2}:${v2}分</span>
+              <span style="color:${color};font-size:0.8rem">${status}</span>
+            </div>`;
+          }
+          return html;
+        })()}
+      </div>
+
+      <div class="analysis-section">
+        <h3>✦ 梅花易数 · 缘分卦详解</h3>
         <div class="hexagram">
           <div class="hexagram-name">${meihua.original.name}</div>
-          <p style="margin:8px 0">${meihua.upperTrigram.symbol} ${meihua.upperTrigram.name}上 · ${meihua.lowerTrigram.symbol} ${meihua.lowerTrigram.name}下 · 动爻第${meihua.movingLine}爻</p>
-          <p style="color:var(--gold-dark);margin:8px 0;line-height:1.9">${meihua.original.judgment}</p>
-          ${meihua.changed&&meihua.changed!==meihua.original?`<p style="color:var(--text-dim);margin-top:12px">变卦：<strong>${meihua.changed.name}</strong></p><p style="color:var(--text-dim)">${meihua.changed.judgment}</p>`:''}
+          <p style="margin:4px 0">${meihua.upperTrigram.symbol} ${meihua.upperTrigram.name}上 · ${meihua.lowerTrigram.symbol} ${meihua.lowerTrigram.name}下 · 动爻<strong>第${meihua.movingLine}爻</strong></p>
         </div>
+        <p style="color:var(--gold-dark);line-height:1.9;margin:8px 0">📖 ${getHexDetail(meihua.original.name)}</p>
+        <p style="color:var(--text-dim);line-height:1.9;margin-top:4px">📜 卦辞：${meihua.original.judgment||''}</p>
+        ${(()=>{
+          const yc=getYaoCi(meihua.original.name,meihua.movingLine);
+          return `<div style="padding:10px;margin-top:8px;background:rgba(196,30,58,0.04);border-left:3px solid var(--red);border-radius:0 10px 10px 0"><p style="color:var(--red);font-weight:600;font-size:0.85rem">动爻第${meihua.movingLine}爻辞</p><p style="color:var(--text);line-height:1.9;font-size:0.92rem">${yc}</p></div>`;
+        })()}
+        ${meihua.changed&&meihua.changed!==meihua.original?`
+          <p style="color:var(--text-dim);margin-top:10px">🔄 变卦：<strong>${meihua.changed.name}</strong></p>
+          <p style="color:var(--text-dim);line-height:1.9">📖 ${getHexDetail(meihua.changed.name)}</p>
+          <p style="color:var(--text-dim);line-height:1.9">📜 ${meihua.changed.judgment||''}</p>
+        `:''}
+        ${(()=>{
+          const uElem=meihua.upperTrigram.element,lElem=meihua.lowerTrigram.element;
+          let tiYong='';
+          if(lElem===uElem) tiYong='体用比和：两人气场天然契合，如两棵并肩的树，无需刻意配合就能和谐共处。';
+          else if(WX_GENERATE[lElem]===uElem) tiYong='体生用：'+name1+'在这段关系中付出较多心力，但真心付出终有回应。';
+          else if(WX_GENERATE[uElem]===lElem) tiYong='用生体：外部机缘眷顾这段关系，缘分本身在推动你们靠近。';
+          else if(WX_OVERCOME[lElem]===uElem) tiYong='体克用：'+name1+'有能力主导关系走向，但需以柔克刚，避免控制欲。';
+          else tiYong='用克体：外部阻力存在，两人需共同面对而非互相消耗。';
+          return `<p style="color:var(--text-dim);line-height:1.9;margin-top:8px;font-size:0.9rem">💡 体用生克：${tiYong}</p>`;
+        })()}
       </div>
 
       <div class="analysis-section">

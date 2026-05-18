@@ -800,7 +800,7 @@ footer p{margin:4px 0}
         <button class="btn btn-primary" style="padding:10px 20px;font-size:0.9rem" onclick="copyShareLink()">📋 复制链接</button>
       </div>
     </div>
-    <p>☯ 赛博天师 · v2.6 · <span id="ver-check" style="cursor:pointer" onclick="location.reload(true)" title="点击强制刷新">🔄 刷新</span></p>
+    <p>☯ 赛博天师 · v2.7 · <span id="ver-check" style="cursor:pointer" onclick="location.reload(true)" title="点击强制刷新">🔄 刷新</span></p>
     <p>仅供娱乐参详，勿过度执念。命运在己，不在卦中。</p>
   </footer>
 </div>
@@ -3502,22 +3502,37 @@ function init(){
 
 document.addEventListener('DOMContentLoaded',init);
 
-// Auto version check — ping GitHub Pages for newer version
+// Auto version check — ping server for updates, show banner if newer version available
 (function(){
-  const CURRENT_VER='v2.6';
   try{
     fetch('https://xtx-max.github.io/cyber-taoist/',{method:'HEAD',cache:'no-cache'})
       .then(r=>r.headers.get('last-modified'))
       .then(lm=>{
+        if(!lm) return;
         const stored=localStorage.getItem('cyberTaoistLastMod');
         if(stored && stored!==lm){
+          // Show update banner
+          const banner=document.createElement('div');
+          banner.id='update-banner';
+          banner.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#c41e3a,#a07830);color:#fff;text-align:center;padding:10px;font-size:0.9rem;font-weight:600;cursor:pointer;animation:slideDown 0.3s ease';
+          banner.textContent='🆕 有新版本可用！点击此处立即刷新 →';
+          banner.onclick=()=>{location.reload(true);};
+          document.body.prepend(banner);
+          // Also update footer
           const verEl=document.getElementById('ver-check');
-          if(verEl){verEl.textContent='🆕 有更新！点此刷新';verEl.style.color='var(--red)';verEl.style.fontWeight='700';}
+          if(verEl){verEl.textContent='🆕 有更新！';verEl.style.color='var(--red)';verEl.style.fontWeight='700';}
+          // Auto-refresh after 3 seconds
+          setTimeout(()=>{const b=document.getElementById('update-banner');if(b)b.textContent='⏳ 正在刷新…';},2500);
+          setTimeout(()=>{location.reload(true);},3000);
         }
-        if(lm) localStorage.setItem('cyberTaoistLastMod',lm);
+        localStorage.setItem('cyberTaoistLastMod',lm);
       }).catch(()=>{});
   }catch(e){}
 })();
+// Add slideDown animation
+const style=document.createElement('style');
+style.textContent='@keyframes slideDown{from{transform:translateY(-100%)}to{transform:translateY(0)}}';
+document.head.appendChild(style);
 </script>
 </body>
 </html>

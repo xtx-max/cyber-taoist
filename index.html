@@ -623,6 +623,15 @@ footer p{margin:4px 0}
         <h1>合盘缘分 · 双人合参</h1>
         <div class="deco-line"></div>
         <p class="subtitle">以年柱为根，日柱为身，五行互补为用，看两人缘分之深浅。</p>
+        <div class="profile-bar">
+          <span style="color:var(--text-dim);font-size:0.85rem;font-weight:500">📋 选择档案：</span>
+          <select id="compat-profile1" onchange="loadProfileToCompat(1)" style="min-width:180px">
+            <option value="">— 我的档案 —</option>
+          </select>
+          <select id="compat-profile2" onchange="loadProfileToCompat(2)" style="min-width:180px">
+            <option value="">— 对方档案 —</option>
+          </select>
+        </div>
         <div class="form-row">
           <div class="form-group"><label>你的姓名</label><input type="text" id="compat-name1" placeholder="请输入"></div>
           <div class="form-group"><label>对方姓名</label><input type="text" id="compat-name2" placeholder="请输入"></div>
@@ -2052,6 +2061,24 @@ function switchTab(pageName){
   },150);
 }
 
+function loadProfileToCompat(num){
+  const sel=document.getElementById('compat-profile'+num);
+  const id=sel.value;
+  if(!id) return;
+  const profiles=getProfiles();
+  const p=profiles.find(x=>x.id===parseInt(id));
+  if(!p) return;
+  document.getElementById('compat-name'+num).value=p.name||'';
+  document.getElementById('compat-date'+num).value=p.date;
+  const hourEl=document.getElementById('compat-hour'+num);
+  if(hourEl) hourEl.value=p.clockHourBranch!==undefined?p.clockHourBranch:p.hourBranch;
+  document.getElementById('compat'+num+'-lng').value=p.longitude||120;
+  // Set city input
+  const cityEl=document.getElementById('compat-city'+num);
+  if(cityEl) cityEl.value=''; // clear, user can search
+  showToast('已加载「'+p.name+'」的档案到第'+num+'人 ✨');
+}
+
 function loadProfileToBazi(){
   const sel=document.getElementById('bazi-profile');
   const id=sel.value;
@@ -2075,12 +2102,12 @@ function updateAllProfileSelects(){
   for(let p of profiles) opts+=`<option value="${p.id}">${p.name} — ${p.date} ${HOUR_NAMES[p.hourBranch]}</option>`;
   const baziSel=document.getElementById('bazi-profile');
   const dailySel=document.getElementById('daily-profile');
+  const compatSel1=document.getElementById('compat-profile1');
+  const compatSel2=document.getElementById('compat-profile2');
   if(baziSel) baziSel.innerHTML=opts;
-  if(dailySel){
-    let dOpts='<option value="">— 选择已保存的档案 —</option>';
-    for(let p of profiles) dOpts+=`<option value="${p.id}">${p.name} — ${p.date} ${HOUR_NAMES[p.hourBranch]}</option>`;
-    dailySel.innerHTML=dOpts;
-  }
+  if(dailySel) dailySel.innerHTML=opts;
+  if(compatSel1) compatSel1.innerHTML=opts;
+  if(compatSel2) compatSel2.innerHTML=opts;
 }
 
 function updateProfileSelect(){

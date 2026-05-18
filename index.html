@@ -1801,8 +1801,8 @@ function getYaoCi(hexName,movingLine){
 
 // Expanded 64 hexagram detailed interpretations
 const HEXAGRAM_DETAIL = {
-  '乾为天':'六龙御天，纯阳至健。天行健，君子以自强不息。此卦大象主创造、领导与成功。问事业则前程似锦，问感情则需主动表达。但纯阳易折，需知刚柔并济之道。',
-  '坤为地':'地势坤，君子以厚德载物。此卦主包容、承载与柔顺。柔能克刚，以宽广的胸怀容纳万物。问事则以耐心和坚持为上，不争即是争。',
+  '乾为天':'六龙御天，纯阳至健。天行健，君子以自强不息。此卦大象主创造、领导与成功，是六十四卦之首，象征一切事物的开端和巅峰。问事业则前程似锦但需持续精进，问感情则需你主动迈出第一步。然纯阳易折——刚强之外要懂得以柔济刚、刚柔并济，方可长久。乾卦六爻从"潜龙勿用"到"亢龙有悔"，完整描绘了一个事物从萌芽到鼎盛再到衰退的全过程——居安思危是乾卦的核心智慧。',
+  '坤为地':'地势坤，君子以厚德载物。此卦主包容、承载与柔顺，是大地之德，万物之母。柔能克刚——不是软弱的柔，而是如水般可以穿透一切的柔。以宽广的胸怀容纳生活中的一切，不急不躁，稳扎稳打。问事则以耐心和坚持为上，不争即是争，不争而天下莫能与之争。坤卦提醒：真正的力量不在锋芒，而在承载万物的厚度之中。',
   '水雷屯':'云雷屯，君子以经纶。万物始生，破土艰难。此卦主创业初期的艰难——万事开头难。但只要方向正确、坚持不辍，终能突破重围。宜稳扎稳打。',
   '山水蒙':'山下出泉，蒙。君子以果行育德。此卦主启蒙、学习与探索。当前所问之事可能还处于"不明"状态，需要的不是行动而是学习。',
   '水天需':'云上于天，需。君子以饮食宴乐。此卦主等待——云气已升于天而雨未降。宜耐心等候，在等待中做好准备。时机到了自然水到渠成。',
@@ -1811,8 +1811,8 @@ const HEXAGRAM_DETAIL = {
   '水地比':'地上有水，比。先王以建万国、亲诸侯。此卦主亲比、辅助与合作。水流地上润泽万物，意味着和谐共处。宜寻找盟友互助。',
   '风天小畜':'风行天上，小畜。君子以懿文德。此卦主小规模的积蓄和准备。风行天上而未下雨，力量在储备中。此时宜从文化和内在素养入手。',
   '天泽履':'上天下泽，履。君子以辨上下、定民志。此卦主践行与行为规范。履虎尾而不被咬——行事谨慎小心，以礼自守便可化险为夷。',
-  '地天泰':'天地交，泰。后以财成天地之道、辅相天地之宜。此卦大吉——天地之气互通，万物通达。是天时地利人和的完美状态。乘势而上。',
-  '天地否':'天地不交，否。君子以俭德辟难。此卦闭塞不通，天地隔绝。运势低迷时宜收敛锋芒、俭朴度日。否极终将泰来，静待。',
+  '地天泰':'天地交，泰。后以财成天地之道、辅相天地之宜。此卦大吉——天在下而地在上，看似反常实为天地之气互通交融的最佳状态。万物通达，上下交流顺畅无阻，是天时地利人和的完美时刻。问事则乘势而上，但卦辞也提醒"无平不陂，无往不复"——泰极则否来，在最好的运势里保持清醒的头脑，才是让好运长久的真正秘诀。',
+  '天地否':'天地不交，否。君子以俭德辟难。天在上地在下，彼此隔绝不通——这是自然界中最"卡住"的状态。但正如冬日之后必有春天，否卦的精髓在于"等待"而非"强求"。运势低迷时收敛锋芒、俭朴度日、回归内心。"否终则倾，何可长也"——闭塞不会永远持续，转机已在孕育之中。',
   '天火同人':'天与火，同人。君子以类族辨物。此卦主团结与合作。天在上而火向上，志向相同。寻志同道合者共事，可成大事。',
   '火天大有':'火在天上，大有。君子以遏恶扬善。此卦主丰富与拥有。如烈日当空普照万物，是丰收大获之象。但需以善驭之，方能长久。',
   '地山谦':'地中有山，谦。君子以裒多益寡。此卦主谦逊——大地之中藏高山，内有大而不外显。谦受益，满招损，以虚心接纳万物。',
@@ -2351,18 +2351,32 @@ function analyzeBazi(){
 
       <div class="analysis-section">
         <h3>✦ 性格总纲 · 日主${analysis.dayMaster.stem}（${personality.strength}）</h3>
-        <p style="line-height:2;font-size:0.98rem;color:var(--text);margin-bottom:12px">${personality.coreTraits}</p>
-        <p style="color:var(--text-dim);line-height:1.9;font-size:0.92rem">${personality.summary}</p>
+        <p style="line-height:2.1;font-size:0.98rem;color:var(--text);margin-bottom:12px">${personality.coreTraits}</p>
+        <p style="color:var(--text-dim);line-height:2;font-size:0.93rem;margin-bottom:8px">${personality.summary}</p>
+        <p style="color:var(--text-dim);line-height:2;font-size:0.9rem">
+          日主${analysis.dayMaster.stem}坐${analysis.dayMaster.animal}，${analysis.dayMaster.yinyang}性${analysis.dayMaster.element}干。${analysis.dayMaster.element==='木'?'木主仁，其性直，其情和。如春风吹拂，有生长养育之德。':analysis.dayMaster.element==='火'?'火主礼，其性急，其情恭。如夏日骄阳，有光明磊落之德。':analysis.dayMaster.element==='土'?'土主信，其性重，其情厚。如大地承载，有诚信敦厚之德。':analysis.dayMaster.element==='金'?'金主义，其性刚，其情烈。如秋霜肃杀，有刚毅果决之德。':'水主智，其性聪，其情善。如冬雪润物，有智慧灵动之德。'}命局中五行之气以${analysis.strongestElement}最旺、${analysis.weakestElement}最弱，月令${analysis.season}当权。${personality.strength==='身强'?'身强者有充沛的能量表达自我、影响环境，是天生的行动者和领导者。其挑战在于学会收敛和倾听。':personality.strength==='身弱'?'身弱者心思更为细腻敏锐，善于观察和思考。其优势在于灵活和内省，但需要在外部世界中找到可以依靠的支撑点。':'中和者刚柔并济，能进能退。这是最为理想的能量状态——既有行动力也有反思力，既有主见也能变通。'}
+        </p>
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
         <div style="padding:16px;background:rgba(91,154,139,0.06);border-radius:var(--radius-sm);border:1px solid rgba(91,154,139,0.15)">
           <div style="font-weight:700;color:var(--jade);margin-bottom:8px;font-size:0.9rem">🌟 性格优势</div>
-          <p style="color:var(--text);line-height:1.8;font-size:0.9rem">${personality.coreStrengths}</p>
+          <p style="color:var(--text);line-height:1.9;font-size:0.9rem">${personality.coreStrengths}</p>
         </div>
         <div style="padding:16px;background:rgba(196,30,58,0.04);border-radius:var(--radius-sm);border:1px solid rgba(196,30,58,0.12)">
           <div style="font-weight:700;color:var(--red);margin-bottom:8px;font-size:0.9rem">⚡ 潜在弱点</div>
-          <p style="color:var(--text);line-height:1.8;font-size:0.9rem">${personality.coreWeaknesses}</p>
+          <p style="color:var(--text);line-height:1.9;font-size:0.9rem">${personality.coreWeaknesses}</p>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+        <div style="padding:14px;background:rgba(255,255,255,0.5);border-radius:var(--radius-sm);border:1px solid var(--border)">
+          <div style="font-weight:700;color:var(--gold-dark);margin-bottom:6px;font-size:0.85rem">💼 事业天赋</div>
+          <p style="color:var(--text-dim);font-size:0.88rem;line-height:1.8">${personality.coreCareer}</p>
+        </div>
+        <div style="padding:14px;background:rgba(255,255,255,0.5);border-radius:var(--radius-sm);border:1px solid var(--border)">
+          <div style="font-weight:700;color:var(--red);margin-bottom:6px;font-size:0.85rem">💕 情感模式</div>
+          <p style="color:var(--text-dim);font-size:0.88rem;line-height:1.8">${personality.coreRelationship}</p>
         </div>
       </div>
 
@@ -3176,16 +3190,17 @@ function askMeiHua(){
       'ti-ke-yong':'体卦克用卦，你具备驾驭此事的能力。需要付出努力但最终可控。'
     };
     ans+=relInsight[rel]||'';
-    // 3. Domain-specific note
+    // 3. Domain-specific deep analysis
     const domainNote={
-      '感情姻缘':'问感情之事，卦已明示。观爻变可知情之走向，真诚即是最好策略。',
-      '事业工作':'问事业前程，卦象已显趋势。顺势而为比逆势硬闯更为明智。',
-      '财运财富':'问财帛之事，卦中自有消息。时机比努力更重要——在对的时间做对的事。',
-      '健康身体':'问健康之事，身心本为一体。卦象提醒你关注那些被忽略的信号。',
-      '学业考试':'问学业功名，卦象已明方向。恒心和专注是最好的老师。',
-      '出行迁移':'问出行之事，卦已指出宜忌。做好万全准备后大胆出发。',
-      '人际合作':'问人我关系，以诚相待为第一义。卦象提醒你：换位思考可化解大半纷争。',
-      '选择决策':'问抉择之事，卦已给出方向。两难之时听从直觉往往不错。'
+      '感情姻缘':'问感情姻缘之事，卦象已然明示情之走向。观本卦之体用可知两人之间谁为主导、谁为辅助；观变卦可知关系之发展趋势；观动爻可知当前最关键的那个变量是什么。感情之事，真诚为第一要义——卦可指路，但路需自己走。',
+      '事业工作':'问事业前程，卦象已显吉凶趋势。本卦为当下之势，变卦为未来之机。体卦是你的能力底盘，用卦是外部环境。顺势而为胜过逆势硬闯——在对的方向努力远比盲目拼命重要。',
+      '财运财富':'问财帛之事，卦中自有玄机。体用生克揭示了你与财富之间的关系——是财富在找你，还是你在追财富。变卦指示了财务上的转折点，而动爻则告诉你：关键的决定应该什么时候做。',
+      '健康身体':'问健康之事，身心本为一体不可分割。卦象所指不仅是身体的症状，更是你内在能量状态的映射。体卦为你的身体本钱，用卦为外部的医疗和环境影响。关注卦中五行对身体的提示。',
+      '学业考试':'问学业功名，卦象已明方向。本卦如你的知识基础，变卦如考试结果。动爻指示了最需要下功夫的那个环节。恒心和专注是最有力的武器——智慧是积累出来的，不是临时抱佛脚抱出来的。',
+      '出行迁移':'问出行迁移之事，卦已指出宜忌。本卦判断出发的时机是否成熟，变卦预测旅途中的变化与结果。宜仔细品味爻辞中的警示和建议，做好万全准备之后大胆出发。',
+      '人际合作':'问人我关系之事，以诚相待是第一要义。卦象的体用生克反映了你和他人之间的力量对比和利害关系。换位思考往往能化解一半以上的纷争——卦的智慧在于让你看到自己立场之外的东西。',
+      '选择决策':'问两难抉择之事，卦已给出方向性的指引。本卦是你所处的两难局面，变卦是选择之后可能出现的结果。不要纠结于卦的"吉凶"，而要关注卦的"趋势"——趋势告诉你哪条路更适合你的本心。',
+      '综合运势':'问运势吉凶，卦象已全然展现。本卦为当下气运之状，变卦为未来之转机，互卦为中间之过程。三卦合参，配合动爻之变，可勾画出事情发展的完整轮廓。天地不言而四时行焉——答案已在卦中，请静心体悟。'
     };
     ans+=(domainNote[domain]||'')+' ';
     // 4. Judgment text

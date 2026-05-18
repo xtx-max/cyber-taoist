@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="赛博天师">
@@ -11,10 +11,13 @@
 <meta name="description" content="赛博天师 · Cyber Taoist — 生辰八字分析、梅花易数占卜、每日运势、合盘缘分">
 <title>赛博天师 · Cyber Taoist</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' style='stop-color:%23c41e3a'/><stop offset='100%25' style='stop-color:%23c9a84c'/></linearGradient></defs><circle cx='32' cy='32' r='30' fill='none' stroke='url(%23g)' stroke-width='2'/><circle cx='32' cy='32' r='28' fill='none' stroke='%23c9a84c' stroke-width='0.5' stroke-dasharray='8 4' opacity='0.5'/><path d='M32 2 A30 30 0 0 1 32 62 A15 15 0 0 0 32 32 A15 15 0 0 1 32 2Z' fill='%23c41e3a' opacity='0.8'/><circle cx='32' cy='17' r='3' fill='%23c9a84c'/><path d='M32 62 A30 30 0 0 1 32 2 A15 15 0 0 0 32 32 A15 15 0 0 1 32 62Z' fill='%23c9a84c' opacity='0.8'/><circle cx='32' cy='47' r='3' fill='%23c41e3a'/><rect x='14' y='28' width='4' height='2' fill='%23c9a84c' opacity='0.6'/><rect x='46' y='34' width='4' height='2' fill='%23c9a84c' opacity='0.6'/><rect x='28' y='8' width='2' height='4' fill='%23c9a84c' opacity='0.6'/><rect x='34' y='52' width='2' height='4' fill='%23c9a84c' opacity='0.6'/></svg>">
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<!-- Google Fonts loaded async to prevent blocking in China -->
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=ZCOOL+KuaiLe&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
-<style>/* Font fallback — ensure readable even if CDN blocked */ body{font-family:'PingFang SC','Hiragino Sans GB','Microsoft YaHei','Noto Sans SC',sans-serif} </style>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=ZCOOL+KuaiLe&family=Ma+Shan+Zheng&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=ZCOOL+KuaiLe&family=Ma+Shan+Zheng&display=swap" rel="stylesheet"></noscript>
+<script>/* Fallback: if Google Fonts doesn't load within 2s, use system fonts */setTimeout(function(){if(!document.fonts||document.fonts.check('1em Noto Sans SC'))return;document.documentElement.style.setProperty('--font-main',"'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif");document.documentElement.style.setProperty('--font-display',"'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif");},2000);</script>
+<style>/* System font stack — works immediately even if Google Fonts blocked */ body{font-family:'PingFang SC','Hiragino Sans GB','Microsoft YaHei','Noto Sans SC',sans-serif} </style>
 <style>
 /* ============ CSS Variables — Festive Feng Shui Theme ============ */
 :root {

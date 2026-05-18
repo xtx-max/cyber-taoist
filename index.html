@@ -1914,7 +1914,10 @@ function computeCompatibility(bazi1,bazi2){
   else if(monthRel.includes('三合')){score+=4;highlights.push('月柱三合：事业和生活节奏协同共振，合作无间');}
   // Hidden stem complement: check if one person's weak element is the other's strong
   const a1=analyzeBaziFull(bazi1),a2=analyzeBaziFull(bazi2);
-  if(a1.weakestElement && a2.strongestElement && WX_GENERATE[a2.strongestElement]===a1.weakestElement){
+  // Symmetric: check if either person's strong complements the other's weak
+  const complement1=a1.weakestElement&&a2.strongestElement&&WX_GENERATE[a2.strongestElement]===a1.weakestElement;
+  const complement2=a2.weakestElement&&a1.strongestElement&&WX_GENERATE[a1.strongestElement]===a2.weakestElement;
+  if(complement1||complement2){
     score+=8;highlights.push('五行深度互补：彼此的强势正好弥补对方的短板，形成完整闭环');
   }
   score=Math.max(30,Math.min(100,score));

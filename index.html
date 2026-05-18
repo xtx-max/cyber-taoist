@@ -2544,28 +2544,51 @@ function analyzeCompatibility(){
   const date2=document.getElementById('compat-date2').value;
   const h1=parseInt(document.getElementById('compat-hour1').value);
   const h2=parseInt(document.getElementById('compat-hour2').value);
-  const lng1=parseFloat(document.getElementById('compat1-lng').value)||120;
-  const lng2=parseFloat(document.getElementById('compat2-lng').value)||120;
+  let lng1=parseFloat(document.getElementById('compat1-lng').value)||120;
+  let lng2=parseFloat(document.getElementById('compat2-lng').value)||120;
   if(!date1||!date2){showToast('请填写双方的出生日期');return;}
   showLoading('compat-result');
   setProgress('compat-result',10,'八字排盘中');
   setTimeout(()=>{
   try{
-  const [y1,m1,d1]=date1.split('-').map(Number);
-  const [y2,m2,d2]=date2.split('-').map(Number);
-  const clockH1=(h1===0?0:h1*2-1+1),clockH2=(h2===0?0:h2*2-1+1);
-  const solar1=applyTrueSolarTime(clockH1,0,lng1);
-  const solar2=applyTrueSolarTime(clockH2,0,lng2);
-  const adjDate1=solar1.dayAdvance?new Date(y1,m1-1,d1+1,12,0,0):new Date(y1,m1-1,d1,12,0,0);
-  const adjDate2=solar2.dayAdvance?new Date(y2,m2-1,d2+1,12,0,0):new Date(y2,m2-1,d2,12,0,0);
+  // Check if both profiles are loaded from saved data — use saved bazi directly
+  const pid1=parseInt(document.getElementById('compat-profile1').value);
+  const pid2=parseInt(document.getElementById('compat-profile2').value);
+  const profiles=getProfiles();
+  const prof1=pid1?profiles.find(x=>x.id===pid1):null;
+  const prof2=pid2?profiles.find(x=>x.id===pid2):null;
+  let bazi1,bazi2,solar1,solar2;
+  if(prof1&&prof1.bazi&&prof1.bazi.dayPillar){
+    // Use saved bazi from profile — guarantees same score every time
+    bazi1=prof1.bazi;
+    solar1={description:'(已存档案·经度'+(prof1.longitude||120).toFixed(1)+'°)',hourBranch:bazi1.hourPillar.branchIdx,dayAdvance:false};
+    lng1=prof1.longitude||120;
+  }else{
+    const [y1,m1,d1]=date1.split('-').map(Number);
+    const clockH1=(h1===0?0:h1*2-1+1);
+    solar1=applyTrueSolarTime(clockH1,0,lng1);
+    const adjDate1=solar1.dayAdvance?new Date(y1,m1-1,d1+1,12,0,0):new Date(y1,m1-1,d1,12,0,0);
+    bazi1=calculateBazi(adjDate1,solar1.hourBranch);
+  }
+  if(prof2&&prof2.bazi&&prof2.bazi.dayPillar){
+    bazi2=prof2.bazi;
+    solar2={description:'(已存档案·经度'+(prof2.longitude||120).toFixed(1)+'°)',hourBranch:bazi2.hourPillar.branchIdx,dayAdvance:false};
+    lng2=prof2.longitude||120;
+  }else{
+    const [y2,m2,d2]=date2.split('-').map(Number);
+    const clockH2=(h2===0?0:h2*2-1+1);
+    solar2=applyTrueSolarTime(clockH2,0,lng2);
+    const adjDate2=solar2.dayAdvance?new Date(y2,m2-1,d2+1,12,0,0):new Date(y2,m2-1,d2,12,0,0);
+    bazi2=calculateBazi(adjDate2,solar2.hourBranch);
+  }
   setProgress('compat-result',30,'八字排盘中');
-  const bazi1=calculateBazi(adjDate1,solar1.hourBranch);
-  const bazi2=calculateBazi(adjDate2,solar2.hourBranch);
   setProgress('compat-result',55,'命理合参中');
   const compat=computeCompatibility(bazi1,bazi2);
   const a1=compat.a1,a2=compat.a2; // reuse from computeCompatibility
   setProgress('compat-result',78,'卦象解读中');
-  const d1_=new Date(y1,m1-1,d1),d2_=new Date(y2,m2-1,d2);
+  // Use profile dates if available, otherwise form dates
+  const d1_=prof1&&prof1.date?new Date(prof1.date+'T12:00:00'):new Date(y1||2000,0,1);
+  const d2_=prof2&&prof2.date?new Date(prof2.date+'T12:00:00'):new Date(y2||2000,0,1);
   const n1=(d1_.getFullYear()+d1_.getMonth()+d1_.getDate())%100+1;
   const n2=(d2_.getFullYear()+d2_.getMonth()+d2_.getDate())%100+1;
   const meihua=meiHuaYiShu(n1,n2,h1+h2+1);

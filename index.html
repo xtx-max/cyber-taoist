@@ -2581,7 +2581,13 @@ function analyzeCompatibility(){
         <div class="compat-label">${compat.tier}</div>
       </div>
 
-      <p style="text-align:center;color:var(--text-dim);line-height:1.9;margin-bottom:24px;font-size:0.95rem">${compat.desc}</p>
+      <p style="text-align:center;color:var(--text-dim);line-height:1.9;margin-bottom:20px;font-size:0.95rem">${compat.desc}</p>
+
+      <p style="text-align:center;font-size:0.78rem;color:var(--text-dim);margin-bottom:16px;padding:8px;background:rgba(201,168,76,0.05);border-radius:8px">
+        🕐 ${name1}：经度${lng1.toFixed(1)}° ${solar1.description} → ${HOUR_NAMES[solar1.hourBranch]}${solar1.dayAdvance?'(日柱+1天)':''}
+        ｜ ${name2}：经度${lng2.toFixed(1)}° ${solar2.description} → ${HOUR_NAMES[solar2.hourBranch]}${solar2.dayAdvance?'(日柱+1天)':''}
+        <br>评分基于：${bazi1.yearPillar.stem}${bazi1.yearPillar.branch} ${bazi1.dayPillar.stem}${bazi1.dayPillar.branch} ↔ ${bazi2.yearPillar.stem}${bazi2.yearPillar.branch} ${bazi2.dayPillar.stem}${bazi2.dayPillar.branch}
+      </p>
 
       <div class="pillars-grid">
         <div class="pillar-card"><div class="pillar-label">${name1}·年柱</div><div class="pillar-stem">${bazi1.yearPillar.stem}</div><div class="pillar-branch">${bazi1.yearPillar.branch}</div></div>

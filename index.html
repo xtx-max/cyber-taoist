@@ -1890,7 +1890,7 @@ function getYingQi(movingLine, upperTrigram, lowerTrigram){
 // SECTION 6: COMPATIBILITY ANALYSIS
 // ============================================================
 
-function analyzeCompatibility(bazi1,bazi2){
+function computeCompatibility(bazi1,bazi2){
   const a1=analyzeBaziFull(bazi1),a2=analyzeBaziFull(bazi2);
   let score=100;const details=[],highlights=[],cautions=[];
   const yearRel=checkRelationship(bazi1.yearPillar.branchIdx,bazi2.yearPillar.branchIdx);
@@ -2552,7 +2552,7 @@ function analyzeCompatibility(){
   const bazi1=calculateBazi(adjDate1,solar1.hourBranch);
   const bazi2=calculateBazi(adjDate2,solar2.hourBranch);
   setProgress('compat-result',55,'命理合参中');
-  const compat=analyzeCompatibility(bazi1,bazi2);
+  const compat=computeCompatibility(bazi1,bazi2);
   const a1=analyzeBaziFull(bazi1),a2=analyzeBaziFull(bazi2);
   setProgress('compat-result',78,'卦象解读中');
   const d1_=new Date(y1,m1-1,d1),d2_=new Date(y2,m2-1,d2);

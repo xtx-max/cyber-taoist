@@ -10,6 +10,9 @@
 <meta name="theme-color" content="#fef9f0">
 <meta name="description" content="赛博天师 · Cyber Taoist — 生辰八字分析、梅花易数占卜、每日运势、合盘缘分">
 <title>赛博天师 · Cyber Taoist</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' style='stop-color:%23c41e3a'/><stop offset='100%25' style='stop-color:%23c9a84c'/></linearGradient></defs><circle cx='32' cy='32' r='30' fill='none' stroke='url(%23g)' stroke-width='2'/><circle cx='32' cy='32' r='28' fill='none' stroke='%23c9a84c' stroke-width='0.5' stroke-dasharray='8 4' opacity='0.5'/><path d='M32 2 A30 30 0 0 1 32 62 A15 15 0 0 0 32 32 A15 15 0 0 1 32 2Z' fill='%23c41e3a' opacity='0.8'/><circle cx='32' cy='17' r='3' fill='%23c9a84c'/><path d='M32 62 A30 30 0 0 1 32 2 A15 15 0 0 0 32 32 A15 15 0 0 1 32 62Z' fill='%23c9a84c' opacity='0.8'/><circle cx='32' cy='47' r='3' fill='%23c41e3a'/><rect x='14' y='28' width='4' height='2' fill='%23c9a84c' opacity='0.6'/><rect x='46' y='34' width='4' height='2' fill='%23c9a84c' opacity='0.6'/><rect x='28' y='8' width='2' height='4' fill='%23c9a84c' opacity='0.6'/><rect x='34' y='52' width='2' height='4' fill='%23c9a84c' opacity='0.6'/></svg>">
 <!-- Google Fonts loaded async to prevent blocking in China -->
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
@@ -795,12 +798,13 @@ footer p{margin:4px 0}
       <p style="font-weight:700;color:var(--gold-dark);margin-bottom:8px">🔗 分享给朋友</p>
       <p style="font-size:0.85rem;color:var(--text-dim);margin-bottom:12px">复制链接发给任何人，手机电脑一触即达</p>
       <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-        <input id="share-url" readonly value="https://xtx-max.github.io/cyber-taoist/" style="flex:1;min-width:200px;max-width:320px;font-size:0.85rem;cursor:pointer" onclick="this.select();document.execCommand('copy');showToast('链接已复制 📋')" title="点击复制链接">
+        <input id="share-url" readonly value="https://xtx-max.github.io/cyber-taoist/" style="flex:1;min-width:200px;max-width:320px;font-size:0.85rem;cursor:pointer" onclick="this.value='https://xtx-max.github.io/cyber-taoist/';this.select();navigator.clipboard.writeText(this.value);showToast('链接已复制 📋 如对方看到旧版，请其点页面底部「检查更新」')" title="点击复制链接">
         <button class="btn btn-primary" style="padding:10px 20px;font-size:0.9rem" onclick="copyShareLink()">📋 复制链接</button>
       </div>
     </div>
-    <p>☯ 赛博天师 · 以古法为基，AI 为辅</p>
+    <p>☯ 赛博天师 · v2.5 · <span id="ver-check" style="cursor:pointer" onclick="location.reload(true)" title="点击刷新获取最新版本">🔄 检查更新</span></p>
     <p>仅供娱乐参详，勿过度执念。命运在己，不在卦中。</p>
+    <p style="font-size:0.7rem;color:var(--text-dim);margin-top:4px">如显示异常或不是最新版，请点上方「检查更新」刷新</p>
   </footer>
 </div>
 
@@ -2079,7 +2083,7 @@ function copyText(text){
   else{showToast('请手动复制结果');}
 }
 function copyShareLink(){
-  const url='https://xtx-max.github.io/cyber-taoist/';
+  const url='https://xtx-max.github.io/cyber-taoist/?v='+Date.now();
   if(navigator.clipboard){navigator.clipboard.writeText(url).then(()=>showToast('链接已复制！发给朋友即可使用 🔗'));}
   else{const el=document.getElementById('share-url');if(el){el.select();document.execCommand('copy');showToast('链接已复制 📋');}}
 }

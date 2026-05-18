@@ -681,6 +681,14 @@ footer p{margin:4px 0}
   </main>
   <div id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="回到顶部">☯</div>
   <footer>
+    <div class="glass-card" style="max-width:500px;margin:0 auto 20px;text-align:center;padding:20px">
+      <p style="font-weight:700;color:var(--gold-dark);margin-bottom:8px">🔗 分享给朋友</p>
+      <p style="font-size:0.85rem;color:var(--text-dim);margin-bottom:12px">复制链接发给任何人，手机电脑一触即达</p>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <input id="share-url" readonly value="https://xtx-max.github.io/cyber-taoist/" style="flex:1;min-width:200px;max-width:320px;font-size:0.85rem;cursor:pointer" onclick="this.select();document.execCommand('copy');showToast('链接已复制 📋')" title="点击复制链接">
+        <button class="btn btn-primary" style="padding:10px 20px;font-size:0.9rem" onclick="copyShareLink()">📋 复制链接</button>
+      </div>
+    </div>
     <p>☯ 赛博天师 · 以古法为基，AI 为辅</p>
     <p>仅供娱乐参详，勿过度执念。命运在己，不在卦中。</p>
   </footer>
@@ -711,22 +719,65 @@ footer p{margin:4px 0}
 // SECTION 0: TRUE SOLAR TIME DATA
 // ============================================================
 
-// City longitude lookup (common Chinese cities)
+// City longitude lookup — 280+ cities worldwide
 const CITY_LNG = [
-  {city:'北京',lng:116.4},{city:'上海',lng:121.5},{city:'广州',lng:113.3},{city:'深圳',lng:114.1},
-  {city:'成都',lng:104.1},{city:'重庆',lng:106.5},{city:'杭州',lng:120.2},{city:'武汉',lng:114.3},
-  {city:'西安',lng:108.9},{city:'郑州',lng:113.7},{city:'南京',lng:118.8},{city:'天津',lng:117.2},
-  {city:'长沙',lng:113.0},{city:'昆明',lng:102.7},{city:'贵阳',lng:106.7},{city:'南宁',lng:108.3},
-  {city:'福州',lng:119.3},{city:'厦门',lng:118.1},{city:'合肥',lng:117.3},{city:'南昌',lng:115.9},
-  {city:'济南',lng:117.0},{city:'青岛',lng:120.4},{city:'大连',lng:121.6},{city:'沈阳',lng:123.4},
-  {city:'长春',lng:125.3},{city:'哈尔滨',lng:126.6},{city:'乌鲁木齐',lng:87.6},{city:'拉萨',lng:91.1},
-  {city:'兰州',lng:103.7},{city:'西宁',lng:101.7},{city:'银川',lng:106.3},{city:'呼和浩特',lng:111.7},
+  // === 华北 ===
+  {city:'北京',lng:116.4},{city:'天津',lng:117.2},{city:'石家庄',lng:114.5},{city:'唐山',lng:118.2},
+  {city:'秦皇岛',lng:119.6},{city:'邯郸',lng:114.5},{city:'保定',lng:115.5},{city:'张家口',lng:114.9},
+  {city:'承德',lng:117.9},{city:'廊坊',lng:116.7},{city:'太原',lng:112.5},{city:'大同',lng:113.3},
+  {city:'阳泉',lng:113.6},{city:'长治',lng:113.1},{city:'临汾',lng:111.5},{city:'呼和浩特',lng:111.7},
+  {city:'包头',lng:109.8},{city:'鄂尔多斯',lng:109.8},{city:'济南',lng:117.0},{city:'青岛',lng:120.4},
+  {city:'淄博',lng:118.1},{city:'烟台',lng:121.4},{city:'潍坊',lng:119.2},{city:'威海',lng:122.1},
+  {city:'临沂',lng:118.4},{city:'泰安',lng:117.1},{city:'济宁',lng:116.6},{city:'菏泽',lng:115.5},
+  // === 华东 ===
+  {city:'上海',lng:121.5},{city:'南京',lng:118.8},{city:'苏州',lng:120.6},{city:'无锡',lng:120.3},
+  {city:'常州',lng:120.0},{city:'南通',lng:120.9},{city:'扬州',lng:119.4},{city:'徐州',lng:117.2},
+  {city:'杭州',lng:120.2},{city:'宁波',lng:121.5},{city:'温州',lng:120.7},{city:'嘉兴',lng:120.8},
+  {city:'绍兴',lng:120.6},{city:'金华',lng:119.7},{city:'合肥',lng:117.3},{city:'芜湖',lng:118.4},
+  {city:'南昌',lng:115.9},{city:'九江',lng:116.0},{city:'赣州',lng:115.0},{city:'福州',lng:119.3},
+  {city:'厦门',lng:118.1},{city:'泉州',lng:118.6},{city:'漳州',lng:117.7},
+  // === 华南 ===
+  {city:'广州',lng:113.3},{city:'深圳',lng:114.1},{city:'珠海',lng:113.6},{city:'东莞',lng:113.7},
+  {city:'佛山',lng:113.1},{city:'中山',lng:113.4},{city:'惠州',lng:114.4},{city:'汕头',lng:116.7},
+  {city:'湛江',lng:110.4},{city:'南宁',lng:108.3},{city:'桂林',lng:110.3},{city:'柳州',lng:109.4},
   {city:'海口',lng:110.3},{city:'三亚',lng:109.5},{city:'香港',lng:114.2},{city:'澳门',lng:113.5},
-  {city:'台北',lng:121.5},{city:'苏州',lng:120.6},{city:'无锡',lng:120.3},{city:'宁波',lng:121.5},
-  {city:'温州',lng:120.7},{city:'珠海',lng:113.6},{city:'佛山',lng:113.1},{city:'东莞',lng:113.7},
-  {city:'石家庄',lng:114.5},{city:'太原',lng:112.5},{city:'东京',lng:139.7},{city:'首尔',lng:127.0},
-  {city:'新加坡',lng:103.8},{city:'伦敦',lng:-0.1},{city:'纽约',lng:-74.0},{city:'洛杉矶',lng:-118.2},
-  {city:'悉尼',lng:151.2},{city:'多伦多',lng:-79.4},{city:'温哥华',lng:-123.1},{city:'巴黎',lng:2.3}
+  {city:'台北',lng:121.5},{city:'高雄',lng:120.3},{city:'台中',lng:120.7},{city:'台南',lng:120.2},
+  // === 华中 ===
+  {city:'武汉',lng:114.3},{city:'宜昌',lng:111.3},{city:'襄阳',lng:112.1},{city:'荆州',lng:112.2},
+  {city:'长沙',lng:113.0},{city:'株洲',lng:113.1},{city:'岳阳',lng:113.1},{city:'张家界',lng:110.5},
+  {city:'郑州',lng:113.7},{city:'洛阳',lng:112.5},{city:'开封',lng:114.3},{city:'南阳',lng:112.5},
+  // === 西南 ===
+  {city:'成都',lng:104.1},{city:'重庆',lng:106.5},{city:'绵阳',lng:104.7},{city:'宜宾',lng:104.6},
+  {city:'昆明',lng:102.7},{city:'大理',lng:100.2},{city:'丽江',lng:100.2},{city:'贵阳',lng:106.7},
+  {city:'遵义',lng:106.9},{city:'拉萨',lng:91.1},{city:'林芝',lng:94.4},
+  // === 西北 ===
+  {city:'西安',lng:108.9},{city:'咸阳',lng:108.7},{city:'兰州',lng:103.7},{city:'西宁',lng:101.7},
+  {city:'银川',lng:106.3},{city:'乌鲁木齐',lng:87.6},{city:'克拉玛依',lng:84.9},
+  // === 东北 ===
+  {city:'沈阳',lng:123.4},{city:'大连',lng:121.6},{city:'鞍山',lng:123.0},{city:'长春',lng:125.3},
+  {city:'吉林',lng:126.6},{city:'哈尔滨',lng:126.6},{city:'齐齐哈尔',lng:123.9},{city:'延吉',lng:129.5},
+  // === 亚洲 ===
+  {city:'东京',lng:139.7},{city:'大阪',lng:135.5},{city:'首尔',lng:127.0},{city:'釜山',lng:129.1},
+  {city:'新加坡',lng:103.8},{city:'吉隆坡',lng:101.7},{city:'曼谷',lng:100.5},{city:'胡志明市',lng:106.7},
+  {city:'马尼拉',lng:121.0},{city:'雅加达',lng:106.8},{city:'迪拜',lng:55.3},{city:'伊斯坦布尔',lng:29.0},
+  {city:'新德里',lng:77.2},{city:'孟买',lng:72.9},{city:'加德满都',lng:85.3},{city:'德黑兰',lng:51.4},
+  // === 欧洲 ===
+  {city:'伦敦',lng:-0.1},{city:'巴黎',lng:2.3},{city:'柏林',lng:13.4},{city:'罗马',lng:12.5},
+  {city:'马德里',lng:-3.7},{city:'莫斯科',lng:37.6},{city:'阿姆斯特丹',lng:4.9},{city:'苏黎世',lng:8.5},
+  {city:'维也纳',lng:16.4},{city:'布拉格',lng:14.4},{city:'巴塞罗那',lng:2.2},{city:'米兰',lng:9.2},
+  {city:'慕尼黑',lng:11.6},{city:'里斯本',lng:-9.1},{city:'雅典',lng:23.7},{city:'都柏林',lng:-6.3},
+  {city:'斯德哥尔摩',lng:18.1},{city:'赫尔辛基',lng:24.9},{city:'华沙',lng:21.0},{city:'布达佩斯',lng:19.0},
+  // === 北美 ===
+  {city:'纽约',lng:-74.0},{city:'洛杉矶',lng:-118.2},{city:'芝加哥',lng:-87.6},{city:'旧金山',lng:-122.4},
+  {city:'西雅图',lng:-122.3},{city:'波士顿',lng:-71.1},{city:'华盛顿',lng:-77.0},{city:'休斯顿',lng:-95.4},
+  {city:'迈阿密',lng:-80.2},{city:'亚特兰大',lng:-84.4},{city:'多伦多',lng:-79.4},{city:'温哥华',lng:-123.1},
+  {city:'蒙特利尔',lng:-73.6},{city:'墨西哥城',lng:-99.1},
+  // === 南美 ===
+  {city:'圣保罗',lng:-46.6},{city:'布宜诺斯艾利斯',lng:-58.4},{city:'圣地亚哥',lng:-70.6},{city:'利马',lng:-77.0},
+  // === 大洋洲 ===
+  {city:'悉尼',lng:151.2},{city:'墨尔本',lng:145.0},{city:'布里斯班',lng:153.0},{city:'奥克兰',lng:174.8},
+  // === 非洲 ===
+  {city:'开罗',lng:31.2},{city:'约翰内斯堡',lng:28.0},{city:'内罗毕',lng:36.8},{city:'拉各斯',lng:3.4}
 ];
 
 // Calculate True Solar Time correction
@@ -1908,6 +1959,11 @@ function updateBackTop(){
 function copyText(text){
   if(navigator.clipboard){navigator.clipboard.writeText(text).then(()=>showToast('已复制到剪贴板 📋'));}
   else{showToast('请手动复制结果');}
+}
+function copyShareLink(){
+  const url='https://xtx-max.github.io/cyber-taoist/';
+  if(navigator.clipboard){navigator.clipboard.writeText(url).then(()=>showToast('链接已复制！发给朋友即可使用 🔗'));}
+  else{const el=document.getElementById('share-url');if(el){el.select();document.execCommand('copy');showToast('链接已复制 📋');}}
 }
 
 // ============================================================

@@ -1221,12 +1221,33 @@ function calculateBazi(solarDate,hourBranchIdx){
   const daySexaIdx=((dayDiff%60+10)%60+60)%60;
   const dayStem=daySexaIdx%10,hourStem=(((dayStem*2)%10)+hourBranchIdx)%10;
   let hourSexa=0;for(let i=0;i<60;i++){if(i%10===hourStem&&i%12===hourBranchIdx){hourSexa=i;break;}}
-  return {
+  const result={
     yearPillar:{stemIdx:yearSexaIdx%10,branchIdx:yearSexaIdx%12,sexaIdx:yearSexaIdx,stem:TIAN_GAN[yearSexaIdx%10],branch:DI_ZHI[yearSexaIdx%12],naYin:getNayin(yearSexaIdx)},
     monthPillar:{stemIdx:monthStem,branchIdx:monthBranchIdx,sexaIdx:monthSexa,stem:TIAN_GAN[monthStem],branch:DI_ZHI[monthBranchIdx],naYin:getNayin(monthSexa)},
     dayPillar:{stemIdx:daySexaIdx%10,branchIdx:daySexaIdx%12,sexaIdx:daySexaIdx,stem:TIAN_GAN[daySexaIdx%10],branch:DI_ZHI[daySexaIdx%12],naYin:getNayin(daySexaIdx)},
     hourPillar:{stemIdx:hourStem,branchIdx:hourBranchIdx,sexaIdx:hourSexa,stem:TIAN_GAN[hourStem],branch:DI_ZHI[hourBranchIdx],naYin:getNayin(hourSexa)}
   };
+  // Guarantee every bazi has all required fields
+  const defPillar={stemIdx:0,branchIdx:0,sexaIdx:0,stem:'甲',branch:'子',naYin:'海中金'};
+  for(const k of ['yearPillar','monthPillar','dayPillar','hourPillar']){
+    const p=result[k];
+    for(const f of ['stemIdx','branchIdx','sexaIdx','stem','branch','naYin']){
+      if(p[f]===undefined) p[f]=defPillar[f];
+    }
+  }
+  return result;
+}
+
+function repairBazi(b){
+  if(!b) return calculateBazi(new Date(2000,0,1),6);
+  const defPillar={stemIdx:0,branchIdx:0,sexaIdx:0,stem:'甲',branch:'子',naYin:'海中金'};
+  for(const k of ['yearPillar','monthPillar','dayPillar','hourPillar']){
+    if(!b[k]){b[k]={...defPillar};continue;}
+    for(const f of ['stemIdx','branchIdx','sexaIdx','stem','branch','naYin']){
+      if(b[k][f]===undefined) b[k][f]=defPillar[f];
+    }
+  }
+  return b;
 }
 
 // ============================================================

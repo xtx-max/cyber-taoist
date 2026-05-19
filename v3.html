@@ -799,7 +799,9 @@ footer p{margin:4px 0}
 </div>
 
 <script>
-
+// ============================================================
+// SECTION 0: NAV LOGO SVG (inject into DOM)
+// ============================================================
 (function injectLogo(){
   const iconContainer = document.querySelector('.logo-icon');
   if(iconContainer) {
@@ -817,8 +819,13 @@ footer p{margin:4px 0}
   }
 })();
 
+// ============================================================
+// SECTION 0: TRUE SOLAR TIME DATA
+// ============================================================
+
+// City longitude lookup — 280+ cities worldwide
 const CITY_LNG = [
-  
+  // === 华北 ===
   {city:'北京',lng:116.4},{city:'天津',lng:117.2},{city:'石家庄',lng:114.5},{city:'唐山',lng:118.2},
   {city:'秦皇岛',lng:119.6},{city:'邯郸',lng:114.5},{city:'保定',lng:115.5},{city:'张家口',lng:114.9},
   {city:'承德',lng:117.9},{city:'廊坊',lng:116.7},{city:'太原',lng:112.5},{city:'大同',lng:113.3},
@@ -826,73 +833,80 @@ const CITY_LNG = [
   {city:'包头',lng:109.8},{city:'鄂尔多斯',lng:109.8},{city:'济南',lng:117.0},{city:'青岛',lng:120.4},
   {city:'淄博',lng:118.1},{city:'烟台',lng:121.4},{city:'潍坊',lng:119.2},{city:'威海',lng:122.1},
   {city:'临沂',lng:118.4},{city:'泰安',lng:117.1},{city:'济宁',lng:116.6},{city:'菏泽',lng:115.5},
-  
+  // === 华东 ===
   {city:'上海',lng:121.5},{city:'南京',lng:118.8},{city:'苏州',lng:120.6},{city:'无锡',lng:120.3},
   {city:'常州',lng:120.0},{city:'南通',lng:120.9},{city:'扬州',lng:119.4},{city:'徐州',lng:117.2},
   {city:'杭州',lng:120.2},{city:'宁波',lng:121.5},{city:'温州',lng:120.7},{city:'嘉兴',lng:120.8},
   {city:'绍兴',lng:120.6},{city:'金华',lng:119.7},{city:'合肥',lng:117.3},{city:'芜湖',lng:118.4},
   {city:'南昌',lng:115.9},{city:'九江',lng:116.0},{city:'赣州',lng:115.0},{city:'福州',lng:119.3},
   {city:'厦门',lng:118.1},{city:'泉州',lng:118.6},{city:'漳州',lng:117.7},
-  
+  // === 华南 ===
   {city:'广州',lng:113.3},{city:'深圳',lng:114.1},{city:'珠海',lng:113.6},{city:'东莞',lng:113.7},
   {city:'佛山',lng:113.1},{city:'中山',lng:113.4},{city:'惠州',lng:114.4},{city:'汕头',lng:116.7},
   {city:'湛江',lng:110.4},{city:'南宁',lng:108.3},{city:'桂林',lng:110.3},{city:'柳州',lng:109.4},
   {city:'海口',lng:110.3},{city:'三亚',lng:109.5},{city:'香港',lng:114.2},{city:'澳门',lng:113.5},
   {city:'台北',lng:121.5},{city:'高雄',lng:120.3},{city:'台中',lng:120.7},{city:'台南',lng:120.2},
-  
+  // === 华中 ===
   {city:'武汉',lng:114.3},{city:'宜昌',lng:111.3},{city:'襄阳',lng:112.1},{city:'荆州',lng:112.2},
   {city:'长沙',lng:113.0},{city:'株洲',lng:113.1},{city:'岳阳',lng:113.1},{city:'张家界',lng:110.5},
   {city:'郑州',lng:113.7},{city:'洛阳',lng:112.5},{city:'开封',lng:114.3},{city:'南阳',lng:112.5},
-  
+  // === 西南 ===
   {city:'成都',lng:104.1},{city:'重庆',lng:106.5},{city:'绵阳',lng:104.7},{city:'宜宾',lng:104.6},
   {city:'昆明',lng:102.7},{city:'大理',lng:100.2},{city:'丽江',lng:100.2},{city:'贵阳',lng:106.7},
   {city:'遵义',lng:106.9},{city:'拉萨',lng:91.1},{city:'林芝',lng:94.4},
-  
+  // === 西北 ===
   {city:'西安',lng:108.9},{city:'咸阳',lng:108.7},{city:'兰州',lng:103.7},{city:'西宁',lng:101.7},
   {city:'银川',lng:106.3},{city:'乌鲁木齐',lng:87.6},{city:'克拉玛依',lng:84.9},
-  
+  // === 东北 ===
   {city:'沈阳',lng:123.4},{city:'大连',lng:121.6},{city:'鞍山',lng:123.0},{city:'长春',lng:125.3},
   {city:'吉林',lng:126.6},{city:'哈尔滨',lng:126.6},{city:'齐齐哈尔',lng:123.9},{city:'延吉',lng:129.5},
-  
+  // === 亚洲 ===
   {city:'东京',lng:139.7},{city:'大阪',lng:135.5},{city:'首尔',lng:127.0},{city:'釜山',lng:129.1},
   {city:'新加坡',lng:103.8},{city:'吉隆坡',lng:101.7},{city:'曼谷',lng:100.5},{city:'胡志明市',lng:106.7},
   {city:'马尼拉',lng:121.0},{city:'雅加达',lng:106.8},{city:'迪拜',lng:55.3},{city:'伊斯坦布尔',lng:29.0},
   {city:'新德里',lng:77.2},{city:'孟买',lng:72.9},{city:'加德满都',lng:85.3},{city:'德黑兰',lng:51.4},
-  
+  // === 欧洲 ===
   {city:'伦敦',lng:-0.1},{city:'巴黎',lng:2.3},{city:'柏林',lng:13.4},{city:'罗马',lng:12.5},
   {city:'马德里',lng:-3.7},{city:'莫斯科',lng:37.6},{city:'阿姆斯特丹',lng:4.9},{city:'苏黎世',lng:8.5},
   {city:'维也纳',lng:16.4},{city:'布拉格',lng:14.4},{city:'巴塞罗那',lng:2.2},{city:'米兰',lng:9.2},{city:'巴勒莫',lng:13.4},{city:'佛罗伦萨',lng:11.3},{city:'那不勒斯',lng:14.3},{city:'威尼斯',lng:12.3},
   {city:'慕尼黑',lng:11.6},{city:'里斯本',lng:-9.1},{city:'雅典',lng:23.7},{city:'都柏林',lng:-6.3},
   {city:'斯德哥尔摩',lng:18.1},{city:'赫尔辛基',lng:24.9},{city:'华沙',lng:21.0},{city:'布达佩斯',lng:19.0},
-  
+  // === 北美 ===
   {city:'纽约',lng:-74.0},{city:'洛杉矶',lng:-118.2},{city:'芝加哥',lng:-87.6},{city:'旧金山',lng:-122.4},
   {city:'西雅图',lng:-122.3},{city:'波士顿',lng:-71.1},{city:'华盛顿',lng:-77.0},{city:'休斯顿',lng:-95.4},
   {city:'迈阿密',lng:-80.2},{city:'亚特兰大',lng:-84.4},{city:'多伦多',lng:-79.4},{city:'温哥华',lng:-123.1},
   {city:'蒙特利尔',lng:-73.6},{city:'墨西哥城',lng:-99.1},
-  
+  // === 南美 ===
   {city:'圣保罗',lng:-46.6},{city:'布宜诺斯艾利斯',lng:-58.4},{city:'圣地亚哥',lng:-70.6},{city:'利马',lng:-77.0},
-  
+  // === 大洋洲 ===
   {city:'悉尼',lng:151.2},{city:'墨尔本',lng:145.0},{city:'布里斯班',lng:153.0},{city:'奥克兰',lng:174.8},
-  
+  // === 非洲 ===
   {city:'开罗',lng:31.2},{city:'约翰内斯堡',lng:28.0},{city:'内罗毕',lng:36.8},{city:'拉各斯',lng:3.4}
 ];
 
+// Calculate True Solar Time correction
+// Uses local timezone meridian (nearest 15° multiple) as reference
+// True Solar Time = Local Clock Time + (longitude - timezoneMeridian) × 4 minutes
 function getTrueSolarOffset(longitude){
   const timezoneMeridian = Math.round(longitude / 15) * 15;
-  return (longitude - timezoneMeridian) * 4; 
+  return (longitude - timezoneMeridian) * 4; // in minutes
 }
 
+// Apply True Solar Time correction to birth hour and determine adjusted time
 function applyTrueSolarTime(birthHour, birthMinute, longitude){
   const offsetMin = getTrueSolarOffset(longitude);
-  
+  // Keep within 0-1440 range (one day)
+  var totalMin = birthHour * 60 + birthMinute + offsetMin;
   totalMin = ((totalMin % 1440) + 1440) % 1440;
   const adjHour = Math.floor(totalMin / 60);
   const adjMin = Math.round(totalMin % 60);
-
+  // Determine 时辰 (two-hour period)
+  // 子时: 23:00-00:59, 丑时: 1:00-2:59, ..., 亥时: 21:00-22:59
   let hourBranch;
-  if(adjHour >= 23 || adjHour < 1) hourBranch = 0; 
+  if(adjHour >= 23 || adjHour < 1) hourBranch = 0; // 子时
   else hourBranch = Math.floor((adjHour - 1) / 2) + 1;
-
+  // Day adjustment flag: if original hour < 23 but adjusted hour >= 23, day advances
+  // If original hour >= 23 but adjusted hour < 23, day stays (already on next day)
   const dayAdvance = (birthHour < 23 && adjHour >= 23);
   return {
     adjustedHour: adjHour,
@@ -904,6 +918,7 @@ function applyTrueSolarTime(birthHour, birthMinute, longitude){
   };
 }
 
+// Get longitude from city name
 function getLngByCity(cityName){
   const found = CITY_LNG.find(c => c.city === cityName);
   return found ? found.lng : null;
@@ -922,11 +937,13 @@ const DZ_MONTHS = ['寅','卯','辰','巳','午','未','申','酉','戌','亥','
 const SEXAGENARY = [];
 for(let i=0;i<60;i++) SEXAGENARY.push(TIAN_GAN[i%10]+DI_ZHI[i%12]);
 
+// Five Elements
 const WX_GENERATE = {木:'火',火:'土',土:'金',金:'水',水:'木'};
 const WX_OVERCOME = {木:'土',土:'水',水:'火',火:'金',金:'木'};
 const WX_GENERATED_BY = {火:'木',土:'火',金:'土',水:'金',木:'水'};
 const WX_OVERCOME_BY = {土:'木',水:'土',火:'水',金:'火',木:'金'};
 
+// Shi Shen table
 const SHI_SHEN_TABLE = [];
 (function buildShiShen(){
   for(let dm=0;dm<10;dm++){
@@ -944,9 +961,11 @@ const SHI_SHEN_TABLE = [];
 })();
 const SHI_SHEN_NAMES=['比肩','劫财','食神','伤官','偏财','正财','七杀','正官','偏印','正印'];
 
+// Na Yin
 const NAYIN=['海中金','炉中火','大林木','路旁土','剑锋金','山头火','涧下水','城头土','白蜡金','杨柳木','泉中水','屋上土','霹雳火','松柏木','流年水','砂石金','山下火','平地木','壁上土','金箔金','覆灯火','天河水','大驿土','钗环金','桑柘木','柘榴木','大海水','石榴木','大海水','海中金'];
 function getNayin(idx){return NAYIN[Math.floor(idx/2)];}
 
+// Na Yin detailed descriptions
 const NAYIN_DESC = {
   '海中金':'金藏海底，深不可测。需火炼方显光芒，忌水多反淹其华。主深藏不露，大器晚成。',
   '炉中火':'洪炉之火，天地为炉。热情奔放，创造力强，但需有节，过旺则焚。主能量充沛，事业心重。',
@@ -962,12 +981,14 @@ const NAYIN_DESC = {
   '屋上土':'顶天立地，遮风挡雨。责任感强，令人信赖。宜稳固根基，忌好高骛远。'
 };
 
+// 合冲刑害 tables
 const LIU_HE = [[0,1],[2,11],[3,10],[4,9],[5,8],[6,7]];
 const SAN_HE = [[2,6,10],[3,7,11],[0,4,8],[1,5,9]];
 const LIU_CHONG = [[0,6],[1,7],[2,8],[3,9],[4,10],[5,11]];
 const XING = [[0,3],[3,6],[6,9],[9,0],[1,10],[2,5],[4,8]];
 const HAI = [[0,7],[1,6],[2,9],[3,8],[4,11],[5,10]];
 
+// Xiao Liu Ren
 const XLR_PALACES=[
   {name:'大安',element:'木',color:'青',direction:'东',
    meaning:'身不动时，五行属木，颜色青色，方位东方。临青龙，谋事主一、五、七。安稳祥和，诸事顺遂。',
@@ -989,6 +1010,7 @@ const XLR_PALACES=[
    fortune:'诸事宜缓，不宜大举。谋事多阻，宜静心等待时机。空亡之后，必有新生。',level:'凶'}
 ];
 
+// 64 Hexagrams
 const HEXAGRAMS=[
   {name:'乾为天',judgment:'元亨利贞。天行健，君子以自强不息。此事当以刚健之姿应对，顺应天道，终得圆满。',upper:0,lower:0},
   {name:'天泽履',judgment:'履虎尾，不咥人，亨。如履薄冰，谨慎行事。虽临险境，以柔克刚可化险为夷。',upper:0,lower:1},
@@ -1066,6 +1088,7 @@ const EIGHT_TRIGRAMS=[
   {name:'坤',symbol:'☷',element:'土',nature:'地'}
 ];
 
+// Lunar calendar data
 const LUNAR_INFO = (function(){
   const data={};
   const raw=[
@@ -1105,6 +1128,7 @@ const LUNAR_INFO = (function(){
   return data;
 })();
 
+// Lunar New Year reference
 const LNY_REF = {
   1900:[1900,1,31],1901:[1901,2,19],1902:[1902,2,8],1903:[1903,1,29],1904:[1904,2,16],
   1905:[1905,2,4],1906:[1906,1,25],1907:[1907,2,13],1908:[1908,2,2],1909:[1909,1,22],
@@ -1138,6 +1162,10 @@ const LNY_REF = {
   2045:[2045,2,17],2046:[2046,2,6],2047:[2047,1,26],2048:[2048,2,14],2049:[2049,2,2],
   2050:[2050,1,23]
 };
+
+// ============================================================
+// SECTION 2: CORE ALGORITHMS
+// ============================================================
 
 function getJieQi(year){
   function jieDay(y,C,baseY){const Y=y-baseY;return Math.floor(Y*0.2422+C)-Math.floor(Y/4);}
@@ -1199,7 +1227,7 @@ function calculateBazi(solarDate,hourBranchIdx){
     dayPillar:{stemIdx:daySexaIdx%10,branchIdx:daySexaIdx%12,sexaIdx:daySexaIdx,stem:TIAN_GAN[daySexaIdx%10],branch:DI_ZHI[daySexaIdx%12],naYin:getNayin(daySexaIdx)},
     hourPillar:{stemIdx:hourStem,branchIdx:hourBranchIdx,sexaIdx:hourSexa,stem:TIAN_GAN[hourStem],branch:DI_ZHI[hourBranchIdx],naYin:getNayin(hourSexa)}
   };
-  
+  // Guarantee every bazi has all required fields
   const defPillar={stemIdx:0,branchIdx:0,sexaIdx:0,stem:'甲',branch:'子',naYin:'海中金'};
   for(const k of ['yearPillar','monthPillar','dayPillar','hourPillar']){
     const p=result[k];
@@ -1222,12 +1250,16 @@ function repairBazi(b){
   return b;
 }
 
+// ============================================================
+// SECTION 3: DA YUN (大运) CALCULATION
+// ============================================================
+
 function calculateDaYun(bazi,gender){
   const yearStem=bazi.yearPillar.stemIdx,yearBranch=bazi.yearPillar.branchIdx;
   const monthStem=bazi.monthPillar.stemIdx,monthBranch=bazi.monthPillar.branchIdx;
-  const isYangYear=yearStem%2===0; 
+  const isYangYear=yearStem%2===0; // 甲丙戊庚壬=阳年
   const isMale=gender==='male';
-  
+  // 男阳年/女阴年=顺排，男阴年/女阳年=逆排
   const forward=(isMale&&isYangYear)||(!isMale&&!isYangYear);
   const dayuns=[];
   for(let i=1;i<=8;i++){
@@ -1245,6 +1277,11 @@ function getDayunStartAge(bazi,forward){
   return forward?Math.max(1,Math.floor((11-monthPillar.branchIdx)*3.5)):Math.max(1,Math.floor(monthPillar.branchIdx*3.2));
 }
 
+// ============================================================
+// SECTION 3.5: PILLAR INTERPRETATIONS
+// ============================================================
+
+// Detailed Heavenly Stem interpretations
 const STEM_DETAIL = {
   '甲':{nature:'阳木参天',traits:'刚正不阿，有领袖气质。如参天大树，心胸开阔，志向高远。为人正直，有担当精神，但有局面大而细节不足之象。',
     advice:'宜以金雕琢，以火泄秀。适度放权，关注细节可使事业更上层楼。'},
@@ -1268,6 +1305,7 @@ const STEM_DETAIL = {
     advice:'宜有辛金发源，以木泄水。适时表达内心，让深藏的智慧之泉滋养自己与他人。'}
 };
 
+// Detailed Earthly Branch interpretations
 const BRANCH_DETAIL = {
   '子':{nature:'阳水之精',season:'仲冬',traits:'智慧深邃，如子夜之泉。思维敏捷，善谋略，有独立精神。代表新的开始与潜在的无限可能。',
     advice:'宜借木之生机引导水势。避免过于内敛，适时与人合作可放大个人优势。'},
@@ -1295,6 +1333,7 @@ const BRANCH_DETAIL = {
     advice:'宜借木引导水势。将深藏的智慧引导出来，在世间留下自己的印记。'}
 };
 
+// Detailed Na Yin descriptions for all 30 pairs (extended)
 const NAYIN_FULL = {
   '海中金':'金藏海底，深不可测。需洪炉烈火锻炼，方显珠光宝气。主大器晚成，不鸣则已一鸣惊人。忌水过多反淹光芒。',
   '炉中火':'洪炉烈火，天地为炉造化为工。热情奔放，创造力强，但需有节有度。过旺则焚，得水既济方成气候。',
@@ -1326,6 +1365,11 @@ const NAYIN_FULL = {
   '石榴木':'初生石榴，枝嫩叶新。充满潜力和可塑性。宜趁早确立方向，在成长最快的时期做最优选择。'
 };
 
+// ============================================================
+// SECTION 3.8: COMPREHENSIVE PERSONALITY ANALYSIS
+// ============================================================
+
+// Detailed day master personality by stem × strength
 const DM_PERSONALITY = {
   '甲':{strong:{
     traits:'甲木参天，雄壮挺拔。你如森林中的参天大树，天生具有领袖风范。为人刚正不阿，说话直来直往，有担当、有魄力。在人群中你往往是那个拍板定案的人，不喜欢拖泥带水。你的气场强大，能给人安全感，但也因此偶尔显得固执己见，不善于从他人角度考虑问题。你拥有极强的上进心和事业心，渴望在人生舞台上建树丰碑。',
@@ -1459,6 +1503,7 @@ const DM_PERSONALITY = {
   }
 };
 
+// Shi Shen personality maps
 const SHISHEN_PERSONALITY = {
   '比肩':{pos:'自我意识强，独立自主，有竞争心和进取精神。自尊心强，不轻易低头。',neg:'可能过于自我中心，缺乏合作意识，容易与人较劲。'},
   '劫财':{pos:'行动力强，果敢决断，有开拓精神。善于抓住机会，不放过任何可能。',neg:'冲动消费，有时不计后果，情绪化行动可能带来损失。'},
@@ -1472,6 +1517,7 @@ const SHISHEN_PERSONALITY = {
   '正印':{pos:'心地善良，有慈悲心和包容力。好学不倦，有文化底蕴和智慧。',neg:'有时过于理想化，缺乏现实感，容易被利用。'}
 };
 
+// Month pillar seasonal personality
 const MONTH_PERSONALITY = {
   2:{name:'寅月·孟春',traits:'生于初春，如万物萌发。性格中带有开拓者的朝气和活力，对未来充满期待。有创新精神，但可能经验不足而略显冒进。'},
   3:{name:'卯月·仲春',traits:'生于春意最浓之时，如花朵绽放。性格温柔而有魅力，善与人交。心思细腻，审美感强，但有时缺乏决断。'},
@@ -1497,6 +1543,7 @@ function analyzePersonality(bazi,analysis){
   const isWeak=dmScore<=avgScore*0.75;
   const strength=isStrong?'strong':(isWeak?'weak':'balanced');
 
+  // 1. Day Master Core Personality
   const dmEntry=DM_PERSONALITY[dmStem];
   const dmKey=dmEntry&&dmEntry[strength]?strength:(dmEntry&&dmEntry.strong?'strong':'weak');
   const dmData=dmEntry?dmEntry[dmKey]:null;
@@ -1511,6 +1558,7 @@ function analyzePersonality(bazi,analysis){
     coreCareer='宜结合用神五行选择方向';coreRelationship='真诚待人，随缘而行';
   }
 
+  // 2. Five Elements Character Balance
   const elemPersonality=[];
   const sorted=Object.entries(analysis.elementScores).sort((a,b)=>b[1]-a[1]);
   const strongest=sorted[0][0],weakest=sorted[4][0];
@@ -1540,6 +1588,7 @@ function analyzePersonality(bazi,analysis){
     else if(s<avgScore*0.7) elemPersonality.push(elemTraitsMap[el].deficit);
   }
 
+  // 3. Shi Shen Personality
   const shiShenAnalysis=[];
   const mainShiShen=[];
   for(let i=0;i<4;i++){
@@ -1551,15 +1600,19 @@ function analyzePersonality(bazi,analysis){
     if(info) shiShenAnalysis.push(`<strong>${ss}</strong>：${info.pos}${info.neg}`);
   }
 
+  // 4. Month seasonal personality
   const monthInfo=MONTH_PERSONALITY[bazi.monthPillar.branchIdx];
   const seasonTraits=monthInfo?`生于<strong>${monthInfo.name}</strong>，${monthInfo.traits}`:'';
 
+  // 5. Year pillar family imprint
   const yearStem=bazi.yearPillar.stem;
   const yearStemTraits=STEM_DETAIL[yearStem]?STEM_DETAIL[yearStem].traits:'';
 
+  // 6. Hour pillar inner self
   const hourStem=bazi.hourPillar.stem;
   const hourStemTraits=STEM_DETAIL[hourStem]?STEM_DETAIL[hourStem].traits:'';
 
+  // 7. Generate comprehensive summary
   function generateSummary(){
     const s=analysis.elementScores;
     const ws=analysis.weakestElement,ss=analysis.strongestElement;
@@ -1589,6 +1642,10 @@ function analyzePersonality(bazi,analysis){
     summary:generateSummary(),mainShiShen
   };
 }
+
+// ============================================================
+// SECTION 4: METAPHYSICS ANALYSIS
+// ============================================================
 
 function analyzeBaziFull(bazi){
   const dm=bazi.dayPillar.stemIdx,dmElement=TG_ELEMENT[dm],dmYY=dm%2;
@@ -1632,6 +1689,10 @@ function checkRelationship(b1,b2){
   return rel;
 }
 
+// ============================================================
+// SECTION 5: DIVINATION
+// ============================================================
+
 function xiaoLiuRen(lunarMonth,lunarDay,lunarHourBranch){
   const hourMap={0:0,1:1,2:2,3:3,4:4,5:5,6:0,7:1,8:2,9:3,10:4,11:5};
   let idx=(lunarMonth-1)%6;idx=(idx+lunarDay-1)%6;idx=(idx+(hourMap[lunarHourBranch]||0))%6;
@@ -1645,22 +1706,26 @@ function meiHuaYiShu(num1,num2,num3){
   const upperBin=upperIdx.toString(2).padStart(3,'0');
   const lowerBin=lowerIdx.toString(2).padStart(3,'0');
   let fullBin=upperBin+lowerBin;
-
+  // 互卦: lines 2,3,4 → lower mutual trigram, lines 3,4,5 → upper mutual trigram
+  // fullBin positions: [0]=line6(upper1), [1]=line5(upper2), [2]=line4(upper3),
+  //                    [3]=line3(lower1), [4]=line2(lower2), [5]=line1(lower3)
+  // Lower mutual: lines 2,3,4 → fullBin[4],fullBin[3],fullBin[2]
+  // Upper mutual: lines 3,4,5 → fullBin[3],fullBin[2],fullBin[1]
   const mutualLowerBin=fullBin[4]+fullBin[3]+fullBin[2];
   const mutualUpperBin=fullBin[3]+fullBin[2]+fullBin[1];
   const mutualLower=parseInt(mutualLowerBin,2),mutualUpper=parseInt(mutualUpperBin,2);
   const mutualHex=HEXAGRAMS.find(h=>h.upper===mutualUpper&&h.lower===mutualLower);
-  
+  // 变卦
   const changePos=6-movingLine;
   const changedChar=fullBin[changePos]==='0'?'1':'0';
   fullBin=fullBin.substring(0,changePos)+changedChar+fullBin.substring(changePos+1);
   const newUpper=parseInt(fullBin.substring(0,3),2),newLower=parseInt(fullBin.substring(3,6),2);
   const changed=HEXAGRAMS.find(h=>h.upper===newUpper&&h.lower===newLower);
-  
+  // 综卦 (inverse): flip the hexagram upside down
   const revBin=fullBin[5]+fullBin[4]+fullBin[3]+fullBin[2]+fullBin[1]+fullBin[0];
   const revUpper=parseInt(revBin.substring(0,3),2),revLower=parseInt(revBin.substring(3,6),2);
   const inverseHex=HEXAGRAMS.find(h=>h.upper===revUpper&&h.lower===revLower);
-  
+  // 错卦 (complement): flip all lines
   const compBin=fullBin.split('').map(c=>c==='0'?'1':'0').join('');
   const compUpper=parseInt(compBin.substring(0,3),2),compLower=parseInt(compBin.substring(3,6),2);
   const complementHex=HEXAGRAMS.find(h=>h.upper===compUpper&&h.lower===compLower);
@@ -1671,21 +1736,22 @@ function meiHuaYiShu(num1,num2,num3){
   };
 }
 
+// 384 爻辞 — module-level, created once (not inside function)
 const YAO_CI_DB={
-    '乾为天':['潜龙勿用。时机未到，宜积蓄力量，静待风云变幻。','见龙在田，利见大人。才华初露，需要伯乐赏识。主动展','终日乾乾，夕惕若厉。勤勉不懈，朝乾夕惕，虽处险境亦','或跃在渊，无咎。进退自如，既可一跃飞天亦可安守深渊','飞龙在天，利见大人。大展宏图，如日中天。贵人相助，','亢龙有悔。盛极必衰，居高思危。切忌得意忘形，功成身'],
-    '坤为地':['履霜，坚冰至。见微知著，小患不除将酿大祸。防微杜渐','直方大，不习无不利。正直端方，自然行事，无需刻意修','含章可贞，或从王事。内含才华而不炫耀，待机而动，功','括囊，无咎无誉。谨言慎行，收敛锋芒。此时沉默是金。','黄裳，元吉。中庸之道，谦逊温良。以柔克刚，不争而胜','龙战于野，其血玄黄。阴阳相争，事情走到了极端。物极'],
-    '水雷屯':['磐桓，利居贞，利建侯。万物始生，破土艰难。宜稳守根','屯如邅如，乘马班如。徘徊难进，非不欲进也，乃势未至','即鹿无虞，惟入于林中。无导而猎，必陷于林。强求反失','乘马班如，求婚媾。往吉，坚持可成。机遇终会降临。','屯其膏，小贞吉，大贞凶。小利可得，大举有险。宜小不','乘马班如，泣血涟如。穷途末路之象，宜回退重整。何不'],
-    '山水蒙':['发蒙，利用刑人。启蒙之初，以规矩立基，以榜样引导。','包蒙，吉。纳妇吉。包容无知，耐心启蒙，有教无类。','勿用取女。见金夫不有躬。时机未到，不宜强求冒进。','困蒙，吝。困于蒙昧，不主动求学则终将受困。宜求知。','童蒙，吉。保持赤子之心，虚心好学。如孩童般纯粹最吉','击蒙，不利为寇，利御寇。破蒙有度，过激则反。点到为'],
-    '水天需':['需于郊，利用恒。等待之初，宜有耐心。不急不躁。','需于沙，小有言。等待之中或有口舌是非，不必在意，终','需于泥，致寇至。处境变难，泥足深陷。宜警惕外来风险','需于血，出自穴。经历血泪波折后终得脱困，顺而听命。','需于酒食，贞吉。等待中的休养和准备。养精蓄锐为正道','入于穴，有不速之客。意外变化来临，以礼相待可化险为'],
+    '乾为天':['潜龙勿用。时机未到，宜积蓄力量，静待风云变幻。','见龙在田，利见大人。才华初露，需要伯乐赏识。主动展示自己。','终日乾乾，夕惕若厉。勤勉不懈，朝乾夕惕，虽处险境亦可无咎。','或跃在渊，无咎。进退自如，既可一跃飞天亦可安守深渊，审时度势为上。','飞龙在天，利见大人。大展宏图，如日中天。贵人相助，事业巅峰。','亢龙有悔。盛极必衰，居高思危。切忌得意忘形，功成身退方为智者。'],
+    '坤为地':['履霜，坚冰至。见微知著，小患不除将酿大祸。防微杜渐。','直方大，不习无不利。正直端方，自然行事，无需刻意修饰。','含章可贞，或从王事。内含才华而不炫耀，待机而动，功成不居。','括囊，无咎无誉。谨言慎行，收敛锋芒。此时沉默是金。','黄裳，元吉。中庸之道，谦逊温良。以柔克刚，不争而胜。','龙战于野，其血玄黄。阴阳相争，事情走到了极端。物极必反。'],
+    '水雷屯':['磐桓，利居贞，利建侯。万物始生，破土艰难。宜稳守根基。','屯如邅如，乘马班如。徘徊难进，非不欲进也，乃势未至也。','即鹿无虞，惟入于林中。无导而猎，必陷于林。强求反失。','乘马班如，求婚媾。往吉，坚持可成。机遇终会降临。','屯其膏，小贞吉，大贞凶。小利可得，大举有险。宜小不宜大。','乘马班如，泣血涟如。穷途末路之象，宜回退重整。何不归去？'],
+    '山水蒙':['发蒙，利用刑人。启蒙之初，以规矩立基，以榜样引导。','包蒙，吉。纳妇吉。包容无知，耐心启蒙，有教无类。','勿用取女。见金夫不有躬。时机未到，不宜强求冒进。','困蒙，吝。困于蒙昧，不主动求学则终将受困。宜求知。','童蒙，吉。保持赤子之心，虚心好学。如孩童般纯粹最吉。','击蒙，不利为寇，利御寇。破蒙有度，过激则反。点到为止。'],
+    '水天需':['需于郊，利用恒。等待之初，宜有耐心。不急不躁。','需于沙，小有言。等待之中或有口舌是非，不必在意，终吉。','需于泥，致寇至。处境变难，泥足深陷。宜警惕外来风险。','需于血，出自穴。经历血泪波折后终得脱困，顺而听命。','需于酒食，贞吉。等待中的休养和准备。养精蓄锐为正道。','入于穴，有不速之客。意外变化来临，以礼相待可化险为夷。'],
     '天水讼':['不永所事，小有言。争讼宜早结束，不宜长期纠缠。','不克讼，归而逋。不宜争斗，退让于邑，可保平安。','食旧德，贞厉。守旧德不争可保安宁，但从人者难大吉。','不克讼，复即命渝。放弃争端回归正理，安贞则吉。','讼，元吉。公平裁决可得大吉。正理在握则无忧。','或锡之鞶带，终朝三褫之。得而复失，胜讼亦不长久。'],
-    '地水师':['师出以律，否臧凶。行动需有纪律，失律则凶。','在师中，吉。身在团队中，承天宠也，得众人之力。','师或舆尸，凶。领导失误将导致满载尸体而归。决策需谨','师左次，无咎。战略退让，保存实力，未失常也。','田有禽，利执言。时机成熟，宜果断出击。长子帅师。','大君有命，开国承家。功成身退，小人勿用，选贤与能。'],
+    '地水师':['师出以律，否臧凶。行动需有纪律，失律则凶。','在师中，吉。身在团队中，承天宠也，得众人之力。','师或舆尸，凶。领导失误将导致满载尸体而归。决策需谨慎。','师左次，无咎。战略退让，保存实力，未失常也。','田有禽，利执言。时机成熟，宜果断出击。长子帅师。','大君有命，开国承家。功成身退，小人勿用，选贤与能。'],
     '地天泰':['拔茅茹，以其汇，征吉。团结同心，合力进取。','包荒，用冯河。胸怀宽广，不拘小节可渡大川。','无平不陂，无往不复。盛衰循环，居安思危方得始终。','翩翩不富，以其邻。轻装简行，不戒以孚，诚信待人。','帝乙归妹，以祉元吉。喜结良缘，大事可成，天作之合。','城复于隍，勿用师。泰极否来，大势已去时不可强为。'],
-    '天地否':['拔茅茹，以其汇，贞吉亨。守正待时，同心可渡否运。','包承，小人吉，大人否亨。包容忍耐，不与小人一般见识','包羞。忍辱负重，含羞待时，位不当也。','有命无咎，畴离祉。天命所归，顺势而为，志行也。','休否，大人吉。否运将尽，宜早做准备。其亡其亡。','倾否，先否后喜。否极泰来，厄运过后喜事临门。'],
-    '天火同人':['同人于门，无咎。聚合之初，从身边做起，无咎。','同人于宗，吝。局限于宗族圈子则视野狭隘。宜放宽格局','伏戎于莽，升其高陵。隐藏意图暗中观察，三岁不兴。','乘其墉，弗克攻。已登城墙却不下令攻击，义弗克也。','同人先号啕而后笑。先苦后甜，同心终能战胜困难。','同人于郊，无悔。聚合于郊外，志未得也。独善其身。'],
-    '火天大有':['无交害，匪咎。不被外物所伤，艰则无咎。','大车以载，有攸往。以车载物，积中不败。厚德载物。','公用亨于天子，小人弗克。公用献于天子，小人难当大任','匪其彭，无咎。不盛气凌人，明辨是非则可无咎。','厥孚交如，威如。诚信交于天下，威严自成。','自天佑之，吉无不利。自天而降的护佑，大吉大利。'],
+    '天地否':['拔茅茹，以其汇，贞吉亨。守正待时，同心可渡否运。','包承，小人吉，大人否亨。包容忍耐，不与小人一般见识。','包羞。忍辱负重，含羞待时，位不当也。','有命无咎，畴离祉。天命所归，顺势而为，志行也。','休否，大人吉。否运将尽，宜早做准备。其亡其亡。','倾否，先否后喜。否极泰来，厄运过后喜事临门。'],
+    '天火同人':['同人于门，无咎。聚合之初，从身边做起，无咎。','同人于宗，吝。局限于宗族圈子则视野狭隘。宜放宽格局。','伏戎于莽，升其高陵。隐藏意图暗中观察，三岁不兴。','乘其墉，弗克攻。已登城墙却不下令攻击，义弗克也。','同人先号啕而后笑。先苦后甜，同心终能战胜困难。','同人于郊，无悔。聚合于郊外，志未得也。独善其身。'],
+    '火天大有':['无交害，匪咎。不被外物所伤，艰则无咎。','大车以载，有攸往。以车载物，积中不败。厚德载物。','公用亨于天子，小人弗克。公用献于天子，小人难当大任。','匪其彭，无咎。不盛气凌人，明辨是非则可无咎。','厥孚交如，威如。诚信交于天下，威严自成。','自天佑之，吉无不利。自天而降的护佑，大吉大利。'],
     '地山谦':['谦谦君子，用涉大川。以谦卑之态行大事，吉。','鸣谦，贞吉。谦逊之名远扬，中心得也。','劳谦君子，有终吉。有功而不居，万民服也。有终。','无不利，撝谦。凡事无不利，发挥谦德，不违则也。','不富以其邻。不以财富凌驾邻人，利用侵伐。','鸣谦，利用行师。谦名远扬，可以兴师征邑国。'],
     '雷地豫':['鸣豫，凶。得意忘形则凶，志穷也。','介于石，不终日。坚如磐石之志，不终日而变。宜恒久。','盱豫，悔迟。犹豫观望则悔之晚矣，当机立断。','由豫，大有得。由豫而大有收获，志大行也。','贞疾，恒不死。守正虽有困难，但恒久不死。','冥豫，成有渝。沉迷豫乐，但成事仍有变数。'],
-    '泽雷随':['官有渝，贞吉。出门交有功。官职有变，守正则吉。','系小子，失丈夫。顾此失彼，捡芝麻丢西瓜。','系丈夫，失小子。随有求得。抓住大的，小的自然会来。','随有获，贞凶。随顺而有获得，但守正仍有危险。有孚在','孚于嘉，吉。诚信于美好之事，大吉。','拘系之，乃从维之。被束缚后才顺从。王用亨于西山。'],
+    '泽雷随':['官有渝，贞吉。出门交有功。官职有变，守正则吉。','系小子，失丈夫。顾此失彼，捡芝麻丢西瓜。','系丈夫，失小子。随有求得。抓住大的，小的自然会来。','随有获，贞凶。随顺而有获得，但守正仍有危险。有孚在道。','孚于嘉，吉。诚信于美好之事，大吉。','拘系之，乃从维之。被束缚后才顺从。王用亨于西山。'],
     '山风蛊':['干父之蛊，有子考。继承父业，纠正弊端。考无咎。','干母之蛊，不可贞。纠正母辈遗留问题，不可操之过急。','干父之蛊，小有悔。纠正中或有小悔，无大咎。','裕父之蛊。宽容对待前辈遗留的问题，但往则见吝。','干父之蛊，用誉。纠正弊端而获得赞誉。','不事王侯，高尚其事。不事权贵，以高洁自守。'],
     '地泽临':['咸临，贞吉。以感召之心临下，守正则吉。','咸临，吉无不利。以德感召，没有不顺利的。','甘临，无攸利。以甜言蜜语临人，无所利。既忧之。','至临，无咎。亲自到位，深入一线，可以无咎。','知临，大君之宜。以智慧治理，这是明君应有的方式。','敦临，吉无咎。以敦厚之心临下，吉而无咎。'],
     '风地观':['童观，小人无咎。如孩童般观看，君子则吝。','窥观，利女贞。从门缝中窥视，见识有限。宜放宽眼界。','观我生进退。反观自身，审时度势以定进退。','观国之光，利用宾于王。观察国家气象，可成王之宾客。','观我生，君子无咎。反观自身，君子可以无咎。','观其生，君子无咎。观察他人他事，引以为鉴。'],
@@ -1693,30 +1759,30 @@ const YAO_CI_DB={
     '山火贲':['贲其趾，舍车而徒。装饰脚趾，舍车步行。返璞归真。','贲其须。装饰胡须。外表之美，需要内在来支撑。','贲如濡如。装饰得水润光泽。永贞则吉。','贲如皤如，白马翰如。素白之马飞奔而来。非寇，婚媾。','贲于丘园，束帛戋戋。俭朴装饰山丘园林。吝，终吉。','白贲，无咎。以素白为饰，返璞归真，无咎。'],
     '山地剥':['剥床以足。床从足部开始剥落。根基先坏，蔑贞凶。','剥床以辨。剥落到床板。根基已动摇。蔑贞凶。','剥之，无咎。在剥落中保持清醒，可以无咎。','剥床以肤。剥落及肌肤。切近灾也，凶。','贯鱼以宫人宠。如贯穿鱼群般管理宫人。无不利。','硕果不食。君子得舆，小人剥庐。大的果实不被吃掉。'],
     '地雷复':['不远复，无祗悔。走不远就回头，不至于有大悔。元吉。','休复，吉。以休美之心回归，吉。','频复，厉。频繁地反复，有危险但无咎。','中行独复。行至中途独自回归。从道不从众。','敦复，无悔。以敦厚之心回归，无悔。','迷复，凶。迷失方向而反复，有灾眚。终于迷失。'],
-    '天雷无妄':['无妄，往吉。真实无妄地前行，吉。','不耕获，不菑畲。不耕种就想收获，不开荒就想熟田。妄','无妄之灾。意外的灾祸。或系之牛，行人之得。','可贞，无咎。守正可以无咎。','无妄之疾，勿药有喜。意外小病，不吃药也会好。有喜。','无妄，行有眚。虽然真实无妄，但行动仍有障碍。'],
+    '天雷无妄':['无妄，往吉。真实无妄地前行，吉。','不耕获，不菑畲。不耕种就想收获，不开荒就想熟田。妄也。','无妄之灾。意外的灾祸。或系之牛，行人之得。','可贞，无咎。守正可以无咎。','无妄之疾，勿药有喜。意外小病，不吃药也会好。有喜。','无妄，行有眚。虽然真实无妄，但行动仍有障碍。'],
     '山天大畜':['有厉，利已。前方有危险，宜停下来。','舆说輹。车厢脱离了车轴。前进受阻。','良马逐，利艰贞。良马奔驰，利于在艰难中坚守。','童牛之牿。小牛角上加了木架。防患于未然，元吉。','豮豕之牙。阉猪的獠牙。虽有利器但已无害。','何天之衢。通达于天的大道。亨。'],
-    '山雷颐':['舍尔灵龟，观我朵颐。舍弃你的灵龟，看我咀嚼。凶。','颠颐，拂经。颠倒养生之道，违背常理。凶。','拂颐，贞凶。违背颐养之道，守正亦凶。十年勿用。','颠颐，吉。颠倒颐养反而得吉。虎视眈眈。','拂经，居贞吉。违背常理但安居守正则吉。不可涉大川。','由颐，厉吉。由颐养之道而来，虽有危险但终吉。利涉大'],
+    '山雷颐':['舍尔灵龟，观我朵颐。舍弃你的灵龟，看我咀嚼。凶。','颠颐，拂经。颠倒养生之道，违背常理。凶。','拂颐，贞凶。违背颐养之道，守正亦凶。十年勿用。','颠颐，吉。颠倒颐养反而得吉。虎视眈眈。','拂经，居贞吉。违背常理但安居守正则吉。不可涉大川。','由颐，厉吉。由颐养之道而来，虽有危险但终吉。利涉大川。'],
     '泽风大过':['藉用白茅。用洁白茅草垫底。谨慎之至，无咎。','枯杨生稊。枯杨树生新枝。老夫得其女妻。','栋桡。房屋的大梁弯曲了。凶。','栋隆，吉。屋梁重新隆起。吉。有它吝。','枯杨生华。枯杨树开花。老妇得其士夫。无咎无誉。','过涉灭顶。涉水过深，水没头顶。凶。但无咎。'],
-    '坎为水':['习坎，入于坎窞。陷入深坑之中。凶。','坎有险，求小得。坎中藏险，但求小有所得。','来之坎坎，险且枕。前后来去都是坎险。入于坎窞，勿用','樽酒簋贰，用缶。简朴的祭祀，纳约自牖。终无咎。','坎不盈，祗既平。坎陷尚未满溢，危险渐平。无咎。','系用徽纆，置于丛棘。被绳索捆绑，置于荆棘丛中。凶。'],
+    '坎为水':['习坎，入于坎窞。陷入深坑之中。凶。','坎有险，求小得。坎中藏险，但求小有所得。','来之坎坎，险且枕。前后来去都是坎险。入于坎窞，勿用。','樽酒簋贰，用缶。简朴的祭祀，纳约自牖。终无咎。','坎不盈，祗既平。坎陷尚未满溢，危险渐平。无咎。','系用徽纆，置于丛棘。被绳索捆绑，置于荆棘丛中。凶。'],
     '离为火':['履错然。脚步交错，混乱之初。敬之则无咎。','黄离，元吉。黄色之火，中正之色。大吉。','日昃之离。夕阳西下之火。不鼓缶而歌则大耋之嗟。凶。','突如其来如。火焰突然爆发。焚如死如弃如。','出涕沱若。泪水如雨而下。戚嗟若。但终吉。','王用出征，有嘉折首。以正邦也。斩首获嘉。无咎。'],
     '泽山咸':['咸其拇。感应始于脚趾。心动于微末之处。','咸其腓，凶，居吉。感应至小腿，动则凶，静则吉。','咸其股，执其随。感应至大腿，感情用事会被牵着走。','贞吉悔亡，憧憧往来。心念专一，真诚相待可得善果。','咸其脢，无悔。感应至后背，感情已深，心心相印。','咸其辅颊舌。花言巧语无益，行动胜于千言万语。'],
     '雷风恒':['浚恒，贞凶。急于求深反失恒道，持之有度方为恒。','悔亡。守中道则无悔。恒久之道在于不偏不倚。','不恒其德，或承之羞。三心二意难成事，恒心为贵。','田无禽。方向不对努力白费，宜调整策略而非盲目坚持。','恒其德，贞。恒守其德，妇人吉，夫子凶。刚柔有别。','振恒，凶。动摇不定则凶。恒之上，大无功也。'],
     '天山遁':['遁尾，厉。退避之尾，有危险。勿用有攸往。','执之用黄牛之革。用黄牛皮捆绑。坚定退避之志。','系遁，有疾厉。被系绊而难以退避，有疾厉。畜臣妾吉。','好遁，君子吉。从容退避，君子吉，小人否。','嘉遁，贞吉。以嘉美之姿退避，守正则吉。','肥遁，无不利。从容宽裕地退避，无所不利。'],
-    '雷天大壮':['壮于趾，征凶。强壮在脚趾就远征，凶。有孚。','贞吉。守正则吉。','小人用壮，君子用罔。小人用强力，君子用无为之法。','贞吉，悔亡。藩决不赢。冲破藩篱，无悔。壮于大舆之輹','丧羊于易。在边界丢失了羊。无悔。','羝羊触藩。公羊角触藩篱，不能退不能遂。艰则吉。'],
+    '雷天大壮':['壮于趾，征凶。强壮在脚趾就远征，凶。有孚。','贞吉。守正则吉。','小人用壮，君子用罔。小人用强力，君子用无为之法。','贞吉，悔亡。藩决不赢。冲破藩篱，无悔。壮于大舆之輹。','丧羊于易。在边界丢失了羊。无悔。','羝羊触藩。公羊角触藩篱，不能退不能遂。艰则吉。'],
     '火地晋':['晋如摧如，贞吉。前进有阻，守正方吉。罔孚裕无咎。','晋如愁如，贞吉。虽有忧愁，守正得福。受兹介福。','众允，悔亡。众人认可同意，悔恨消除。','晋如鼫鼠，贞厉。贪多求快如大老鼠，有危险。','悔亡，失得勿恤。不患得失，放手前行。往吉无不利。','晋其角，维用伐邑。锐意进取但需以正道行事。'],
-    '地火明夷':['明夷于飞，垂其翼。光明受伤，低飞垂翼。三日不食。','明夷，夷于左股。左腿受伤，用拯马壮。可获救。','明夷于南狩，得其大首。隐忍后的出击，可擒获贼首。','入于左腹，获明夷之心。深入体察黑暗的本质，于出门庭','箕子之明夷，利贞。如箕子般以智慧面对黑暗。','不明晦，初登于天，后入于地。由明转暗，盛极而衰。'],
+    '地火明夷':['明夷于飞，垂其翼。光明受伤，低飞垂翼。三日不食。','明夷，夷于左股。左腿受伤，用拯马壮。可获救。','明夷于南狩，得其大首。隐忍后的出击，可擒获贼首。','入于左腹，获明夷之心。深入体察黑暗的本质，于出门庭。','箕子之明夷，利贞。如箕子般以智慧面对黑暗。','不明晦，初登于天，后入于地。由明转暗，盛极而衰。'],
     '风火家人':['闲有家。治理家庭要有规矩，悔亡。','无攸遂，在中馈。不独断专行，管理家中饮食。贞吉。','家人嗃嗃。家中严厉，悔厉但终吉。妇子嘻嘻终吝。','富家，大吉。使家庭富足，大吉大利。','王假有家。王者到访其家。勿恤，吉。','有孚威如。有诚信和威严，终吉。'],
-    '火泽睽':['悔亡，丧马勿逐。马丢了不必追，自会回来。见恶人无咎','遇主于巷。在小巷中遇到主人。不期而遇，无咎。','见舆曳，其牛掣。车被拖拽牛被牵制。其人天且劓。','睽孤，遇元夫。孤独乖离之中，遇到善人。交孚厉无咎。','悔亡，厥宗噬肤。同宗之人来帮你解决问题。往何咎？','睽孤，见豕负涂。在孤独中见猪满身泥。先张之弧后说之'],
+    '火泽睽':['悔亡，丧马勿逐。马丢了不必追，自会回来。见恶人无咎。','遇主于巷。在小巷中遇到主人。不期而遇，无咎。','见舆曳，其牛掣。车被拖拽牛被牵制。其人天且劓。','睽孤，遇元夫。孤独乖离之中，遇到善人。交孚厉无咎。','悔亡，厥宗噬肤。同宗之人来帮你解决问题。往何咎？','睽孤，见豕负涂。在孤独中见猪满身泥。先张之弧后说之。'],
     '水山蹇':['往蹇，来誉。前进有难，退回来则获赞誉。宜待。','王臣蹇蹇。君王和大臣都陷入艰难。匪躬之故。','往蹇，来反。前行有难，退回来。宜反。','往蹇，来连。前行有难，退回来连结力量。','大蹇，朋来。大难之中，朋友会来相助。','往蹇，来硕。前行有难，退回来则有大收获。利见大人。'],
     '雷水解':['无咎。危难开始化解。','田获三狐。狩猎获得三只狐狸。得黄矢，贞吉。','负且乘。背着东西又坐车。致寇至。贞吝。','解而拇。解开脚趾的束缚。朋至斯孚。','君子维有解。君子能解脱困境。有孚于小人。','公用射隼于高墉之上。在高墙上射杀猛禽。获之无不利。'],
-    '山泽损':['已事遄往。事情完了赶快离开。酌损之。','利贞，征凶。守正有利，出征有凶。弗损益之。','三人行则损一人。三人同行必有一人掉队。一人行则得其','损其疾。减损其疾病。使遄有喜，无咎。','或益之十朋之龟。有人送你价值十朋的大龟。弗克违。','弗损益之。不减反增。得臣无家。'],
+    '山泽损':['已事遄往。事情完了赶快离开。酌损之。','利贞，征凶。守正有利，出征有凶。弗损益之。','三人行则损一人。三人同行必有一人掉队。一人行则得其友。','损其疾。减损其疾病。使遄有喜，无咎。','或益之十朋之龟。有人送你价值十朋的大龟。弗克违。','弗损益之。不减反增。得臣无家。'],
     '风雷益':['利用为大作。利于做大事。元吉无咎。','或益之十朋之龟。有人赠价值十朋的宝龟。永贞吉。','益之用凶事。增益用于凶事。中行告公用圭。','中行告公从。以中道行事则公侯听从。利用为依迁国。','有孚惠心。有诚信惠爱之心。勿问元吉。','莫益之。没有人增益他。或击之。立心勿恒，凶。'],
     '泽天夬':['壮于前趾。脚趾用力过猛，往不胜为咎。','惕号。警号高呼。莫夜有戎，勿恤。','壮于頄。面颊用力过猛，有凶。君子夬夬独行。','臀无肤。臀部受伤无皮肤。其行次且。牵羊悔亡。','苋陆夬夬。如斩断苋陆草般决断。中行无咎。','无号。没有号令。终有凶。'],
     '天风姤':['系于金柅。被金属刹车系住。贞吉。有攸往见凶。','包有鱼。厨房中有鱼。无咎。不利宾。','臀无肤。臀部无皮肤。其行次且。厉无大咎。','包无鱼。厨房中没有鱼。起凶。','以杞包瓜。用杞柳包裹瓜果。含章，有陨自天。','姤其角。相遇触及角尖。吝，无咎。'],
     '泽地萃':['有孚不终。诚信不能始终如一。乃乱乃萃。','引吉，无咎。被人引导则吉，孚乃利用禴。','萃如嗟如。聚集而又叹息。无攸利。往无咎小吝。','大吉，无咎。','萃有位。聚集众人而拥有地位。无咎。匪孚。','赍咨涕洟。悲伤叹息泪流满面。无咎。'],
     '地风升':['允升，大吉。诚信地上升，大吉。','孚乃利用禴。诚信可以用于简朴的祭祀。无咎。','升虚邑。上升至空虚的城邑。无所疑也。','王用亨于岐山。君王在岐山祭祀。吉无咎。','贞吉，升阶。守正则吉，步步高升。','冥升。在黑暗中上升。利于不息之贞。'],
-    '泽水困':['臀困于株木。臀部被困在树桩上。入于幽谷三岁不觌。','困于酒食。被困于酒食宴饮之中。朱绂方来。利用亨祀。','困于石。被困在石头之间。据于蒺藜。入于其宫不见其妻','来徐徐。慢慢地来。困于金车。吝有终。','劓刖。割鼻断足之困。困于赤绂。乃徐有说。利用祭祀。','困于葛藟。被藤蔓缠绕。于臲兀。曰动悔有悔。征吉。'],
-    '水风井':['井泥不食。井底有泥不能饮用。旧井无禽。','井谷射鲋。井中射小鱼。瓮敝漏。装水的陶罐破了。','井渫不食。井已清理干净却不被饮用。为我心恻。可用汲','井甃。修整井壁。无咎。','井冽寒泉食。井水清冽如寒泉，可饮用了。','井收勿幕。井修好了不要盖上盖子。有孚元吉。'],
+    '泽水困':['臀困于株木。臀部被困在树桩上。入于幽谷三岁不觌。','困于酒食。被困于酒食宴饮之中。朱绂方来。利用亨祀。','困于石。被困在石头之间。据于蒺藜。入于其宫不见其妻。','来徐徐。慢慢地来。困于金车。吝有终。','劓刖。割鼻断足之困。困于赤绂。乃徐有说。利用祭祀。','困于葛藟。被藤蔓缠绕。于臲兀。曰动悔有悔。征吉。'],
+    '水风井':['井泥不食。井底有泥不能饮用。旧井无禽。','井谷射鲋。井中射小鱼。瓮敝漏。装水的陶罐破了。','井渫不食。井已清理干净却不被饮用。为我心恻。可用汲。','井甃。修整井壁。无咎。','井冽寒泉食。井水清冽如寒泉，可饮用了。','井收勿幕。井修好了不要盖上盖子。有孚元吉。'],
     '泽火革':['巩用黄牛之革。用黄牛皮牢牢地束缚。不可妄动。','己日乃革之。到了己日才变革。征吉无咎。','征凶，贞厉。变革太急有凶险。革言三就。','悔亡，有孚改命。悔恨消除，以诚信改变命运。吉。','大人虎变。大人如虎般威猛地变革。未占有孚。','君子豹变。君子如豹般华丽地完成变革。小人革面。'],
     '火风鼎':['鼎颠趾。鼎脚朝上翻倒了。利出否。得妾以其子。','鼎有实。鼎中有食物。我仇有疾。不我能即。','鼎耳革。鼎耳脱落了。其行塞。雉膏不食。','鼎折足。鼎足断了。覆公餗。其形渥。凶。','鼎黄耳金铉。鼎有黄色耳和金属杠。利贞。','鼎玉铉。鼎有玉制的杠。大吉无不利。'],
     '震为雷':['震来虩虩。惊雷滚滚而来，令人战栗。后笑言哑哑。','震来厉。雷震猛烈而来有危险。亿丧贝。勿逐七日得。','震苏苏。雷声渐苏。震行无眚。','震遂泥。雷震陷入泥中。','震往来厉。雷震往来都有危险。亿无丧有事。','震索索。雷声索索渐弱。视矍矍。征凶。震不于其躬。'],
@@ -1730,11 +1796,12 @@ const YAO_CI_DB={
     '风水涣':['用拯马壮。用健壮的马拯救。吉。','涣奔其机。涣散中抓住时机。悔亡。','涣其躬。涣散自身。无悔。','涣其群。涣散群体。元吉。涣有丘。匪夷所思。','涣汗其大号。涣散中大汗淋漓地号令。涣王居。无咎。','涣其血。涣散其忧患。去逖出。无咎。'],
     '水泽节':['不出户庭。不出房门庭院。无咎。','不出门庭。不走出大门庭院。凶。','不节若。若不加节制。则嗟若。但可无咎。','安节。安然地节制。亨。','甘节。甘美地节制。吉。往有尚。','苦节。苦涩地节制。贞凶悔亡。'],
     '风泽中孚':['虞吉。戒备则吉。有它不燕。','鸣鹤在阴。鹤在树荫中鸣叫。其子和之。我有好爵。','得敌。遇到对手。或鼓或罢或泣或歌。','月几望。月将圆。马匹亡。无咎。','有孚挛如。诚信紧紧相连。无咎。','翰音登于天。高亢的声音上达于天。贞凶。'],
-    '雷山小过':['飞鸟以凶。飞鸟带来凶兆。','过其祖，遇其妣。错过祖父遇到祖母。不及其君遇其臣。','弗过防之。不要过度但要提防。从或戕之。凶。','无咎。弗过遇之。不过分而待之。往厉必戒。','密云不雨。浓云密布却不下雨。自我西郊。公弋取彼在穴','弗遇过之。没有相遇却超过了。飞鸟离之。凶。'],
-    '水火既济':['曳其轮。拖着车轮。濡其尾。无咎。','妇丧其茀。妇人丢失了发饰。勿逐，七日得。','高宗伐鬼方。三年攻克鬼方。小人勿用。','繻有衣袽。华衣之下有破旧内衬。终日戒。','东邻杀牛。东邻杀牛祭祀不如西邻简朴的禴祭。实受其福','濡其首。水淹没了头。厉。'],
+    '雷山小过':['飞鸟以凶。飞鸟带来凶兆。','过其祖，遇其妣。错过祖父遇到祖母。不及其君遇其臣。','弗过防之。不要过度但要提防。从或戕之。凶。','无咎。弗过遇之。不过分而待之。往厉必戒。','密云不雨。浓云密布却不下雨。自我西郊。公弋取彼在穴。','弗遇过之。没有相遇却超过了。飞鸟离之。凶。'],
+    '水火既济':['曳其轮。拖着车轮。濡其尾。无咎。','妇丧其茀。妇人丢失了发饰。勿逐，七日得。','高宗伐鬼方。三年攻克鬼方。小人勿用。','繻有衣袽。华衣之下有破旧内衬。终日戒。','东邻杀牛。东邻杀牛祭祀不如西邻简朴的禴祭。实受其福。','濡其首。水淹没了头。厉。'],
     '火水未济':['濡其尾。弄湿了尾巴。吝。','曳其轮。拖着车轮。贞吉。','未济，征凶。事情未成，出征有凶。利涉大川。','贞吉悔亡。震用伐鬼方三年有赏于大国。','贞吉无悔。君子之光。有孚，吉。','有孚于饮酒。诚信地饮酒。无咎。濡其首。']
 };
 
+// 384 爻辞 — now a global, created once
 function getYaoCi(hexName,movingLine){
   if(YAO_CI_DB[hexName]&&YAO_CI_DB[hexName][movingLine-1]) return YAO_CI_DB[hexName][movingLine-1];
   return ['此初爻为事物发端，根基生变，万事从头来过。宜稳扎稳打。',
@@ -1745,6 +1812,7 @@ function getYaoCi(hexName,movingLine){
     '此上爻为事之终，穷极将变。盛极必衰，否极泰来。'][movingLine-1]||'此爻之变恰合天机，静心体察卦辞。';
 }
 
+// Expanded 64 hexagram detailed interpretations
 const HEXAGRAM_DETAIL = {
   '乾为天':'六龙御天，纯阳至健。天行健，君子以自强不息。此卦大象主创造、领导与成功，是六十四卦之首，象征一切事物的开端和巅峰。问事业则前程似锦但需持续精进，问感情则需你主动迈出第一步。然纯阳易折——刚强之外要懂得以柔济刚、刚柔并济，方可长久。乾卦六爻从"潜龙勿用"到"亢龙有悔"，完整描绘了一个事物从萌芽到鼎盛再到衰退的全过程——居安思危是乾卦的核心智慧。',
   '坤为地':'地势坤，君子以厚德载物。此卦主包容、承载与柔顺，是大地之德，万物之母。柔能克刚——不是软弱的柔，而是如水般可以穿透一切的柔。以宽广的胸怀容纳生活中的一切，不急不躁，稳扎稳打。问事则以耐心和坚持为上，不争即是争，不争而天下莫能与之争。坤卦提醒：真正的力量不在锋芒，而在承载万物的厚度之中。',
@@ -1814,6 +1882,7 @@ const HEXAGRAM_DETAIL = {
 
 function getHexDetail(hexName){return HEXAGRAM_DETAIL[hexName]||'卦象已显，天地不言而四时行焉。请静心体悟卦辞，答案自在你心中。';}
 
+// Time analysis (应期) based on moving line position
 function getYingQi(movingLine, upperTrigram, lowerTrigram){
   const timingMap={
     1:{period:'近期（1-7天内）',desc:'初爻主始，变在根基。应期较快，事物尚在萌芽阶段即会显现变化。关注未来一周内的发展。'},
@@ -1824,12 +1893,16 @@ function getYingQi(movingLine, upperTrigram, lowerTrigram){
     6:{period:'远期或当下即变（视具体而定）',desc:'上爻为事之终，物极必反。若事在鼎盛则衰退将至，若已至谷底则转机在即。穷则变，变则通。'}
   };
   const base=timingMap[movingLine]||timingMap[3];
-  
+  // Adjust based on upper trigram element season
   const elemSeasons={金:'秋',木:'春',水:'冬',火:'夏',土:'四季之末'};
   const season=elemSeasons[upperTrigram?upperTrigram.element:'']||'';
   const seasonNote=season?` 从五行时序看，用卦属${upperTrigram.element}，旺于${season}季，届时行事更为有利。`:'';
   return base.period+' — '+base.desc+seasonNote;
 }
+
+// ============================================================
+// SECTION 6: COMPATIBILITY ANALYSIS
+// ============================================================
 
 function computeCompatibility(bazi1,bazi2){
   let score=100;const highlights=[],cautions=[];
@@ -1852,9 +1925,9 @@ function computeCompatibility(bazi1,bazi2){
   if(monthRel.includes('六冲')){score-=8;cautions.push('月柱六冲：处事节奏时有碰撞，需协调双方的生活步调');}
   else if(monthRel.includes('六合')){score+=5;highlights.push('月柱六合：成长轨迹协调，在工作和生活上配合默契');}
   else if(monthRel.includes('三合')){score+=4;highlights.push('月柱三合：事业和生活节奏协同共振，合作无间');}
-  
+  // Hidden stem complement: check if one person's weak element is the other's strong
   const a1=analyzeBaziFull(bazi1),a2=analyzeBaziFull(bazi2);
-  
+  // Symmetric: check if either person's strong complements the other's weak
   const complement1=a1.weakestElement&&a2.strongestElement&&WX_GENERATE[a2.strongestElement]===a1.weakestElement;
   const complement2=a2.weakestElement&&a1.strongestElement&&WX_GENERATE[a1.strongestElement]===a2.weakestElement;
   if(complement1||complement2){
@@ -1870,6 +1943,10 @@ function computeCompatibility(bazi1,bazi2){
   return {score,tier,desc,highlights,cautions,yearRel,dayRel,monthRel,a1,a2};
 }
 
+// ============================================================
+// SECTION 7: FORTUNE TEXT TEMPLATES (EXPANDED)
+// ============================================================
+
 function generateDailyFortune(bazi){
   const today=new Date();
   const todayBazi=calculateBazi(today,Math.floor(today.getHours()/2));
@@ -1883,6 +1960,7 @@ function generateDailyFortune(bazi){
   const isGoodDay=todayGod<=3||dayBranchRel.includes('六合');
   const isBadDay=todayGod===6||dayBranchRel.includes('六冲')||dayBranchRel.includes('相害');
 
+  // --- Wealth (财运) --- Expanded
   const wealthGood=[
     '财星高照，如春水初生，源头活水自然来。今日宜关注与理财相关的信息，或有意外之喜。然君子爱财，取之有道。虽有机遇在前，亦当以稳健之心待之，细水长流方为上策。',
     '财帛宫明亮如十五之月，正财偏财皆有起色。如同秋日丰收的果园，之前的耕耘将在今日结出甜美的果实。投资理财可适度关注，但不宜孤注一掷。',
@@ -1900,6 +1978,7 @@ function generateDailyFortune(bazi){
     '今日宜捂紧钱袋，不宜冲动消费。如雾中行舟，方向未明之际不宜冒进。守财即是聚财，耐心等待云开雾散。记住：最稳妥的投资，就是投资自己。'
   ];
 
+  // --- Love (爱情) --- Expanded
   const loveGood=[
     '红鸾星动，桃花灼灼。今日与人相处时，你的魅力如月华般柔美而动人。有伴者感情升温，如蜜里调油；单身的你或将在不经意间遇见那个拨动你心弦的人。保持开放而真诚的心，美好的缘分正在靠近。',
     '今日感情运势如沐春风，你的温柔与善意会被身边的人敏锐地感知和珍视。有伴者宜共度温馨时光，一餐一饭皆是情意；单身者不妨多参与有意义的社交——缘分的种子往往在不经意间发芽开花。',
@@ -1914,6 +1993,7 @@ function generateDailyFortune(bazi){
     '今日桃花运势稍弱，可能感到一丝孤单或不被理解。请记得，这只是一日之象，而非永恒。先善待自己，让自己成为值得被爱的人——良缘自会在恰当的时候悄然而至。自爱者，人恒爱之。'
   ];
 
+  // --- Health (健康) --- Expanded
   const healthGood=[
     '精力充沛如春日新笋，气色红润，生命力蓬勃向上。今日适合适度运动，舒展筋骨，让身体与天地之气共振。饮食清淡为宜，多饮水可助气血通畅，身心康泰。',
     '身心康泰，精神饱满。今日的你如同山间清泉，清澈而有活力。宜早睡早起，顺天时而动。适合进行一些户外活动，让身体在自然中得到滋养与放松。一动一静，皆合天道。'
@@ -1923,6 +2003,7 @@ function generateDailyFortune(bazi){
     '精力稍显不足，如同灯盏需添油。不必强求高效，适当减少今日的安排。早些休息，让身体在深度睡眠中自我修复。明天的你，会感谢今天懂得放慢脚步、善待自己的自己。'
   ];
 
+  // --- Lucky Colors --- Expanded
   const colors=[
     {name:'琥珀金',hex:'#c9a84c',desc:'金色辉映，如日初升，为你带来温暖与光芒。宜穿戴金色配饰，提升财气与人缘。'},
     {name:'翡翠绿',hex:'#5b9a8b',desc:'绿色蕴藏生机，如春日新芽，为你注入活力与希望。宜亲近自然草木，洗涤心灵尘埃。'},
@@ -1940,6 +2021,7 @@ function generateDailyFortune(bazi){
   fortune.health=isGoodDay?pick(healthGood):pick(healthCautious);
   fortune.color=pickSeed(colors);
 
+  // --- 宜/忌 ---
   const yiGood=['宜签约合作，宜出行拜访','宜投资理财，宜参加社交','宜运动健身，宜表达心意','宜整理规划，宜学习新知'];
   const yiNeutral=['宜按部就班，宜修身养性','宜整理内务，宜静心阅读','宜梳理思绪，宜致电问候','宜清淡饮食，宜早睡早起'];
   const yiCautious=['宜静守为主，宜温故知新','宜低调行事，宜在家休养','宜反思复盘，宜减少应酬','宜储蓄节流，宜联络旧友'];
@@ -1950,6 +2032,7 @@ function generateDailyFortune(bazi){
   fortune.yi=isGoodDay?pickSeed(yiGood):isBadDay?pickSeed(yiCautious):pickSeed(yiNeutral);
   fortune.ji=isGoodDay?pickSeed(jiGood):isBadDay?pickSeed(jiCautious):pickSeed(jiNeutral);
 
+  // --- Advice ---
   const advicesGood=[
     '今日气场顺遂，如行云流水。你内在的力量正被天时加持，不要犹豫，大胆去做你一直想做的事吧。世界正在为你敞开一扇门。',
     '把握今日之良机，如同乘着顺风之船。但请保持谦逊与感恩之心——天地之道，盈满则亏。在收获中不忘分享，福气方能长久。',
@@ -1967,6 +2050,7 @@ function generateDailyFortune(bazi){
   ];
   fortune.advice=isGoodDay?pick(advicesGood):isBadDay?pick(advicesCautious):pick(advicesNeutral);
 
+  // Summary
   if(isGoodDay) fortune.summary='吉星高照，诸事顺遂';
   else if(isBadDay) fortune.summary='宜静守心，待时而动';
   else fortune.summary='中正平和，无咎无誉';
@@ -1978,6 +2062,11 @@ function generateDailyFortune(bazi){
   return fortune;
 }
 
+// ============================================================
+// SECTION 8: UI CONTROLLER
+// ============================================================
+
+// Loading helper — feng shui ritual animation
 function showLoading(targetId){
   const el=document.getElementById(targetId);
   if(!el) return;
@@ -1999,6 +2088,7 @@ function showToast(msg){
   setTimeout(()=>toast.remove(),3000);
 }
 
+// Back to top visibility
 function updateBackTop(){
   const btn=document.getElementById('back-top');
   if(!btn) return;
@@ -2006,6 +2096,7 @@ function updateBackTop(){
   else btn.classList.remove('show');
 }
 
+// Copy text to clipboard
 function copyText(text){
   if(navigator.clipboard){navigator.clipboard.writeText(text).then(()=>showToast('已复制到剪贴板 📋'));}
   else{showToast('请手动复制结果');}
@@ -2016,12 +2107,16 @@ function copyShareLink(){
   else{const el=document.getElementById('share-url');if(el){el.select();document.execCommand('copy');showToast('链接已复制 📋');}}
 }
 
+// ============================================================
+// SECTION 8.1: PROFILE MANAGEMENT
+// ============================================================
+
 function getProfiles(){try{const d=localStorage.getItem('cyberTaoistProfiles');if(!d)return[];const p=JSON.parse(d);if(!Array.isArray(p))return[];return p.map(x=>{if(!x)return null;if(!x.bazi||!x.bazi.dayPillar||!x.bazi.dayPillar.stem){x.bazi=repairBazi(x.bazi||{});x.v=1;}return x;}).filter(Boolean);}catch(e){return[]}}
 function saveProfile(name,gender,date,clockHourBranch,longitude){
   const profiles=getProfiles();
   const lng=longitude||120;
   const [y,m,d]=date.split('-').map(Number);
-  
+  // Always save raw clock data; solar time correction applied at analysis time
   const clockHour=(clockHourBranch===0?0:clockHourBranch*2-1+1);
   const solarTime=applyTrueSolarTime(clockHour,0,lng);
   const solarDate=new Date(y,m-1,d,12,0,0);
@@ -2084,7 +2179,7 @@ function loadProfileToCompat(num){
   document.getElementById('compat-name'+num).value=p.name||'';
   document.getElementById('compat-date'+num).value=p.date;
   const hourEl=document.getElementById('compat-hour'+num);
-  
+  // v1+ profiles: use clockHourBranch (raw). v0: use hourBranch directly
   if(hourEl) hourEl.value=(p.v>=1&&p.clockHourBranch!==undefined)?p.clockHourBranch:p.hourBranch;
   document.getElementById('compat'+num+'-lng').value=p.longitude||120;
   const cityEl=document.getElementById('compat-city'+num);
@@ -2109,7 +2204,7 @@ function loadProfileToBazi(){
 }
 
 function updateAllProfileSelects(){
-  
+  // Update profile selectors on bazi page and daily page
   const profiles=getProfiles();
   let opts='<option value="">— 选择已保存的档案 —</option>';
   for(let p of profiles) opts+=`<option value="${p.id}">${p.name} — ${p.date} ${HOUR_NAMES[p.hourBranch]}</option>`;
@@ -2127,6 +2222,7 @@ function updateProfileSelect(){
   updateAllProfileSelects();
 }
 
+// ========== Autocomplete Engine ==========
 function initAutocomplete(inputId, ddId, lngId){
   const input=document.getElementById(inputId);
   const dd=document.getElementById(ddId);
@@ -2135,6 +2231,7 @@ function initAutocomplete(inputId, ddId, lngId){
   if(!input||!dd||!lngEl) return;
   let activeIdx=-1;
 
+  // Build dropdown HTML from CITY_LNG
   function renderDropdown(filter){
     let html='';let count=0;
     const q=(filter||'').toLowerCase();
@@ -2187,13 +2284,20 @@ function initAutocomplete(inputId, ddId, lngId){
     input.value=city;lngEl.value=lng;
     dd.classList.remove('show');wrap?.classList.remove('open');
   }
-  
+  // Close on outside click
   document.addEventListener('click',(e)=>{if(!wrap.contains(e.target)){dd.classList.remove('show');wrap?.classList.remove('open');}});
 }
 
-function onCityChange(prefix){} 
+// Remove old onCityChange — handled by autocomplete now
+function onCityChange(prefix){} // no-op, kept for backward compat
 
 function switchToBaziForProfile(){switchTab('bazi');showToast('请填写出生信息，分析完成后自动保存为档案 ✨');}
+
+// showToast defined above in SECTION 8
+
+// ============================================================
+// SECTION 9: RENDER FUNCTIONS
+// ============================================================
 
 function analyzeBazi(){
   const name=document.getElementById('bazi-name').value||'未命名';
@@ -2203,15 +2307,14 @@ function analyzeBazi(){
   const longitude=parseFloat(document.getElementById('bazi-lng').value)||120;
   if(!date){showToast('请选择出生日期');return;}
   showLoading('bazi-result');
-  try{
   const [y,m,d]=date.split('-').map(Number);
-
-  const clockHour=(clockHourBranch===0?0:clockHourBranch*2-1+1); 
+  // Calculate True Solar Time
+  const clockHour=(clockHourBranch===0?0:clockHourBranch*2-1+1); // midpoint of 时辰
   const clockMinute=0;
   const solarTime=applyTrueSolarTime(clockHour,clockMinute,longitude);
   const hourBranch=solarTime.hourBranch;
   const solarDate=new Date(y,m-1,d,12,0,0);
-  
+  // If day advances due to true solar time correction
   const adjustedSolarDate=solarTime.dayAdvance?new Date(y,m-1,d+1,12,0,0):solarDate;
   const bazi=calculateBazi(adjustedSolarDate,hourBranch);
   const analysis=analyzeBaziFull(bazi);
@@ -2462,7 +2565,6 @@ function analyzeBazi(){
   saveHistory('bazi',name+' · '+bazi.dayPillar.stem+bazi.dayPillar.branch+'日主');
   renderHistory();
   renderProfileList();
-  }catch(e){document.getElementById('bazi-result').innerHTML='<div class="glass-card" style="text-align:center;padding:30px"><p style="color:var(--red)">计算出错</p><p>'+e.message+'</p></div>';}
 }
 
 function analyzeCompatibility(){
@@ -2476,7 +2578,7 @@ function analyzeCompatibility(){
   let lng2=parseFloat(document.getElementById('compat2-lng').value)||120;
   if(!date1||!date2){showToast('请填写双方的出生日期');return;}
   showLoading('compat-result');
-  
+  // Check if both profiles are loaded from saved data — use saved bazi directly
   const pid1=parseInt(document.getElementById('compat-profile1').value);
   const pid2=parseInt(document.getElementById('compat-profile2').value);
   const profiles=getProfiles();
@@ -2508,9 +2610,9 @@ function analyzeCompatibility(){
   setProgress('compat-result',30,'八字排盘中');
   setProgress('compat-result',55,'命理合参中');
   const compat=computeCompatibility(bazi1,bazi2);
-  const a1=compat.a1,a2=compat.a2; 
+  const a1=compat.a1,a2=compat.a2; // reuse from computeCompatibility
   setProgress('compat-result',78,'卦象解读中');
-  
+  // Use profile dates if available, otherwise form dates
   const d1_=prof1&&prof1.date?new Date(prof1.date+'T12:00:00'):new Date(y1||2000,0,1);
   const d2_=prof2&&prof2.date?new Date(prof2.date+'T12:00:00'):new Date(y2||2000,0,1);
   const n1=(d1_.getFullYear()+d1_.getMonth()+d1_.getDate())%100+1;
@@ -2565,26 +2667,26 @@ function analyzeCompatibility(){
           const domains=['根基 · 家庭背景与价值观','事业 · 生活节奏与处事方式','夫妻宫 · 性格内核与亲密互动','内心 · 晚年趋向与灵魂深处'];
           const deepInterpret=(i,rel,elemRel,elem1,elem2)=>{
             let t='';
-            if(i===0){ 
+            if(i===0){ // year pillar
               if(rel.some(r=>r.includes('六合'))) t='年柱六合是根基层面的和谐。你们对家庭的理解、对未来的规划方向天然一致。父母辈也可能相处融洽，为关系提供稳定的后方支持。';
               else if(rel.some(r=>r.includes('六冲'))) t='年柱六冲意味着成长背景和价值观有较大差异。这不一定致命——许多跨文化跨阶层的伴侣以理解和尊重跨越了这道鸿沟。关键是：不试图改变对方的根。';
               else t='年柱无特殊冲合，家庭背景方面没有天然的助力或阻力。你们需要主动去了解和尊重彼此的来时路。';
-            }else if(i===1){ 
+            }else if(i===1){ // month pillar
               if(rel.some(r=>r.includes('六合'))) t='月柱六合表示你们在工作和生活节奏上配合默契。如同两台齿轮咬合顺畅的机器，彼此知道对方的步调，协作起来事半功倍。';
               else if(rel.some(r=>r.includes('六冲'))) t='月柱六冲可能表现为生活方式或事业节奏的不合拍——一个快一个慢、一个激进一个保守。这需要双方在各自轨道上给对方留出弹性空间。';
               else t='月柱关系中等，生活节奏上需要一些磨合但不至于成为核心矛盾。';
-            }else if(i===2){ 
+            }else if(i===2){ // day pillar — most important
               if(rel.some(r=>r.includes('六合'))) t='日柱六合是合盘中最吉利的信号之一。夫妻宫相合意味着你们在性格深处是匹配的——那种无需多言就能彼此理解的默契。这是高质量长期关系最重要的基石。';
               else if(rel.some(r=>r.includes('三合'))) t='日柱三合同样是好兆头。三合在五行中形成最强能量场，你们在精神和志趣层面有强烈的共鸣。共同目标会让你们紧紧凝聚。';
               else if(rel.some(r=>r.includes('六冲'))) t='日柱六冲是合盘中需要重视的信号。性格深处存在根本性的张力——如同火水相遇，处理不好会互相消耗，但处理好了反而能产生惊人的化学反应。需要双方都有较高的情商和包容力。';
               else if(rel.some(r=>r.includes('相害'))) t='日柱相害，表面和谐下可能有暗流。相处时偶尔会有"说不清哪里不对但就是不舒服"的感觉。需要更深的自我觉察和坦诚沟通来化解。';
               else t='日柱无特殊冲合，性格上不存在天然的深度冲突或契合。关系质量更多取决于后天的经营。';
-            }else{ 
+            }else{ // hour pillar
               if(rel.some(r=>r.includes('六合'))) t='时柱六合意味着你们的内在灵魂能够共鸣。到了晚年或独处时，你们能真正放松地做自己——这是最长情的告白。';
               else if(rel.some(r=>r.includes('六冲'))) t='时柱六冲提醒你们关注内心的差异。可能在精神追求或人生终极目标上存在分歧。但这也可以是互补——一个仰望星空、一个脚踏实地。';
               else t='时柱关系平稳，在内在世界和长期发展上需要持续的沟通来保持同步。';
             }
-            
+            // Add element relation insight
             if(elemRel==='相生') t+=' 五行相生为吉，一方的能量自然滋养另一方，形成良性循环。';
             else if(elemRel==='相克') t+=' 五行相克需要双方有意识地调节——克不是坏事，如同金属需要火炼才能成器，关键在于把握好"度"。';
             return t;
@@ -2617,7 +2719,7 @@ function analyzeCompatibility(){
           const dm1Elem=TG_ELEMENT[bazi1.dayPillar.stemIdx],dm2Elem=TG_ELEMENT[bazi2.dayPillar.stemIdx];
           const ss1to2=SHI_SHEN_NAMES[SHI_SHEN_TABLE[bazi1.dayPillar.stemIdx][bazi2.dayPillar.stemIdx]];
           const ss2to1=SHI_SHEN_NAMES[SHI_SHEN_TABLE[bazi2.dayPillar.stemIdx][bazi1.dayPillar.stemIdx]];
-          
+          // Detailed element interaction
           let elemInsight='',roleInsight='',attractionInsight='';
           if(WX_GENERATE[dm1Elem]===dm2Elem){
             elemInsight=name1+'的'+dm1Elem+'性能量天然地滋养着'+name2+'的'+dm2Elem+'。如同树木生火——'+name1+'是那棵树，提供源源不断的温暖与支持；'+name2+'是那团火，在'+name1+'的滋养下燃烧得更加明亮。';
@@ -2635,7 +2737,7 @@ function analyzeCompatibility(){
             elemInsight='两人日主五行同为'+dm1Elem+'，这是一种极其难得的"同类相吸"。你们不需翻译就能听懂彼此——因为你们本质上是同一种能量频率的人。如同两面镜子对望，在对方身上看到自己的影子。';
             roleInsight='同气相求的伴侣最大的优势是理解，最大的挑战也是理解——因为太像了，彼此的缺点也被放大。保持欣赏、警惕投射，是你们关系的核心课题。';
           }
-          
+          // Shi Shen role interpretation
           const ssMap={
             '正官':'在'+name1+'眼中，'+name2+'是一个有原则、值得尊重的人。这份关系中带有责任感和约束力——不是激情四射的类型，而是细水长流的守护。',
             '七杀':'在'+name1+'眼中，'+name2+'有魄力、有挑战性。这份关系带着张力——可能是又爱又怕的复杂情感。学会将压力转化为动力是'+name1+'的课题。',
@@ -2692,19 +2794,19 @@ function analyzeCompatibility(){
       <div class="analysis-section">
         <h3>✦ 梅花易数 · 缘分卦详解</h3>
         ${(()=>{
-          
+          // Build a comprehensive Mei Hua interpretation for the relationship
           const hexName=meihua.original.name;
           const hexDetail=getHexDetail(hexName);
           const yc=getYaoCi(hexName,meihua.movingLine);
           const uElem=meihua.upperTrigram.element,lElem=meihua.lowerTrigram.element;
-          
+          // Full ti-yong with relationship context
           let tiYongFull='';
           if(lElem===uElem) tiYongFull='<strong>体用比和</strong>——两人气场天然契合，如同两棵并肩生长的树木，根系在地下交织而枝叶在空中各自舒展。你们不需要刻意改变自己去迎合对方，因为本质的振动频率已然一致。这种缘分最难得：彼此独立却又深度共鸣。';
           else if(WX_GENERATE[lElem]===uElem) tiYongFull='<strong>体生用</strong>——'+name1+'在关系中自然地付出滋养，如同春雨润物细无声。'+name1+'的真心不会白费，但需注意不要掏空自己。良好的关系需要双向流动，'+name2+'也需要学会看见并回应这份付出。';
           else if(WX_GENERATE[uElem]===lElem) tiYongFull='<strong>用生体</strong>——这段缘分自带福报，如同春风送暖，外部的因缘际会在推动你们靠近。'+name2+'的存在对'+name1+'而言是一种滋养和助力。你们的关系有"天赐良缘"的底色，好好珍惜。';
           else if(WX_OVERCOME[lElem]===uElem) tiYongFull='<strong>体克用</strong>——'+name1+'在这段关系中有较强的主导力，可以引导关系走向。但"克"需智慧：刚极则折，以柔克刚方为长久之道。'+name1+'需要觉察自己的控制欲，给对方呼吸的空间。';
           else tiYongFull='<strong>用克体</strong>——外部环境或现实因素对这段关系形成一定压力。但这不意味着缘分不好——钻石需要高压才能形成。两人若能共同面对外在挑战而非互相指责，关系反将在磨砺中更加坚固。';
-          
+          // Relationship-specific interpretation based on hexagram
           const relInterpret=(()=>{
             const n=hexName;
             if(n.includes('咸')) return '咸卦为"感应"之卦，正是男女情缘的本卦。卦象显示你们之间有真实的吸引力——不是理性的计算，而是本能的共鸣。此卦鼓励你们以真诚之心回应对方的感受。';
@@ -2719,7 +2821,7 @@ function analyzeCompatibility(){
             if(n.includes('中孚')) return '中孚卦为诚信之象。风吹泽上，真诚无欺。这段关系最需要的品质是"信"——对自己诚实，对对方坦诚。信及豚鱼，至诚可以感天动地。';
             return '此卦象已明示缘分之机。请细细品读卦辞爻辞——每一句古语中都藏着对你们关系的启示。天地不言而四时行焉，答案已在卦中。';
           })();
-          
+          // Changed hexagram interpretation
           let changedInterpret='';
           if(meihua.changed&&meihua.changed!==meihua.original){
             const cn=meihua.changed.name;
@@ -2894,6 +2996,11 @@ function loadDailyFortune(){
   },150);
 }
 
+// ============================================================
+// SECTION 10: ANIMATIONS & PARTICLES
+// ============================================================
+
+// Question domain analyzer & tailored advice engine
 function analyzeQuestionDomain(question){
   const q=question.toLowerCase();
   const domains=[
@@ -2913,7 +3020,7 @@ function analyzeQuestionDomain(question){
 }
 
 function getDomainAdvice(domain, tiYongRel, hexName, question){
-  
+  // tiYongRel: 'bihe'|'yong-sheng-ti'|'ti-sheng-yong'|'yong-ke-ti'|'ti-ke-yong'
   const adviceBank={
     '感情姻缘':{
       'bihe':[
@@ -3003,20 +3110,20 @@ function getDomainAdvice(domain, tiYongRel, hexName, question){
 
   const forDomain=adviceBank[domain]||adviceBank['综合运势'];
   const advices=forDomain[tiYongRel]||forDomain['bihe'];
-  
+  // Pick based on hex name hash for consistency
   const hexHash=(hexName||'').split('').reduce((a,c)=>a+c.charCodeAt(0),0);
   const idx=hexHash%advices.length;
   return advices[idx];
 }
 
 function getTiYongRel(upperTrigram,lowerTrigram){
-  
+  // 体卦(lower)=问事之人, 用卦(upper)=所问之事
   const uElem=upperTrigram.element,lElem=lowerTrigram.element;
-  if(lElem===uElem) return 'bihe';                       
-  if(WX_GENERATE[lElem]===uElem) return 'ti-sheng-yong'; 
-  if(WX_GENERATE[uElem]===lElem) return 'yong-sheng-ti'; 
-  if(WX_OVERCOME[lElem]===uElem) return 'ti-ke-yong';    
-  return 'yong-ke-ti';                                    
+  if(lElem===uElem) return 'bihe';                       // 体用比和
+  if(WX_GENERATE[lElem]===uElem) return 'ti-sheng-yong'; // 体生用: 你生事, 需付出
+  if(WX_GENERATE[uElem]===lElem) return 'yong-sheng-ti'; // 用生体: 事生你, 大吉
+  if(WX_OVERCOME[lElem]===uElem) return 'ti-ke-yong';    // 体克用: 你克事, 可驾驭
+  return 'yong-ke-ti';                                    // 用克体: 事克你, 有阻力
 }
 
 function askMeiHua(){
@@ -3033,6 +3140,7 @@ function askMeiHua(){
   const tiYongRel=getTiYongRel(result.upperTrigram,result.lowerTrigram);
   const domainAdvice=getDomainAdvice(questionDomain,tiYongRel,hex?hex.name:'',question);
 
+  // Build line display
   function buildLines(upperIdx,lowerIdx,movingLine){
     const upperBin=upperIdx.toString(2).padStart(3,'0');
     const lowerBin=lowerIdx.toString(2).padStart(3,'0');
@@ -3048,14 +3156,16 @@ function askMeiHua(){
     return html;
   }
 
+  // Get yao ci for the moving line
   const yaoCi=getYaoCi(hex?hex.name:'',ml);
   const changedYaoCi=changed&&changed!==hex?getYaoCi(changed.name,ml):'';
 
+  // Detailed hexagram description — generate rich interpretation
   function buildHexDesc(h){
     if(!h) return '卦象已成，静心体悟其中玄机。';
     const trigs=h.name;
     let desc=h.judgment||'';
-    
+    // Add element analysis for the hexagram
     const uElem=EIGHT_TRIGRAMS[h.upper]?EIGHT_TRIGRAMS[h.upper].element:'';
     const lElem=EIGHT_TRIGRAMS[h.lower]?EIGHT_TRIGRAMS[h.lower].element:'';
     if(uElem&&lElem&&uElem!==lElem){
@@ -3067,21 +3177,22 @@ function askMeiHua(){
     return desc;
   }
 
+  // Build answer from hexagram data + ti-yong + domain
   function buildAnswer(h,question,domain,rel,upperTrigram,lowerTrigram){
     if(!h) return '卦象已显，请静心体悟。';
     const detail=getHexDetail(h.name);const judgment=h.judgment||'';
     const q=question.trim();
-    
+    // Detect if this is a binary choice question
     const hasOr=/还是/.test(q)||/\sor\s/i.test(q);
     const hasChoice=/选哪个|二选一|怎么选|该不该|要不要|能不能|哪个好|哪个更/.test(q);
     const parts=hasOr?q.split(/还是/):[];
     const optA=parts.length>1?parts[0].trim():'';
     const optB=parts.length>1?parts[1].trim():'';
     const isChoice=hasOr||hasChoice;
-    
+    // Build answer specific to question type
     let html='';
     if(isChoice&&optA&&optB){
-      
+      // Binary choice: directly assess both options
       const leansA=rel==='yong-sheng-ti'||rel==='bihe';
       const leansB=rel==='ti-ke-yong';
       const needsMore=rel==='ti-sheng-yong'||rel==='yong-ke-ti';
@@ -3095,13 +3206,13 @@ function askMeiHua(){
       html+=`</p>`;
       html+=`<p style="line-height:2.1;margin-bottom:14px">具体到这两人——${optA}和${optB}：卦象的提示是不要用"谁更好"的框架去比较，而是问自己"和谁在一起时我更像我自己"。${h.name}的卦义是：${judgment}</p>`;
     }else if(isChoice){
-      
+      // Generic choice question
       html+=`<p style="line-height:2.1;margin-bottom:14px">你问「${q}」。卦得<strong>${h.name}</strong>。${detail}</p>`;
       const choiceAdvice={'yong-sheng-ti':'机会正向你靠近，答案呼之欲出——选那个让你心跳加速的。','bihe':'两个方向其实都走得通。但卦象提示：选那条让你不需要伪装自己的路。','ti-sheng-yong':'无论选哪个都需要你付出，但一条是顺水推舟，一条是逆水行舟。选阻力小的那条先走。','yong-ke-ti':'当前不是做决定的最佳时机。如果可以不选，就先放一放。如果必须选，选那个即使错了也代价较小的。','ti-ke-yong':'你有能力驾驭任何选择。但卦象说：选那个能让你全力以赴而不是患得患失的。'};
       html+=`<p style="line-height:2.1;margin-bottom:14px">面对这个选择，卦象的建议很明确：${choiceAdvice[rel]||choiceAdvice['bihe']}</p>`;
       html+=`<p style="line-height:2.1;margin-bottom:14px">${h.name}的卦义是：${judgment}</p>`;
     }else{
-      
+      // Regular question — directly address it
       html+=`<p style="line-height:2.1;margin-bottom:14px">你问「${q}」。卦得<strong>${h.name}</strong>。${detail}</p>`;
       const relExplain={
         'bihe':`体用比和——对于你问的这件事，卦象说：你本身的状态和这件事需要的状态是一致的。不需要改变自己，以你现在的样子去面对，就是最对的方式。`,
@@ -3121,10 +3232,13 @@ function askMeiHua(){
   const answerText=buildAnswer(hex,question,questionDomain,tiYongRel,result.upperTrigram,result.lowerTrigram);
   const changedAnswer=changed&&changed!==hex?buildAnswer(changed,question,questionDomain,tiYongRel,result.upperTrigram,result.lowerTrigram):'';
 
+  // Mutual hexagram insight
   const mutualInsight=mutual?`互卦「${mutual.name}」揭示事物发展的中间过程。${mutual.judgment||''} 互卦为过程之象，看${mutual.name}之义，可知事件演进中的关键转折。`:'';
 
+  // Inverse hexagram insight
   const inverseInsight=inv&&inv!==hex?`综卦「${inv.name}」为换个角度看同一问题。将本卦上下颠倒，${inv.judgment||''} 若从对方或相反角度审视此事，或有不同领悟。`:'';
 
+  // Complement hexagram insight
   const compInsight=comp&&comp!==hex?`错卦「${comp.name}」揭示事物的反面或隐藏面。${comp.judgment||''} 提醒你注意那些被忽略的可能性与暗中的变数。`:'';
 
   const resultHTML=`
@@ -3247,11 +3361,11 @@ function askMeiHua(){
           ${(()=>{
             const uElem=result.upperTrigram.element,lElem=result.lowerTrigram.element;
             let guide='';
-            
+            // Header with question context
             guide+='<div style="margin-bottom:16px;display:flex;align-items:center;gap:8px"><span style="font-size:1.2rem">🎯</span><span style="font-weight:700;color:var(--red);font-size:1rem">针对「'+question+'」</span><span class="tag" style="font-size:0.78rem">'+questionDomain+'</span></div>';
-            
+            // Domain-specific tailored advice
             guide+='<div style="padding:14px;background:rgba(255,255,255,0.6);border-radius:var(--radius-sm);margin-bottom:16px;border-left:3px solid var(--gold)"><p style="font-weight:700;color:var(--gold-dark);margin-bottom:6px;font-size:0.9rem">💬 卦象回覆</p><p style="line-height:2;font-size:0.95rem">'+domainAdvice+'</p></div>';
-            
+            // Strategy
             const strategyMap={
               'bihe':{label:'体用比和 · 顺势而为',desc:'形势对你有益。建议<strong>保持当前节奏</strong>，以平常心稳步推进。可以主动出击但不必冒进——当前状态本身就是最好的状态，自然为之即可。'},
               'yong-sheng-ti':{label:'用生体 · 大吉',desc:'宜<strong>积极主动</strong>把握机遇，犹豫就会错过。但好运需要智慧和谦逊来守护——在行动中保持清醒，不可得意忘形。'},
@@ -3262,7 +3376,7 @@ function askMeiHua(){
             const s=strategyMap[tiYongRel]||strategyMap['bihe'];
             guide+='<p style="font-weight:700;color:var(--gold-dark);margin-bottom:6px;margin-top:12px">📋 总体策略 · '+s.label+'</p>';
             guide+='<p style="line-height:2;margin-bottom:12px">'+s.desc+'</p>';
-            
+            // Timing
             const seasonMap={木:'春',火:'夏',金:'秋',水:'冬',土:'四季之末'};
             guide+='<p style="font-weight:700;color:var(--gold-dark);margin-bottom:6px;margin-top:12px">⏰ 最佳时机</p>';
             guide+=`<p style="line-height:2">体卦属<strong>${lElem}</strong>，旺于<strong>${seasonMap[lElem]}季</strong>，届时行事最为有利。动爻在第${ml}爻，${ml<=2?'短则一周内可见端倪，宜密切关注变化。':ml<=4?'约需1至3个月见分晓，保持耐心和信心。':ml<=5?'可能需要半年以上时间，做好长期投入的准备。':'事情已近转折点——近期密切关注变化的信号，随时准备调整策略。'}</p>`;
@@ -3284,6 +3398,8 @@ function askMeiHua(){
   saveHistory('meihua',question.substring(0,40));
   renderHistory();
 }
+
+// ============================================================
 
 function handleScrollReveal(){
   document.querySelectorAll('.reveal').forEach(el=>{
@@ -3332,6 +3448,10 @@ function initParticles(){
   animate();
 }
 
+// ============================================================
+// SECTION 11: INITIALIZATION
+// ============================================================
+
 function renderProfileList(){
   const container=document.getElementById('profile-list-container');
   if(!container) return;
@@ -3362,7 +3482,7 @@ function saveHistory(type,data){
   try{
     const history=JSON.parse(localStorage.getItem('cyberTaoistHistory')||'[]');
     history.unshift({type,data,time:new Date().toISOString()});
-    if(history.length>20) history.pop(); 
+    if(history.length>20) history.pop(); // keep last 20
     localStorage.setItem('cyberTaoistHistory',JSON.stringify(history));
   }catch(e){}
 }
@@ -3396,7 +3516,7 @@ window.loadHistoryItem=function(type,data){
 
 function init(){
   initHourSelects();initDates();updateProfileSelect();renderProfileList();renderHistory();
-  
+  // Init autocomplete for all city inputs
   initAutocomplete('bazi-city','ac-dd-bazi','bazi-lng');
   initAutocomplete('compat-city1','ac-dd-compat1','compat1-lng');
   initAutocomplete('compat-city2','ac-dd-compat2','compat2-lng');
@@ -3412,13 +3532,14 @@ function init(){
   if(profiles.length>0){
     const sel=document.getElementById('daily-profile');
     if(sel) sel.value=profiles[profiles.length-1].id;
-    
+    // Auto-load daily fortune if on daily tab
     if(document.getElementById('page-daily')?.classList.contains('active')) loadDailyFortune();
   }
 }
 
 document.addEventListener('DOMContentLoaded',init);
 
+// Auto version check — fire-and-forget, never blocks page
 (function(){
   setTimeout(function(){
     try{
@@ -3439,9 +3560,9 @@ document.addEventListener('DOMContentLoaded',init);
           localStorage.setItem('cyberTaoistLastMod',lm);
         }).catch(function(){});
     }catch(e){}
-  },5000); 
+  },5000); // Wait 5s after page load before checking
 })();
-
+// Add slideDown animation (safe)
 try{var s=document.createElement('style');s.textContent='@keyframes slideDown{from{transform:translateY(-100%)}to{transform:translateY(0)}}';document.head.appendChild(s);}catch(e){}
 </script>
 </body>

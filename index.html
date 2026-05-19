@@ -2111,7 +2111,7 @@ function copyShareLink(){
 // SECTION 8.1: PROFILE MANAGEMENT
 // ============================================================
 
-function getProfiles(){try{const d=localStorage.getItem('cyberTaoistProfiles');if(!d)return[];const p=JSON.parse(d);if(!Array.isArray(p))return[];return p.map(x=>{if(x&&x.bazi){x.bazi=repairBazi(x.bazi);}return x;});}catch(e){return[]}}
+function getProfiles(){try{const d=localStorage.getItem('cyberTaoistProfiles');if(!d)return[];const p=JSON.parse(d);if(!Array.isArray(p))return[];return p.map(x=>{if(!x)return null;if(!x.bazi||!x.bazi.dayPillar||!x.bazi.dayPillar.stem){x.bazi=repairBazi(x.bazi||{});x.v=1;}return x;}).filter(Boolean);}catch(e){return[]}}
 function saveProfile(name,gender,date,clockHourBranch,longitude){
   const profiles=getProfiles();
   const lng=longitude||120;

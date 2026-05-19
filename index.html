@@ -2113,7 +2113,7 @@ function copyShareLink(){
 // SECTION 8.1: PROFILE MANAGEMENT
 // ============================================================
 
-function getProfiles(){try{return JSON.parse(localStorage.getItem('cyberTaoistProfiles')||'[]')}catch(e){return[]}}
+function getProfiles(){try{const d=localStorage.getItem('cyberTaoistProfiles');if(!d)return[];const p=JSON.parse(d);if(!Array.isArray(p))return[];return p.map(x=>{if(x&&x.bazi){x.bazi=repairBazi(x.bazi);}return x;});}catch(e){return[]}}
 function saveProfile(name,gender,date,clockHourBranch,longitude){
   const profiles=getProfiles();
   const lng=longitude||120;
@@ -2930,16 +2930,17 @@ function analyzeCompatibility(){
 }
 
 function loadDailyFortune(){
+  try{
   const sel=document.getElementById('daily-profile');
+  if(!sel) return;
   const profileId=sel.value;
   if(!profileId){
     document.getElementById('daily-result').innerHTML='<p style="text-align:center;color:var(--text-dim);padding:40px">请选择已保存的档案，或在八字命盘页面创建新档案 ✨</p>';
-    document.getElementById('daily-detail').innerHTML='';
     return;
   }
   const profiles=getProfiles();
   const profile=profiles.find(p=>p.id===parseInt(profileId));
-  if(!profile) return;
+  if(!profile||!profile.bazi) return;
   const fortune=generateDailyFortune(profile.bazi);
   const today=new Date();
 
@@ -3009,6 +3010,7 @@ function loadDailyFortune(){
       if(rect.top<window.innerHeight-100) el.classList.add('visible');
     });
   },150);
+  }catch(e){}
 }
 
 // ============================================================

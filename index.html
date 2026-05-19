@@ -2289,6 +2289,7 @@ function analyzeBazi(){
   if(!date){showToast('请选择出生日期');return;}
   showLoading('bazi-result');
   setTimeout(()=>{
+  try{
   const [y,m,d]=date.split('-').map(Number);
   // Calculate True Solar Time
   const clockHour=(clockHourBranch===0?0:clockHourBranch*2-1+1); // midpoint of 时辰
@@ -2348,7 +2349,11 @@ function analyzeBazi(){
         <p style="line-height:2.1;font-size:0.98rem;color:var(--text);margin-bottom:12px">${personality.coreTraits}</p>
         <p style="color:var(--text-dim);line-height:2;font-size:0.93rem;margin-bottom:8px">${personality.summary}</p>
         <p style="color:var(--text-dim);line-height:2;font-size:0.9rem">
-          日主${analysis.dayMaster.stem}坐${analysis.dayMaster.animal}，${analysis.dayMaster.yinyang}性${analysis.dayMaster.element}干。${analysis.dayMaster.element==='木'?'木主仁，其性直，其情和。如春风吹拂，有生长养育之德。':analysis.dayMaster.element==='火'?'火主礼，其性急，其情恭。如夏日骄阳，有光明磊落之德。':analysis.dayMaster.element==='土'?'土主信，其性重，其情厚。如大地承载，有诚信敦厚之德。':analysis.dayMaster.element==='金'?'金主义，其性刚，其情烈。如秋霜肃杀，有刚毅果决之德。':'水主智，其性聪，其情善。如冬雪润物，有智慧灵动之德。'}命局中五行之气以${analysis.strongestElement}最旺、${analysis.weakestElement}最弱，月令${analysis.season}当权。${personality.strength==='身强'?'身强者有充沛的能量表达自我、影响环境，是天生的行动者和领导者。其挑战在于学会收敛和倾听。':personality.strength==='身弱'?'身弱者心思更为细腻敏锐，善于观察和思考。其优势在于灵活和内省，但需要在外部世界中找到可以依靠的支撑点。':'中和者刚柔并济，能进能退。这是最为理想的能量状态——既有行动力也有反思力，既有主见也能变通。'}
+          ${(()=>{
+            const elemVirtue={木:'木主仁，其性直，其情和。如春风吹拂，有生长养育之德。',火:'火主礼，其性急，其情恭。如夏日骄阳，有光明磊落之德。',土:'土主信，其性重，其情厚。如大地承载，有诚信敦厚之德。',金:'金主义，其性刚，其情烈。如秋霜肃杀，有刚毅果决之德。',水:'水主智，其性聪，其情善。如冬雪润物，有智慧灵动之德。'};
+            const strengthNote={身强:'身强者有充沛的能量表达自我、影响环境，是天生的行动者和领导者。其挑战在于学会收敛和倾听。',身弱:'身弱者心思更为细腻敏锐，善于观察和思考。其优势在于灵活和内省，但需要在外部世界中找到可以依靠的支撑点。',中和:'中和者刚柔并济，能进能退。这是最为理想的能量状态——既有行动力也有反思力，既有主见也能变通。'};
+            return '日主'+analysis.dayMaster.stem+'坐'+analysis.dayMaster.animal+'，'+analysis.dayMaster.yinyang+'性'+analysis.dayMaster.element+'干。'+(elemVirtue[analysis.dayMaster.element]||'')+'命局中五行之气以'+analysis.strongestElement+'最旺、'+analysis.weakestElement+'最弱，月令'+analysis.season+'当权。'+(strengthNote[personality.strength]||'');
+          })()}
         </p>
       </div>
 
@@ -2543,6 +2548,9 @@ function analyzeBazi(){
   saveHistory('bazi',name+' · '+bazi.dayPillar.stem+bazi.dayPillar.branch+'日主');
   renderHistory();
   renderProfileList();
+  }catch(e){
+    document.getElementById('bazi-result').innerHTML='<div class="glass-card" style="text-align:center;padding:30px"><p style="color:var(--red)">计算出错，请重试</p><p style="color:var(--text-dim);font-size:0.82rem">建议刷新页面后重试。如持续出错，请删除旧档案重新保存。</p><p style="color:var(--text-dim);font-size:0.75rem;margin-top:8px">'+e.message+'</p></div>';
+  }
   },50);
 }
 
@@ -3119,6 +3127,7 @@ function askMeiHua(){
   if(!n1||!n2||n1<1||n2<1){showToast('请输入两个1-999之间的数字');return;}
   showLoading('meihua-result');
   setTimeout(()=>{
+  try{
   const result=meiHuaYiShu(n1,n2,n1+n2);
   const hex=result.original,mutual=result.mutual,changed=result.changed;
   const inv=result.inverse,comp=result.complement;
@@ -3384,6 +3393,9 @@ function askMeiHua(){
   document.getElementById('meihua-result').scrollIntoView({behavior:'smooth',block:'start'});
   saveHistory('meihua',question.substring(0,40));
   renderHistory();
+  }catch(e){
+    document.getElementById('meihua-result').innerHTML='<div class="glass-card" style="text-align:center;padding:30px"><p style="color:var(--red)">计算出错，请重试</p><p style="color:var(--text-dim);font-size:0.75rem">'+e.message+'</p></div>';
+  }
   },50);
 }
 

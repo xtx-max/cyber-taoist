@@ -10,7 +10,6 @@
 <meta name="theme-color" content="#fef9f0">
 <meta name="description" content="赛博天师 · Cyber Taoist — 生辰八字分析、梅花易数占卜、每日运势、合盘缘分">
 <title>赛博天师 · Cyber Taoist</title>
-<meta http-equiv="Cache-Control" content="no-cache">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' style='stop-color:%23c41e3a'/><stop offset='100%25' style='stop-color:%23c9a84c'/></linearGradient></defs><circle cx='32' cy='32' r='30' fill='none' stroke='url(%23g)' stroke-width='2'/><circle cx='32' cy='32' r='28' fill='none' stroke='%23c9a84c' stroke-width='0.5' stroke-dasharray='8 4' opacity='0.5'/><path d='M32 2 A30 30 0 0 1 32 62 A15 15 0 0 0 32 32 A15 15 0 0 1 32 2Z' fill='%23c41e3a' opacity='0.8'/><circle cx='32' cy='17' r='3' fill='%23c9a84c'/><path d='M32 62 A30 30 0 0 1 32 2 A15 15 0 0 0 32 32 A15 15 0 0 1 32 62Z' fill='%23c9a84c' opacity='0.8'/><circle cx='32' cy='47' r='3' fill='%23c41e3a'/><rect x='14' y='28' width='4' height='2' fill='%23c9a84c' opacity='0.6'/><rect x='46' y='34' width='4' height='2' fill='%23c9a84c' opacity='0.6'/><rect x='28' y='8' width='2' height='4' fill='%23c9a84c' opacity='0.6'/><rect x='34' y='52' width='2' height='4' fill='%23c9a84c' opacity='0.6'/></svg>">
 <style>body{font-family:'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif}</style>
 <style>
@@ -3562,10 +3561,8 @@ document.addEventListener('DOMContentLoaded',init);
     }catch(e){}
   },5000); // Wait 5s after page load before checking
 })();
-// Add slideDown animation
-const style=document.createElement('style');
-style.textContent='@keyframes slideDown{from{transform:translateY(-100%)}to{transform:translateY(0)}}';
-document.head.appendChild(style);
+// Add slideDown animation (safe)
+try{var s=document.createElement('style');s.textContent='@keyframes slideDown{from{transform:translateY(-100%)}to{transform:translateY(0)}}';document.head.appendChild(s);}catch(e){}
 </script>
 </body>
 </html>

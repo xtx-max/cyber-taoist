@@ -1545,7 +1545,8 @@ function analyzePersonality(bazi,analysis){
 
   // 1. Day Master Core Personality
   const dmEntry=DM_PERSONALITY[dmStem];
-  const dmData=dmEntry?.(dmEntry[strength]?strength:(dmEntry.strong?'strong':'weak'))||(dmEntry?dmEntry.strong:null);
+  const dmKey=dmEntry&&dmEntry[strength]?strength:(dmEntry&&dmEntry.strong?'strong':'weak');
+  const dmData=dmEntry?dmEntry[dmKey]:null;
   let coreTraits='',coreStrengths='',coreWeaknesses='',coreCareer='',coreRelationship='';
   if(dmData){
     coreTraits=dmData.traits+(strength==='balanced'?' 你的日主五行中和，刚柔并济，能根据不同情境灵活调整自己的姿态。这是最为平衡的状态。':'');

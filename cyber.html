@@ -2566,7 +2566,7 @@ function analyzeBazi(){
   saveHistory('bazi',name+' · '+bazi.dayPillar.stem+bazi.dayPillar.branch+'日主');
   renderHistory();
   renderProfileList();
-  }catch(e){document.getElementById('bazi-result').innerHTML='<div class="glass-card" style="text-align:center;padding:30px"><p style="color:var(--red)">计算出错</p><p style="font-size:0.8rem;color:var(--text-dim)">'+e.message+'</p><p style="font-size:0.65rem;color:var(--text-dim);word-break:break-all">'+(e.stack||'').substring(0,300)+'</p></div>';}
+  }catch(e){var msg=e.message||'未知错误';document.getElementById('bazi-result').innerHTML='<div class="glass-card" style="text-align:center;padding:30px"><p style="color:var(--red)">计算出错</p><p>'+msg+'</p></div>';}
 }
 
 function analyzeCompatibility(){

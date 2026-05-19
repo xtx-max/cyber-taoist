@@ -2111,7 +2111,7 @@ function copyShareLink(){
 // SECTION 8.1: PROFILE MANAGEMENT
 // ============================================================
 
-function getProfiles(){try{const d=localStorage.getItem('cyberTaoistProfiles');if(!d)return[];const p=JSON.parse(d);if(!Array.isArray(p))return[];return p.map(x=>{if(x&&x.bazi){x.bazi=repairBazi(x.bazi);}return x;});}catch(e){return[]}}
+function getProfiles(){try{const d=localStorage.getItem('cyberTaoistProfiles');if(!d)return[];const p=JSON.parse(d);if(!Array.isArray(p))return[];return p.map(x=>{if(!x)return null;if(!x.bazi||!x.bazi.dayPillar||!x.bazi.dayPillar.stem){x.bazi=repairBazi(x.bazi||{});x.v=1;}return x;}).filter(Boolean);}catch(e){return[]}}
 function saveProfile(name,gender,date,clockHourBranch,longitude){
   const profiles=getProfiles();
   const lng=longitude||120;
@@ -2307,8 +2307,6 @@ function analyzeBazi(){
   const longitude=parseFloat(document.getElementById('bazi-lng').value)||120;
   if(!date){showToast('请选择出生日期');return;}
   showLoading('bazi-result');
-  setTimeout(()=>{
-  try{
   const [y,m,d]=date.split('-').map(Number);
   // Calculate True Solar Time
   const clockHour=(clockHourBranch===0?0:clockHourBranch*2-1+1); // midpoint of 时辰
@@ -2567,10 +2565,6 @@ function analyzeBazi(){
   saveHistory('bazi',name+' · '+bazi.dayPillar.stem+bazi.dayPillar.branch+'日主');
   renderHistory();
   renderProfileList();
-  }catch(e){
-    document.getElementById('bazi-result').innerHTML='<div class="glass-card" style="text-align:center;padding:30px"><p style="color:var(--red)">计算出错，请重试</p><p style="color:var(--text-dim);font-size:0.82rem">建议刷新页面后重试。如持续出错，请删除旧档案重新保存。</p><p style="color:var(--text-dim);font-size:0.75rem;margin-top:8px">'+e.message+'</p></div>';
-  }
-  },50);
 }
 
 function analyzeCompatibility(){
@@ -2584,9 +2578,6 @@ function analyzeCompatibility(){
   let lng2=parseFloat(document.getElementById('compat2-lng').value)||120;
   if(!date1||!date2){showToast('请填写双方的出生日期');return;}
   showLoading('compat-result');
-  setProgress('compat-result',10,'八字排盘中');
-  setTimeout(()=>{
-  try{
   // Check if both profiles are loaded from saved data — use saved bazi directly
   const pid1=parseInt(document.getElementById('compat-profile1').value);
   const pid2=parseInt(document.getElementById('compat-profile2').value);
@@ -2921,14 +2912,9 @@ function analyzeCompatibility(){
     document.getElementById('compat-result').scrollIntoView({behavior:'smooth',block:'start'});
     saveHistory('bazi',name1+'❤'+name2+' 合盘'+compat.score+'分');
     renderHistory();
-  }catch(e){
-    document.getElementById('compat-result').innerHTML='<div class="glass-card" style="text-align:center;padding:30px"><p style="color:var(--red)">计算出错，请重试</p><p style="color:var(--text-dim);font-size:0.82rem">建议：① 点页面底部「🔄 刷新」后重试 ② 检查两人档案是否完整（需包含出生日期+时辰+经度）③ 如持续出错，删除旧档案后重新保存</p><p style="color:var(--text-dim);font-size:0.75rem;margin-top:8px">错误：'+e.message+'</p></div>';
-  }
-  },30);
 }
 
 function loadDailyFortune(){
-  try{
   const sel=document.getElementById('daily-profile');
   if(!sel) return;
   const profileId=sel.value;
@@ -3008,7 +2994,6 @@ function loadDailyFortune(){
       if(rect.top<window.innerHeight-100) el.classList.add('visible');
     });
   },150);
-  }catch(e){}
 }
 
 // ============================================================
@@ -3147,8 +3132,6 @@ function askMeiHua(){
   const n2=parseInt(document.getElementById('meihua-num2').value);
   if(!n1||!n2||n1<1||n2<1){showToast('请输入两个1-999之间的数字');return;}
   showLoading('meihua-result');
-  setTimeout(()=>{
-  try{
   const result=meiHuaYiShu(n1,n2,n1+n2);
   const hex=result.original,mutual=result.mutual,changed=result.changed;
   const inv=result.inverse,comp=result.complement;
@@ -3414,10 +3397,6 @@ function askMeiHua(){
   document.getElementById('meihua-result').scrollIntoView({behavior:'smooth',block:'start'});
   saveHistory('meihua',question.substring(0,40));
   renderHistory();
-  }catch(e){
-    document.getElementById('meihua-result').innerHTML='<div class="glass-card" style="text-align:center;padding:30px"><p style="color:var(--red)">计算出错，请重试</p><p style="color:var(--text-dim);font-size:0.75rem">'+e.message+'</p></div>';
-  }
-  },50);
 }
 
 // ============================================================

@@ -869,7 +869,7 @@ const CITY_LNG = [
   // === 欧洲 ===
   {city:'伦敦',lng:-0.1},{city:'巴黎',lng:2.3},{city:'柏林',lng:13.4},{city:'罗马',lng:12.5},
   {city:'马德里',lng:-3.7},{city:'莫斯科',lng:37.6},{city:'阿姆斯特丹',lng:4.9},{city:'苏黎世',lng:8.5},
-  {city:'维也纳',lng:16.4},{city:'布拉格',lng:14.4},{city:'巴塞罗那',lng:2.2},{city:'米兰',lng:9.2},
+  {city:'维也纳',lng:16.4},{city:'布拉格',lng:14.4},{city:'巴塞罗那',lng:2.2},{city:'米兰',lng:9.2},{city:'巴勒莫',lng:13.4},{city:'佛罗伦萨',lng:11.3},{city:'那不勒斯',lng:14.3},{city:'威尼斯',lng:12.3},
   {city:'慕尼黑',lng:11.6},{city:'里斯本',lng:-9.1},{city:'雅典',lng:23.7},{city:'都柏林',lng:-6.3},
   {city:'斯德哥尔摩',lng:18.1},{city:'赫尔辛基',lng:24.9},{city:'华沙',lng:21.0},{city:'布达佩斯',lng:19.0},
   // === 北美 ===
@@ -886,16 +886,16 @@ const CITY_LNG = [
 ];
 
 // Calculate True Solar Time correction
-// China standard time = UTC+8 (120°E meridian)
-// True Solar Time offset = (longitude - 120) × 4 minutes
+// Uses local timezone meridian (nearest 15° multiple) as reference
+// True Solar Time = Local Clock Time + (longitude - timezoneMeridian) × 4 minutes
 function getTrueSolarOffset(longitude){
-  return (longitude - 120) * 4; // in minutes
+  const timezoneMeridian = Math.round(longitude / 15) * 15;
+  return (longitude - timezoneMeridian) * 4; // in minutes
 }
 
 // Apply True Solar Time correction to birth hour and determine adjusted time
 function applyTrueSolarTime(birthHour, birthMinute, longitude){
   const offsetMin = getTrueSolarOffset(longitude);
-  let totalMin = birthHour * 60 + birthMinute + offsetMin;
   // Keep within 0-1440 range (one day)
   totalMin = ((totalMin % 1440) + 1440) % 1440;
   const adjHour = Math.floor(totalMin / 60);
@@ -1888,22 +1888,22 @@ function getYingQi(movingLine, upperTrigram, lowerTrigram){
 function computeCompatibility(bazi1,bazi2){
   let score=100;const highlights=[],cautions=[];
   const yearRel=checkRelationship(bazi1.yearPillar.branchIdx,bazi2.yearPillar.branchIdx);
-  if(yearRel.includes('六冲')){score-=8;cautions.push('年柱六冲：根基有较大差异，需在核心价值观上多加磨合');}
-  else if(yearRel.includes('六合')){score+=8;highlights.push('年柱六合：根基相融，在家庭观和人生方向上容易达成一致');}
+  if(yearRel.includes('六冲')){score-=12;cautions.push('年柱六冲：根基有较大差异，需在核心价值观上多加磨合');}
+  else if(yearRel.includes('六合')){score+=7;highlights.push('年柱六合：根基相融，在家庭观和人生方向上容易达成一致');}
   else if(yearRel.includes('三合')){score+=5;highlights.push('年柱三合：气场相吸，彼此的家庭背景能够互相接纳');}
-  else if(yearRel.includes('相害')){score-=5;cautions.push('年柱相害：家族背景层面有隐性摩擦，宜保持独立空间');}
+  else if(yearRel.includes('相害')){score-=7;cautions.push('年柱相害：家族背景层面有隐性摩擦，宜保持独立空间');}
   const dayRel=checkRelationship(bazi1.dayPillar.branchIdx,bazi2.dayPillar.branchIdx);
-  if(dayRel.includes('六冲')){score-=15;cautions.push('日柱六冲：性格深处存在张力，需以爱和耐心化解日常冲突');}
-  else if(dayRel.includes('六合')){score+=12;highlights.push('日柱六合：心思相投，彼此能在无声中懂得对方');}
-  else if(dayRel.includes('三合')){score+=8;highlights.push('日柱三合：志趣相合，共同的目标让彼此紧密相连');}
-  else if(dayRel.includes('相害')){score-=8;cautions.push('日柱相害：相处时或有说不清的隔阂，需深度沟通化解');}
-  else if(dayRel.includes('相刑')){score-=6;cautions.push('日柱相刑：性格中有互相摩擦的棱角，需要智慧和耐心');}
+  if(dayRel.includes('六冲')){score-=22;cautions.push('日柱六冲：性格深处存在张力，需以爱和耐心化解日常冲突');}
+  else if(dayRel.includes('六合')){score+=10;highlights.push('日柱六合：心思相投，彼此能在无声中懂得对方');}
+  else if(dayRel.includes('三合')){score+=7;highlights.push('日柱三合：志趣相合，共同的目标让彼此紧密相连');}
+  else if(dayRel.includes('相害')){score-=12;cautions.push('日柱相害：相处时或有说不清的隔阂，需深度沟通化解');}
+  else if(dayRel.includes('相刑')){score-=9;cautions.push('日柱相刑：性格中有互相摩擦的棱角，需要智慧和耐心');}
   const dm1Elem=TG_ELEMENT[bazi1.dayPillar.stemIdx],dm2Elem=TG_ELEMENT[bazi2.dayPillar.stemIdx];
-  if(WX_GENERATE[dm1Elem]===dm2Elem||WX_GENERATE[dm2Elem]===dm1Elem){score+=11;highlights.push('日干相生：五行之气在你们之间自然流转，彼此滋养，如春风与万物');}
-  else if(WX_OVERCOME[dm1Elem]===dm2Elem||WX_OVERCOME[dm2Elem]===dm1Elem){score-=5;cautions.push('日干相克：五行之克是双向的张力，需要双方共同以柔克刚、互相包容');}
-  else if(dm1Elem===dm2Elem){score+=6;highlights.push('日干同气：你们是同类人，彼此理解和共鸣非常深刻');}
+  if(WX_GENERATE[dm1Elem]===dm2Elem||WX_GENERATE[dm2Elem]===dm1Elem){score+=8;highlights.push('日干相生：五行之气在你们之间自然流转，彼此滋养，如春风与万物');}
+  else if(WX_OVERCOME[dm1Elem]===dm2Elem||WX_OVERCOME[dm2Elem]===dm1Elem){score-=8;cautions.push('日干相克：五行之克是双向的张力，需要双方共同以柔克刚、互相包容');}
+  else if(dm1Elem===dm2Elem){score+=4;highlights.push('日干同气：你们是同类人，彼此理解和共鸣非常深刻');}
   const monthRel=checkRelationship(bazi1.monthPillar.branchIdx,bazi2.monthPillar.branchIdx);
-  if(monthRel.includes('六冲')){score-=5;cautions.push('月柱六冲：处事节奏时有碰撞，需协调双方的生活步调');}
+  if(monthRel.includes('六冲')){score-=8;cautions.push('月柱六冲：处事节奏时有碰撞，需协调双方的生活步调');}
   else if(monthRel.includes('六合')){score+=5;highlights.push('月柱六合：成长轨迹协调，在工作和生活上配合默契');}
   else if(monthRel.includes('三合')){score+=4;highlights.push('月柱三合：事业和生活节奏协同共振，合作无间');}
   // Hidden stem complement: check if one person's weak element is the other's strong
@@ -1912,9 +1912,9 @@ function computeCompatibility(bazi1,bazi2){
   const complement1=a1.weakestElement&&a2.strongestElement&&WX_GENERATE[a2.strongestElement]===a1.weakestElement;
   const complement2=a2.weakestElement&&a1.strongestElement&&WX_GENERATE[a1.strongestElement]===a2.weakestElement;
   if(complement1||complement2){
-    score+=8;highlights.push('五行深度互补：彼此的强势正好弥补对方的短板，形成完整闭环');
+    score+=7;highlights.push('五行深度互补：彼此的强势正好弥补对方的短板，形成完整闭环');
   }
-  score=Math.max(30,Math.min(100,score));
+  score=Math.max(20,Math.min(100,score));
   let tier,desc;
   if(score>=85){tier='天作之合';desc='你们的缘分如金风玉露相逢，五行互补，琴瑟和鸣。彼此是对方的镜子，也是对方的光。在生命的长河中，你们互相滋养、共同成长，是天造地设的一对佳偶。';}
   else if(score>=70){tier='佳偶良缘';desc='你们的缘分如春日溪流，清澈而温暖。虽然偶有礁石激起浪花，但整体和谐流畅。如同玉石相击发出的清脆声响——偶尔的碰撞反而让关系更加生动有趣。';}

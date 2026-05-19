@@ -1544,20 +1544,17 @@ function analyzePersonality(bazi,analysis){
   const strength=isStrong?'strong':(isWeak?'weak':'balanced');
 
   // 1. Day Master Core Personality
-  const dmData=DM_PERSONALITY[dmStem]?.[strength]||DM_PERSONALITY[dmStem]?.balanced;
+  const dmEntry=DM_PERSONALITY[dmStem];
+  const dmData=dmEntry?.(dmEntry[strength]?strength:(dmEntry.strong?'strong':'weak'))||(dmEntry?dmEntry.strong:null);
   let coreTraits='',coreStrengths='',coreWeaknesses='',coreCareer='',coreRelationship='';
   if(dmData){
-    coreTraits=dmData.traits;coreStrengths=dmData.strengths;
-    coreWeaknesses=dmData.weaknesses;coreCareer=dmData.career;
-    coreRelationship=dmData.relationship;
+    coreTraits=dmData.traits+(strength==='balanced'?' 你的日主五行中和，刚柔并济，能根据不同情境灵活调整自己的姿态。这是最为平衡的状态。':'');
+    coreStrengths=dmData.strengths;coreWeaknesses=dmData.weaknesses;
+    coreCareer=dmData.career;coreRelationship=dmData.relationship;
   } else {
-    // Fallback for balanced (use strong as base)
-    const fallback=DM_PERSONALITY[dmStem]?.strong;
-    if(fallback){
-      coreTraits=fallback.traits+' 你的日主强弱适中，性格中既有坚定的一面也有柔和的余地，能够根据环境灵活调整自己的姿态。';
-      coreStrengths=fallback.strengths;coreWeaknesses=fallback.weaknesses;
-      coreCareer=fallback.career;coreRelationship=fallback.relationship;
-    }
+    coreTraits='日主'+dmStem+'，属'+dmElem+'性。命局五行之气流转不息，塑造了独特的性格底色。';
+    coreStrengths='适应性良好';coreWeaknesses='视具体命局而定';
+    coreCareer='宜结合用神五行选择方向';coreRelationship='真诚待人，随缘而行';
   }
 
   // 2. Five Elements Character Balance
